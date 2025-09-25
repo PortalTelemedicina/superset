@@ -51,6 +51,7 @@ import {
   sortComparatorWithSearchHelper,
   sortSelectedFirstHelper,
   isEqual as utilsIsEqual,
+  translatePlaceholder,
 } from './utils';
 import { RawValue, SelectOptionsType, SelectProps } from './types';
 import {
@@ -760,7 +761,7 @@ const Select = forwardRef(
           onSearch={shouldShowSearch ? handleOnSearch : undefined}
           onSelect={handleOnSelect}
           onClear={handleClear}
-          placeholder={placeholder}
+          placeholder={translatePlaceholder(placeholder)}
           tokenSeparators={tokenSeparators}
           value={selectValue}
           virtual={

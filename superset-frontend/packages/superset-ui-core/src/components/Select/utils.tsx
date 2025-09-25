@@ -233,10 +233,10 @@ export const mapValues = (
 ): (Record<string, any> | any)[] =>
   labelInValue
     ? values.map(opt => ({
-        key: opt.value,
-        value: opt.value,
-        label: opt.label,
-      }))
+      key: opt.value,
+      value: opt.value,
+      label: opt.label,
+    }))
     : values.map(opt => opt.value);
 
 export const mapOptions = (values: SelectOptionsType): Record<string, any>[] =>
@@ -245,3 +245,17 @@ export const mapOptions = (values: SelectOptionsType): Record<string, any>[] =>
     key: opt.value,
     ...opt,
   }));
+
+// Função pessoal NÃO FAZ PARTE DO SUPERSET
+export const translatePlaceholder = (placeholder: any) => {
+  if (typeof placeholder === "string") {
+    const mapedPlaceholder: Record<string, string> = { "No filter": "Sem filtro", "options": "opções", "option": "opção" }
+    if (placeholder in mapedPlaceholder)
+      return mapedPlaceholder[placeholder]
+    const sufix: string = placeholder.split(" ").at(-1) ?? ""
+    if (sufix in mapedPlaceholder)
+      return placeholder.replace(sufix, mapedPlaceholder[sufix])
+    return placeholder
+  }
+  return placeholder
+};

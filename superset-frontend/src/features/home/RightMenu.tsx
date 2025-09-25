@@ -499,7 +499,7 @@ const RightMenu = ({
           key: 'logout',
           label: (
             <Typography.Link href={navbarRight.user_logout_url}>
-              {t('Logout')}
+              Sair
             </Typography.Link>
           ),
           onClick: handleLogout,
@@ -507,7 +507,7 @@ const RightMenu = ({
 
         items.push({
           type: 'group',
-          label: t('User'),
+          label: 'Usuário',
           key: 'user-section',
           children: userItems,
         });
@@ -518,7 +518,7 @@ const RightMenu = ({
 
         const aboutItem: ItemType = {
           type: 'group',
-          label: t('About'),
+          label: 'Sobre',
           key: 'about-section',
           children: [
             {
@@ -537,7 +537,7 @@ const RightMenu = ({
                     navbarRight.show_watermark &&
                       t('Powered by Apache Superset'),
                     navbarRight.version_string &&
-                      `${t('Version')}: ${navbarRight.version_string}`,
+                      `Versão: ${navbarRight.version_string}`,
                     navbarRight.version_sha &&
                       `${t('SHA')}: ${navbarRight.version_sha}`,
                     navbarRight.build_number &&
@@ -586,7 +586,7 @@ const RightMenu = ({
 
     items.push({
       key: 'settings',
-      label: t('Settings'),
+      label: 'Configurações',
       icon: <Icons.DownOutlined iconSize="xs" />,
       children: buildSettingsMenuItems(),
       className: 'submenu-with-caret',
@@ -783,7 +783,7 @@ class RightMenuErrorWrapper extends PureComponent<RightMenuProps> {
     return { hasError: true };
   }
 
-  noop = () => {};
+  noop = () => { };
 
   render() {
     if (this.state.hasError) {

@@ -133,7 +133,8 @@ const ActionButtons = ({
         onClick={onApply}
         {...getFilterBarTestId('apply-button')}
       >
-        {isVertical ? t('Apply filters') : t('Apply')}
+        {/* {isVertical ? t('Apply filters') : t('Apply')} */}
+        {isVertical ? 'Aplicar filtros' : 'Aplicar'}
       </Button>
       <Button
         disabled={!isClearAllEnabled}
@@ -142,7 +143,8 @@ const ActionButtons = ({
         onClick={onClearAll}
         {...getFilterBarTestId('clear-button')}
       >
-        {t('Clear all')}
+        {/* {t('Clear all')} */}
+        {'Limpar filtros'}
       </Button>
     </ButtonsContainer>
   );
