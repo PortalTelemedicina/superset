@@ -27,8 +27,6 @@ import sys
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
 
-TALISMAN_ENABLED = False
-
 LANGUAGES = {
     'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
     'en': {'flag': 'us', 'name': 'English'}
@@ -119,18 +117,6 @@ class CeleryConfig:
 CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {"ALERT_REPORTS": True}
-
-ENABLE_TEMPLATE_PROCESSING = True
-HTML_SANITIZATION = True
-HTML_SANITIZATION_SCHEMA_EXTENSIONS = {
-    "attributes": {
-        "*": ["style", "className", "src", "width", "height", "frameborder",
-              "marginwidth", "marginheight", "scrolling", "target", "onload", "method",
-          "action", "type", "name", "value", "onsubmit"],
-    },
-    "tagNames": ["style", "iframe", "body", "form", "input"],
-}
-
 
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = f"http://superset_app{os.environ.get('SUPERSET_APP_ROOT', '/')}/"  # When using docker compose baseurl should be http://superset_nginx{ENV{BASEPATH}}/  # noqa: E501
