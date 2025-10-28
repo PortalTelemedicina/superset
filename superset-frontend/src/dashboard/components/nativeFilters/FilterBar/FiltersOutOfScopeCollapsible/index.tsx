@@ -45,7 +45,7 @@ export const FiltersOutOfScopeCollapsible = ({
               font-size: ${theme.fontSizeSM}px;
             `}
           >
-            {t('Filters out of scope (%d)', filtersOutOfScope.length)}
+            {`Filtros fora de escopo (${filtersOutOfScope.length})`}
           </span>
         ),
         children: filtersOutOfScope.map(renderer),
