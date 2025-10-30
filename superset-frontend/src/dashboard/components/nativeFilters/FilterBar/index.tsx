@@ -316,7 +316,7 @@ const FilterBar: FC<FiltersBarProps> = ({
     // This ensures dependent filters are cleared even if parent was cleared first
     nativeFilterValues.forEach(filter => {
       // Filtros com nome Estado não poderão ser apagados
-      if (filter.name === "Estado Padrão") return;
+      if (filter.name.toLowerCase().includes("padrão")) return;
       const { id } = filter;
       if (dataMaskSelected[id]) {
         setDataMaskSelected(draft => {
