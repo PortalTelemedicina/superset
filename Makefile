@@ -18,6 +18,14 @@
 # Python version installed; we need 3.10-3.11
 PYTHON=`command -v python3.11 || command -v python3.10`
 
+REGISTRY		= us.gcr.io
+PROJECT_ID		= ptm-devops
+PROJECT_NAME	= superset-fork
+ENV_NAME		= master
+COMMIT_SHA		= $(shell git log -1 --pretty=format:"%H")
+
+IMAGE			= $(REGISTRY)/$(PROJECT_ID)/$(PROJECT_NAME)-$(ENV_NAME):$(COMMIT_SHA)
+
 .PHONY: install superset venv pre-commit
 
 install: superset pre-commit
@@ -99,6 +107,15 @@ node-app:
 build-cypress:
 	cd superset-frontend; npm run build-instrumented
 	cd superset-frontend/cypress-base; npm ci
+
+build-docker:
+	docker build --build-arg="BUILD_TRANSLATIONS=true" -t $(IMAGE) .
+
+push-docker:
+	gcloud docker -- push $(IMAGE)
+
+echo-docker:
+	@echo $(IMAGE)
 
 open-cypress:
 	if ! [ $(port) ]; then cd superset-frontend/cypress-base; CYPRESS_BASE_URL=http://localhost:9000 npm run cypress open; fi
