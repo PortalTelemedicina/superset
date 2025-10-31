@@ -82,6 +82,7 @@ import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
 import { FilterPlugins } from 'src/constants';
 import AgGridTableChartPlugin from '@superset-ui/plugin-chart-ag-grid-table';
 import TimeTableChartPlugin from '../TimeTable';
+import FlaskChartPlugin from 'plugins/plugin-chart-flask';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -107,6 +108,7 @@ export default class MainPreset extends Preset {
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,
         }),
+        new FlaskChartPlugin().configure({ key: 'ptm_chart' }),
         new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
         new BubbleChartPlugin().configure({ key: VizType.LegacyBubble }),
         new BulletChartPlugin().configure({ key: VizType.Bullet }),
