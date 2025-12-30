@@ -16,6 +16,9 @@
       ],
       "@superset-ui/plugin-chart-*": ["./plugins/plugin-chart-*/src"],
       "@superset-ui/preset-chart-*": ["./plugins/preset-chart-*/src"],
+      "@superset-ui/superset-plugin-chart-echarts-ptm": [
+        "./plugins/superset-plugin-chart-echarts-ptm/src"
+      ],
       "@superset-ui/switchboard": ["./packages/superset-ui-switchboard/src"]
     },
     "typeRoots": ["src/types", "node_modules/@types"]
