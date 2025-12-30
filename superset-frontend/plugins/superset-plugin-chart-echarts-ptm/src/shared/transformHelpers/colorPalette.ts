@@ -85,10 +85,8 @@ export function cleanSeriesColors(
     }
     
     if (Array.isArray(cleanedSeries.data)) {
-      let hasDataColors = false;
       cleanedSeries.data = cleanedSeries.data.map((dataItem: any) => {
         if (dataItem?.itemStyle?.color) {
-          hasDataColors = true;
           const { color, ...restItemStyle } = dataItem.itemStyle;
           return {
             ...dataItem,
