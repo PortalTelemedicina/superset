@@ -55,7 +55,11 @@ export interface PtmPluginConfig {
 }
 
 
-export function createPtmPlugin(config: PtmPluginConfig): typeof ChartPlugin {
+export interface ChartPluginClass {
+  new (): ChartPlugin;
+}
+
+export function createPtmPlugin(config: PtmPluginConfig): ChartPluginClass {
   const {
     name,
     description,
