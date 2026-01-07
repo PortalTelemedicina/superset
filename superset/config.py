@@ -1623,12 +1623,18 @@ TALISMAN_CONFIG = {
             "https://static.scarf.sh/",
             # "https://cdn.brandfolder.io", # Uncomment when SLACK_ENABLE_AVATARS is True  # noqa: E501
             "ows.terrestris.de",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
             "'self'",
             "https://api.mapbox.com",
             "https://events.mapbox.com",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [
@@ -1654,12 +1660,18 @@ TALISMAN_DEV_CONFIG = {
             "https://static.scarf.sh/",
             "https://cdn.brandfolder.io",
             "ows.terrestris.de",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
             "'self'",
             "https://api.mapbox.com",
             "https://events.mapbox.com",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [
