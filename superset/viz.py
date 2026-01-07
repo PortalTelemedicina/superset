@@ -2545,6 +2545,98 @@ class PartitionViz(NVD3TimeSeriesViz):
         return self.nest_values(levels)
 
 
+# =============================================================================
+# PTM (Portal Telemedicina) deck.gl viz classes - MapLibre versions
+# These inherit from the original deck.gl viz classes but use different viz_type
+# to allow frontend to use MapLibre instead of Mapbox
+# =============================================================================
+
+
+class DeckScatterVizPTM(DeckScatterViz):
+    """deck.gl's ScatterLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_scatter_ptm"
+    verbose_name = _("Deck.gl - Scatter plot (PTM)")
+
+
+class DeckScreengridPTM(DeckScreengrid):
+    """deck.gl's ScreenGridLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_screengrid_ptm"
+    verbose_name = _("Deck.gl - Screen grid (PTM)")
+
+
+class DeckGridPTM(DeckGrid):
+    """deck.gl's DeckLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_grid_ptm"
+    verbose_name = _("Deck.gl - 3D Grid (PTM)")
+
+
+class DeckPathVizPTM(DeckPathViz):
+    """deck.gl's PathLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_path_ptm"
+    verbose_name = _("Deck.gl - Paths (PTM)")
+
+
+class DeckPolygonPTM(DeckPolygon):
+    """deck.gl's Polygon Layer - MapLibre version (PTM)"""
+
+    viz_type = "deck_polygon_ptm"
+    verbose_name = _("Deck.gl - Polygon (PTM)")
+
+
+class DeckHexPTM(DeckHex):
+    """deck.gl's HexLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_hex_ptm"
+    verbose_name = _("Deck.gl - 3D Hexagon (PTM)")
+
+
+class DeckHeatmapPTM(DeckHeatmap):
+    """deck.gl's HeatmapLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_heatmap_ptm"
+    verbose_name = _("Deck.gl - Heatmap (PTM)")
+
+
+class DeckContourPTM(DeckContour):
+    """deck.gl's ContourLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_contour_ptm"
+    verbose_name = _("Deck.gl - Contour (PTM)")
+
+
+class DeckGeoJsonPTM(DeckGeoJson):
+    """deck.gl's GeoJSONLayer - MapLibre version (PTM)"""
+
+    viz_type = "deck_geojson_ptm"
+    verbose_name = _("Deck.gl - GeoJSON (PTM)")
+
+
+class DeckArcPTM(DeckArc):
+    """deck.gl's Arc Layer - MapLibre version (PTM)"""
+
+    viz_type = "deck_arc_ptm"
+    verbose_name = _("Deck.gl - Arc (PTM)")
+
+
+class DeckGLMultiLayerPTM(DeckGLMultiLayer):
+    """Pile on multiple DeckGL layers - MapLibre version (PTM)"""
+
+    viz_type = "deck_multi_ptm"
+    verbose_name = _("Deck.gl - Multiple Layers (PTM)")
+
+
+class MapLibreVizPTM(MapboxViz):
+    """Rich maps made with MapLibre - PTM version"""
+
+    viz_type = "maplibre_ptm"
+    verbose_name = _("MapLibre Scatter (PTM)")
+    credits = "<a href=https://maplibre.org/>MapLibre GL JS</a>"
+
+
 @deprecated(deprecated_in="3.0")
 def get_subclasses(cls: type[BaseViz]) -> set[type[BaseViz]]:
     return set(cls.__subclasses__()).union(

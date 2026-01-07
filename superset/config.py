@@ -1836,6 +1836,9 @@ TALISMAN_CONFIG = {
             # "https://cdn.brandfolder.io", # Uncomment when SLACK_ENABLE_AVATARS is True  # noqa: E501
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
@@ -1844,6 +1847,9 @@ TALISMAN_CONFIG = {
             "https://events.mapbox.com",
             "https://tile.openstreetmap.org",
             "https://tile.osm.ch",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [
@@ -1870,6 +1876,9 @@ TALISMAN_DEV_CONFIG = {
             "https://cdn.brandfolder.io",
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
@@ -1878,6 +1887,9 @@ TALISMAN_DEV_CONFIG = {
             "https://events.mapbox.com",
             "https://tile.openstreetmap.org",
             "https://tile.osm.ch",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [
