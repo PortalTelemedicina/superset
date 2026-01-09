@@ -26,6 +26,7 @@ import {
   FeatureFlag,
   t,
   getExtensionsRegistry,
+  useTheme,
 } from '@superset-ui/core';
 import { Global } from '@emotion/react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
@@ -88,6 +89,28 @@ import { dashboardInfoChanged } from '../../actions/dashboardInfo';
 import isDashboardLoading from '../../util/isDashboardLoading';
 import { useChartIds } from '../../util/charts/useChartIds';
 import { useDashboardMetadataBar } from './useDashboardMetadataBar';
+import { Modal } from 'antd';
+
+// [PORTAL_EXTENSION] Import header adapter if available
+// This allows portal extensions to override header rendering without modifying core logic.
+// See: src/extensions/portal/dashboard/header/adapters/HeaderAdapter.tsx
+// TODO: Propose upstream extension point (GitHub issue: TBD)
+let HeaderAdapter = null;
+let HeaderSlotEditor = null;
+let getDefaultHeaderLayout = null;
+
+try {
+  const portalExtensions = require('src/extensions/portal');
+  HeaderAdapter = portalExtensions.HeaderAdapter || null;
+  HeaderSlotEditor = portalExtensions.HeaderSlotEditor || null;
+  getDefaultHeaderLayout = portalExtensions.getDefaultHeaderLayout || null;
+} catch (error) {
+  // Portal extensions not available, use default header
+  // This is expected in development or when extensions are not installed
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[Header] Portal extensions not available, using default header');
+  }
+}
 
 const extensionsRegistry = getExtensionsRegistry();
 
@@ -162,6 +185,8 @@ const Header = () => {
   const [showingPropertiesModal, setShowingPropertiesModal] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [showingEmbedModal, setShowingEmbedModal] = useState(false);
+  const [showingHeaderEditor, setShowingHeaderEditor] = useState(false);
+  const theme = useTheme();
   const dashboardInfo = useSelector(state => state.dashboardInfo);
   const layout = useSelector(state => state.dashboardLayout.present);
   const undoLength = useSelector(state => state.dashboardLayout.past.length);
@@ -346,6 +371,29 @@ const Header = () => {
       }
     },
     [boundActionCreators, dashboardTitle],
+  );
+
+  const handleOpenHeaderEditor = useCallback(() => {
+    setShowingHeaderEditor(true);
+  }, []);
+
+  const handleCloseHeaderEditor = useCallback(() => {
+    setShowingHeaderEditor(false);
+  }, []);
+
+  const handleSaveHeaderLayout = useCallback(
+    (headerLayout) => {
+      const currentMetadata = dashboardInfo.metadata || {};
+      boundActionCreators.dashboardInfoChanged({
+        metadata: {
+          ...currentMetadata,
+          headerLayout,
+        },
+      });
+      boundActionCreators.setUnsavedChanges(true);
+      setShowingHeaderEditor(false);
+    },
+    [boundActionCreators, dashboardInfo.metadata],
   );
 
   const setDropdownVisible = useCallback(visible => {
@@ -558,6 +606,19 @@ const Header = () => {
         />
       ),
       !editMode && !isEmbedded && metadataBar,
+      // Edit mode: Customize Header button (preview button is handled by adapter)
+      editMode && userCanEdit && (
+        <Tooltip title={t('Customize Header Layout')} placement="bottom">
+          <Button
+            buttonStyle="link"
+            css={editButtonStyle}
+            onClick={handleOpenHeaderEditor}
+          >
+            <Icons.EditAlt iconSize="xl" />
+            {t('Customize Header')}
+          </Button>
+        </Tooltip>
+      ),
     ],
     [
       boundActionCreators.savePublished,
@@ -568,6 +629,7 @@ const Header = () => {
       isPublished,
       userCanEdit,
       userCanSaveAs,
+      handleOpenHeaderEditor,
     ],
   );
 
@@ -775,13 +837,37 @@ const Header = () => {
     ],
   );
 
-  return (
-    <div
-      css={headerContainerStyle}
-      data-test="dashboard-header-container"
-      data-test-id={dashboardInfo.id}
-      className="dashboard-header-container"
-    >
+  // [PORTAL_EXTENSION] Get header layout for editor modal (if extension available)
+  const headerLayout = useMemo(() => {
+    if (getDefaultHeaderLayout) {
+      return dashboardInfo?.metadata?.headerLayout || getDefaultHeaderLayout();
+    }
+    return dashboardInfo?.metadata?.headerLayout || { enabled: false, slots: [] };
+  }, [dashboardInfo?.metadata?.headerLayout]);
+
+  // [PORTAL_EXTENSION] Use adapter if available, otherwise fallback to default header
+  const renderHeader = () => {
+    if (HeaderAdapter) {
+      return (
+        <HeaderAdapter
+          dashboardInfo={dashboardInfo}
+          editMode={editMode}
+          isEmbedded={isEmbedded}
+          editableTitleProps={editableTitleProps}
+          certificatiedBadgeProps={certifiedBadgeProps}
+          faveStarProps={faveStarProps}
+          titlePanelAdditionalItems={titlePanelAdditionalItems}
+          rightPanelAdditionalItems={rightPanelAdditionalItems}
+          menuDropdownProps={menuDropdownProps}
+          additionalActionsMenu={additionalActionsMenu}
+          showFaveStar={user?.userId && dashboardInfo?.id}
+          showTitlePanelItems
+        />
+      );
+    }
+
+    // Fallback to original implementation
+    return (
       <PageHeaderWithActions
         editableTitleProps={editableTitleProps}
         certificatiedBadgeProps={certifiedBadgeProps}
@@ -793,6 +879,17 @@ const Header = () => {
         showFaveStar={user?.userId && dashboardInfo?.id}
         showTitlePanelItems
       />
+    );
+  };
+
+  return (
+    <div
+      css={headerContainerStyle}
+      data-test="dashboard-header-container"
+      data-test-id={dashboardInfo.id}
+      className="dashboard-header-container"
+    >
+      {renderHeader()}
       {showingPropertiesModal && (
         <PropertiesModal
           dashboardId={dashboardInfo.id}
@@ -804,6 +901,25 @@ const Header = () => {
           onSubmit={handleOnPropertiesChange}
           onlyApply
         />
+      )}
+
+      {/* Header Layout Editor Modal */}
+      {showingHeaderEditor && editMode && HeaderSlotEditor && (
+        <Modal
+          title={t('Customize Header')}
+          visible={showingHeaderEditor}
+          onCancel={handleCloseHeaderEditor}
+          footer={null}
+          width={900}
+          destroyOnClose
+        >
+          <HeaderSlotEditor
+            headerLayout={headerLayout}
+            dashboardTitle={dashboardTitle}
+            onSave={handleSaveHeaderLayout}
+            onCancel={handleCloseHeaderEditor}
+          />
+        </Modal>
       )}
 
       <OverwriteConfirm />

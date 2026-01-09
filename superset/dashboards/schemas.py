@@ -168,6 +168,29 @@ class DashboardJSONMetadataSchema(Schema):
     remote_id = fields.Integer()
     filter_bar_orientation = fields.Str(allow_none=True)
     native_filter_migration = fields.Dict()
+    # PTM branding configuration for custom dashboard headers and logos
+    ptm_branding = fields.Dict()
+    # [PORTAL_EXTENSION] Header layout configuration for customizable dashboard headers
+    # This field is used by portal extensions for customizable dashboard headers.
+    # The field is defined here for backward compatibility, but the schema validation
+    # is handled by PortalDashboardMetadataExtension when available.
+    # See: superset/extensions/portal/schemas/dashboard_metadata.py
+    headerLayout = fields.Dict(allow_none=True)
+
+    @classmethod
+    def register_extensions(cls):
+        """
+        Register portal extensions for dashboard metadata schema.
+        
+        This method should be called once during Superset initialization
+        to merge extension fields into the base schema.
+        """
+        try:
+            from superset.extensions.portal import register_extensions as register_portal_extensions
+            register_portal_extensions()
+        except ImportError:
+            # Portal extensions not available, continue without them
+            pass
 
     @pre_load
     def remove_show_native_filters(  # pylint: disable=unused-argument
@@ -522,3 +545,9 @@ class CacheScreenshotSchema(Schema):
     urlParams = fields.List(  # noqa: N815
         fields.List(fields.Str(), validate=lambda x: len(x) == 2), required=False
     )
+
+
+# [PORTAL_EXTENSION] Register portal extensions when schema module is imported
+# This allows extension fields to be merged into the schema without modifying core code
+# See: superset/extensions/portal/schemas/dashboard_metadata.py
+DashboardJSONMetadataSchema.register_extensions()
