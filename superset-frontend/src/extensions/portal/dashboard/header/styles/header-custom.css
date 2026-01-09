@@ -1,0 +1,23 @@
+/**
+ * Portal Custom Header Styles
+ * 
+ * Scoped CSS for custom header extension.
+ * All styles are prefixed with .portal-* to avoid conflicts.
+ */
+
+.portal-header-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.portal-header-custom {
+  /* Styles for custom header container */
+}
+
+.portal-slot-group {
+  /* Styles for slot groups (left, center, right) */
+}
+

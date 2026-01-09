@@ -17,21 +17,7 @@
  * under the License.
  */
 
-// For individual deployments to add custom overrides
+export { default as SlotRenderer } from './SlotRenderer';
+export { default as CustomizableHeader } from './CustomizableHeader';
+export { default as HeaderSlotEditor } from './HeaderSlotEditor';
 
-// [PORTAL_EXTENSION] Import portal extensions
-// This ensures portal extensions are initialized during app startup
-// See: src/extensions/portal/index.ts
-try {
-  require('src/extensions/portal');
-} catch (error) {
-  // Portal extensions not available, continue without them
-  // This is expected in development or when extensions are not installed
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[Setup Extensions] Portal extensions not available');
-  }
-}
-
-export default function setupExtensions() {
-  // Additional extension setup can be added here
-}
