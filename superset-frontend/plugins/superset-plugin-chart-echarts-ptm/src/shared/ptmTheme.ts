@@ -303,7 +303,7 @@ export const ptmDataZoom = (
         right: (PTM_ECHART_GRID.right as number) + inset,
 
         height: thickness,
-        bottom: PTM_SPACING.xs,
+        bottom: PTM_SPACING.lg, // Increased from xs (4px) to lg (24px) to prevent container clipping
       },
       inside: {
         type: 'inside' as const,
@@ -326,7 +326,7 @@ export const ptmDataZoom = (
       bottom: PTM_ECHART_GRID.bottom,
 
       width: thickness,
-      right: PTM_SPACING.xs,
+      right: PTM_SPACING.lg, // Increased from xs (4px) to lg (24px) to prevent container clipping
     },
     inside: {
       type: 'inside' as const,
