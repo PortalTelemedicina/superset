@@ -25,7 +25,18 @@ import {
   getStandardizedControls,
   temporalColumnMixin,
 } from '@superset-ui/chart-controls';
-import { headerFontSize, subheaderFontSize, titleFontSize } from '../sharedControls';
+import {
+  headerFontSize,
+  subheaderFontSize,
+  titleFontSize,
+  layoutMode,
+  showIcon,
+  iconName,
+  iconSize,
+  iconColor,
+  additionalText,
+  additionalTextFontSize,
+} from '../sharedControls';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -129,6 +140,7 @@ const config: ControlPanelConfig = {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
+        [layoutMode],
         ['color_picker', null],
         [
           {
@@ -176,6 +188,18 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+      ],
+    },
+    {
+      label: t('PTM Layout Options'),
+      expanded: false,
+      controlSetRows: [
+        [showIcon],
+        [iconName],
+        [iconSize],
+        [iconColor],
+        [additionalText],
+        [additionalTextFontSize],
       ],
     },
     {

@@ -106,3 +106,103 @@ export const subheaderFontSize: CustomControlItem = {
   },
 };
 
+export const layoutMode: CustomControlItem = {
+  name: 'layout_mode',
+  config: {
+    type: 'SelectControl',
+    label: t('Layout Mode'),
+    renderTrigger: true,
+    clearable: false,
+    default: 'classic',
+    description: t('Choose between classic or PTM custom layout'),
+    options: [
+      { label: t('Classic'), value: 'classic' },
+      { label: t('PTM'), value: 'ptm' },
+    ],
+  },
+};
+
+export const showIcon: CustomControlItem = {
+  name: 'show_icon',
+  config: {
+    type: 'CheckboxControl',
+    label: t('Show Icon'),
+    renderTrigger: true,
+    default: false,
+    description: t('Display an icon in the card (PTM layout only)'),
+  },
+};
+
+export const iconName: CustomControlItem = {
+  name: 'icon_name',
+  config: {
+    type: 'TextControl',
+    label: t('Icon Name'),
+    renderTrigger: true,
+    default: 'Activity',
+    description: t('Name of the Lucide icon (e.g., Activity, TrendingUp, Users, Calendar, Heart)'),
+    visibility: ({ controls }: any) => controls?.show_icon?.value === true,
+  },
+};
+
+export const iconSize: CustomControlItem = {
+  name: 'icon_size',
+  config: {
+    type: 'SelectControl',
+    label: t('Icon Size'),
+    renderTrigger: true,
+    clearable: false,
+    default: 20,
+    description: t('Size of the icon in pixels'),
+    options: [
+      { label: t('Small (12px)'), value: 12 },
+      { label: t('Medium (20px)'), value: 20 },
+      { label: t('Large (28px)'), value: 28 },
+      { label: t('XLarge (32px)'), value: 32 },
+    ],
+    visibility: ({ controls }: any) => controls?.show_icon?.value === true,
+  },
+};
+
+export const iconColor: CustomControlItem = {
+  name: 'icon_color',
+  config: {
+    type: 'TextControl',
+    label: t('Icon Color'),
+    renderTrigger: true,
+    default: '#000000',
+    description: t('Color of the icon (hex code)'),
+    visibility: ({ controls }: any) => controls?.show_icon?.value === true,
+  },
+};
+
+export const additionalText: CustomControlItem = {
+  name: 'additional_text',
+  config: {
+    type: 'TextAreaControl',
+    label: t('Additional Text'),
+    renderTrigger: true,
+    default: '',
+    description: t('Additional text to display below the number (PTM layout only)'),
+  },
+};
+
+export const additionalTextFontSize: CustomControlItem = {
+  name: 'additional_text_font_size',
+  config: {
+    type: 'SelectControl',
+    label: t('Additional Text Font Size'),
+    renderTrigger: true,
+    clearable: false,
+    default: 12,
+    description: t('Font size for additional text'),
+    options: [
+      { label: t('Tiny (10px)'), value: 10 },
+      { label: t('Small (12px)'), value: 12 },
+      { label: t('Normal (14px)'), value: 14 },
+      { label: t('Large (16px)'), value: 16 },
+    ],
+    visibility: ({ controls }: any) => Boolean(controls?.additional_text?.value),
+  },
+};
+

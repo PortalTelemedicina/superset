@@ -387,7 +387,18 @@ const PropertiesModal = ({
       updateMetadata: false,
     });
 
-    currentJsonMetadata = jsonStringify(metadata);
+    // CRITICAL FIX: Merge the edited metadata with the complete dashboard metadata
+    // This preserves native_filters, positions, and other properties that are
+    // intentionally hidden from the JSON editor
+    const completeMetadata = {
+      ...originalDashboardMetadata.current,  // Start with complete metadata
+      ...metadata,                             // Override with user edits from JSON editor
+      // Ensure color-related fields from updatedDashboardMetadata are preserved
+      label_colors: customLabelColors,
+      color_scheme: updatedColorScheme,
+    };
+    
+    currentJsonMetadata = jsonStringify(completeMetadata);
 
     const moreOnSubmitProps: { roles?: Roles; tags?: TagType[] } = {};
     const morePutProps: {
