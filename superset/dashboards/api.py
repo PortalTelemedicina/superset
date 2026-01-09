@@ -17,8 +17,11 @@
 # pylint: disable=too-many-lines
 import functools
 import logging
+import os
+import uuid
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import Any, Callable, cast
 from zipfile import is_zipfile, ZipFile
 
@@ -159,6 +162,9 @@ def with_dashboard(
     return functools.update_wrapper(wraps, f)
 
 
+logger = logging.getLogger(__name__)
+
+
 # pylint: disable=too-many-public-methods
 class DashboardRestApi(BaseSupersetModelRestApi):
     datamodel = SQLAInterface(Dashboard)
@@ -183,6 +189,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "screenshot",
         "put_filters",
         "put_colors",
+        "upload_header_image",
     }
     resource_name = "dashboard"
     allow_browser_login = True
@@ -1864,3 +1871,69 @@ class DashboardRestApi(BaseSupersetModelRestApi):
                 ).timestamp(),
             },
         )
+
+    @expose("/upload_header_image/", methods=("POST",))
+    @protect()
+    @safe
+    @permission_name("write")
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}"
+        ".upload_header_image",
+        log_to_statsd=False,
+    )
+    @requires_form_data
+    def upload_header_image(self) -> Response:
+        """
+        Upload an image for dashboard header customization.
+        ---
+        post:
+          summary: Upload header image
+          description: Upload an image file to be used in dashboard header customization
+          requestBody:
+            required: true
+            content:
+              multipart/form-data:
+                schema:
+                  type: object
+                  properties:
+                    file:
+                      type: string
+                      format: binary
+                      description: Image file (PNG, JPG, SVG, max 2MB)
+          responses:
+            200:
+              description: Image uploaded successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        description: URL to access the uploaded image
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        # [PORTAL_EXTENSION] Use isolated handler from extension
+        # This allows extension logic to be separated from core API
+        # See: superset/extensions/portal/api/dashboard_header.py
+        try:
+            from superset.extensions.portal.api.dashboard_header import upload_header_image_handler
+            
+            status_code, result, message = upload_header_image_handler()
+            
+            if status_code == 200:
+                return self.response(status_code, result=result, message=message)
+            elif status_code == 400:
+                return self.response_400(message=message)
+            else:
+                return self.response_500(message=message)
+        except ImportError:
+            # Extension not available, return error
+            logger.warning("Portal extension not available for header image upload")
+            return self.response_400(message="Header image upload not available")

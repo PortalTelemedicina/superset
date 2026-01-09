@@ -13,25 +13,21 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * specific language governing limitations under the License.
  */
 
-// For individual deployments to add custom overrides
+// Export components
+export * from './components';
 
-// [PORTAL_EXTENSION] Import portal extensions
-// This ensures portal extensions are initialized during app startup
-// See: src/extensions/portal/index.ts
-try {
-  require('src/extensions/portal');
-} catch (error) {
-  // Portal extensions not available, continue without them
-  // This is expected in development or when extensions are not installed
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[Setup Extensions] Portal extensions not available');
-  }
-}
+// Export types
+export * from './types';
+// Export getDefaultHeaderLayout helper
+export { getDefaultHeaderLayout } from './types';
 
-export default function setupExtensions() {
-  // Additional extension setup can be added here
-}
+// Export hooks
+export { useStandaloneMode } from './hooks/useStandaloneMode';
+export { useHeaderPreview } from './hooks/useHeaderPreview';
+
+// Export adapter (will be created in Phase 2)
+export { HeaderAdapter } from './adapters/HeaderAdapter';
+
