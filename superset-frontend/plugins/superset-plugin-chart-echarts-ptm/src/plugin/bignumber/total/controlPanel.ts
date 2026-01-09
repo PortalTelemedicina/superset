@@ -24,7 +24,17 @@ import {
   Dataset,
   getStandardizedControls,
 } from '@superset-ui/chart-controls';
-import { headerFontSize, subheaderFontSize } from '../sharedControls';
+import {
+  headerFontSize,
+  subheaderFontSize,
+  layoutMode,
+  showIcon,
+  iconName,
+  iconSize,
+  iconColor,
+  additionalText,
+  additionalTextFontSize,
+} from '../sharedControls';
 
 export default {
   controlPanelSections: [
@@ -57,6 +67,7 @@ export default {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
+        [layoutMode],
         [headerFontSize],
         [subheaderFontSize],
         ['y_axis_format'],
@@ -131,6 +142,18 @@ export default {
             },
           },
         ],
+      ],
+    },
+    {
+      label: t('PTM Layout Options'),
+      expanded: false,
+      controlSetRows: [
+        [showIcon],
+        [iconName],
+        [iconSize],
+        [iconColor],
+        [additionalText],
+        [additionalTextFontSize],
       ],
     },
   ],

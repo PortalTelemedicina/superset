@@ -51,6 +51,13 @@ export default function transformProps(
     yAxisFormat,
     conditionalFormatting,
     currencyFormat,
+    layoutMode = 'classic',
+    showIcon = false,
+    iconName = 'Activity',
+    iconSize = 24,
+    iconColor = '#666666',
+    additionalText = '',
+    additionalTextFontSize = 12,
   } = formData;
   const refs: Record<string, any> = {};
   const { data = [], coltypes = [] } = queriesData[0];
@@ -107,6 +114,13 @@ export default function transformProps(
     onContextMenu,
     refs,
     colorThresholdFormatters,
+    layoutMode,
+    showIcon,
+    iconName,
+    iconSize,
+    iconColor,
+    additionalText,
+    additionalTextFontSize,
   };
 }
 

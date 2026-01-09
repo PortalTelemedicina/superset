@@ -28,7 +28,8 @@
     "access": "public"
   },
   "dependencies": {
-    "lodash.merge": "^4.6.2"
+    "lodash.merge": "^4.6.2",
+    "lucide-react": "^0.263.1"
   },
   "peerDependencies": {
     "@airbnb/config-babel": "^2.0.1",

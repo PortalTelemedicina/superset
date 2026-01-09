@@ -97,5 +97,12 @@ export type BigNumberVizProps = {
   colorThresholdFormatters?: ColorFormatters;
   title?: string;
   titleFontSize?: number;
+  layoutMode?: 'classic' | 'ptm';
+  showIcon?: boolean;
+  iconName?: string;
+  iconSize?: number;
+  iconColor?: string;
+  additionalText?: string;
+  additionalTextFontSize?: number;
 };
 
