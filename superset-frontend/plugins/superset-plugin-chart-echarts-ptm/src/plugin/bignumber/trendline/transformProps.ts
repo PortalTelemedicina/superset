@@ -73,6 +73,13 @@ export default function transformProps(
     yAxisFormat,
     currencyFormat,
     timeRangeFixed,
+    layoutMode = 'classic',
+    showIcon = false,
+    iconName = 'Activity',
+    iconSize = 24,
+    iconColor = '#666666',
+    additionalText = '',
+    additionalTextFontSize = 12,
   } = formData;
   const granularity = extractTimegrain(rawFormData);
   const {
@@ -284,6 +291,13 @@ export default function transformProps(
     onContextMenu,
     xValueFormatter: formatTime,
     refs,
+    layoutMode,
+    showIcon,
+    iconName,
+    iconSize,
+    iconColor,
+    additionalText,
+    additionalTextFontSize,
   };
 }
 

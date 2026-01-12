@@ -27,6 +27,8 @@ import {
   styled,
   BinaryQueryObjectFilterClause,
 } from '@superset-ui/core';
+import * as LucideIcons from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import Echart from './EchartWrapper';
 import { BigNumberVizProps } from './types';
 
@@ -304,7 +306,121 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
   }
 
-  render() {
+  renderIcon() {
+    const { showIcon, iconName, iconSize, iconColor } = this.props;
+    
+    if (!showIcon || !iconName) return null;
+
+    try {
+      // Get the icon component from lucide-react
+      const IconComponent = (LucideIcons as any)[iconName];
+      
+      if (!IconComponent) {
+        console.warn(`Icon "${iconName}" not found in lucide-react`);
+        return null;
+      }
+
+      const size = iconSize || 24;
+      const padding = size / 2; // Padding is half the icon size
+
+      return (
+        <div className="ptm-icon-container" style={{ padding }}>
+          <IconComponent 
+            size={size} 
+            color={iconColor || '#666666'}
+            strokeWidth={2}
+          />
+        </div>
+      );
+    } catch (error) {
+      console.error('Error rendering icon:', error);
+      return null;
+    }
+  }
+
+  renderAdditionalText() {
+    const { additionalText, additionalTextFontSize } = this.props;
+    
+    if (!additionalText) return null;
+
+    return (
+      <div
+        className="additional-text"
+        style={{
+          fontSize: additionalTextFontSize || 12,
+        }}
+      >
+        {additionalText}
+      </div>
+    );
+  }
+
+  renderTrendBadge(fontSize: number) {
+    const { subheader, className } = this.props;
+    
+    if (!subheader) return null;
+
+    const isPositive = className?.includes('positive');
+    const isNegative = className?.includes('negative');
+    
+    const TrendIcon = isPositive ? TrendingUp : isNegative ? TrendingDown : null;
+
+    return (
+      <div className={`trend-badge ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}>
+        {TrendIcon && <TrendIcon className="trend-badge-icon" size={fontSize} strokeWidth={2} />}
+        <span className="trend-badge-text" style={{ fontSize }}>{subheader}</span>
+      </div>
+    );
+  }
+
+  renderPTMLayout() {
+    const {
+      height,
+      headerFontSize,
+      subheaderFontSize,
+      showTrendLine,
+      title,
+      titleFontSize,
+    } = this.props;
+    const className = this.getClassName();
+
+    // Calculate badge font size from subheaderFontSize control
+    // Use a smaller multiplier for the badge to keep it compact
+    const badgeFontSize = Math.max(
+      Math.ceil(subheaderFontSize * height * 0.08),
+      12 // Minimum 12px for readability
+    );
+
+    return (
+      <div className={`${className} ptm-layout`} style={{ height }}>
+        <div className="ptm-header-row">
+          {this.renderIcon()}
+          {this.renderTrendBadge(badgeFontSize)}
+        </div>
+        
+        {title && (
+          <div 
+            className="ptm-title"
+            style={{ fontSize: titleFontSize || 14 }}
+          >
+            {title}
+          </div>
+        )}
+        
+        {this.renderFallbackWarning()}
+        {this.renderHeader(Math.ceil(headerFontSize * height))}
+        {this.renderAdditionalText()}
+        
+        {showTrendLine && (
+          <div className="ptm-bottom-trendline">
+            {this.renderTrendline(60)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  renderClassicLayout() {
     const {
       showTrendLine,
       height,
@@ -351,6 +467,17 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         {this.renderSubheader(Math.ceil(subheaderFontSize * height))}
       </div>
     );
+  }
+
+  render() {
+    const { layoutMode } = this.props;
+
+    // Use PTM layout if specified, otherwise use classic
+    if (layoutMode === 'ptm') {
+      return this.renderPTMLayout();
+    }
+
+    return this.renderClassicLayout();
   }
 }
 
@@ -456,6 +583,89 @@ export default styled(BigNumberVis)`
     
     &.negative .subheader-line .trend-icon {
       color: ${theme.colors.error.base};
+    }
+
+    /* PTM Layout Specific Styles */
+    &.ptm-layout {
+      padding: ${theme.gridUnit * 3}px;
+      gap: ${theme.gridUnit * 2}px;
+
+      .ptm-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        margin-bottom: ${theme.gridUnit * 2}px;
+      }
+
+      .ptm-icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: ${theme.colors.grayscale.light3};
+        border-radius: ${theme.gridUnit * 2}px;
+      }
+
+      .trend-badge {
+        display: flex;
+        align-items: center;
+        gap: ${theme.gridUnit}px;
+        padding: ${theme.gridUnit}px ${theme.gridUnit * 2}px;
+        border-radius: ${theme.gridUnit * 1.5}px;
+        transition: all 0.2s ease;
+
+        &.positive {
+          background-color: ${theme.colors.success.light2};
+          color: ${theme.colors.success.dark1};
+        }
+
+        &.negative {
+          background-color: ${theme.colors.error.light2};
+          color: ${theme.colors.error.dark1};
+        }
+
+        &.neutral {
+          background-color: ${theme.colors.grayscale.light3};
+          color: ${theme.colors.grayscale.dark1};
+        }
+
+        .trend-badge-icon {
+          flex-shrink: 0;
+        }
+
+        .trend-badge-text {
+          font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+          font-weight: 500;
+          line-height: 1;
+        }
+      }
+
+      .ptm-title {
+        font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+        font-weight: 400;
+        color: ${theme.colors.grayscale.base};
+        margin-bottom: ${theme.gridUnit}px;
+        line-height: 1.3;
+      }
+
+      .header-line {
+        margin-bottom: ${theme.gridUnit}px;
+      }
+
+      .additional-text {
+        font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+        font-weight: 400;
+        color: ${theme.colors.grayscale.base};
+        line-height: 1.5;
+        margin-top: ${theme.gridUnit}px;
+      }
+
+      .ptm-bottom-trendline {
+        margin-top: ${theme.gridUnit * 2}px;
+        width: 100%;
+        height: 60px;
+        overflow: hidden;
+      }
     }
   `}
 `;
