@@ -1,0 +1,651 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import React, { useState, useCallback } from 'react';
+import { styled, t, SupersetClient, getClientErrorObject } from '@superset-ui/core';
+import {
+  Button,
+  Modal,
+  Select,
+  Input,
+  InputNumber,
+  Switch,
+  Upload,
+  Form,
+  message,
+} from 'antd';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  DragOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  PictureOutlined,
+} from '@ant-design/icons';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {
+  HeaderLayout,
+  HeaderSlot,
+  SlotType,
+  SlotPosition,
+  createDefaultSlot,
+  getDefaultHeaderLayout,
+  LogoSlot,
+  TitleSlot,
+  TextSlot,
+  DateSlot,
+  BadgeSlot,
+} from '../types';
+import CustomizableHeader from './CustomizableHeader';
+
+const EditorContainer = styled.div`
+  padding: 24px;
+  background: ${({ theme }) => theme.colors.grayscale.light5};
+  border-radius: 8px;
+`;
+
+const PreviewContainer = styled.div`
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+`;
+
+const SlotList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+`;
+
+const SlotItem = styled.div<{ isDragging?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+  border-radius: 6px;
+  opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+  cursor: grab;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary.base};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+`;
+
+const SlotInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SlotTypeLabel = styled.div`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.grayscale.dark2};
+`;
+
+const SlotDetails = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.grayscale.base};
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+interface HeaderSlotEditorProps {
+  headerLayout: HeaderLayout;
+  dashboardTitle?: string;
+  onSave: (layout: HeaderLayout) => void;
+  onCancel: () => void;
+}
+
+export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
+  headerLayout: initialLayout,
+  dashboardTitle,
+  onSave,
+  onCancel,
+}) => {
+  const [layout, setLayout] = useState<HeaderLayout>(
+    initialLayout.enabled ? initialLayout : getDefaultHeaderLayout(),
+  );
+  const [editingSlot, setEditingSlot] = useState<HeaderSlot | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [uploading, setUploading] = useState(false);
+  const [currentSlotType, setCurrentSlotType] = useState<SlotType | null>(null);
+
+  const handleDragEnd = useCallback(
+    (result: any) => {
+      if (!result.destination) return;
+
+      const newSlots = Array.from(layout.slots);
+      const [removed] = newSlots.splice(result.source.index, 1);
+      newSlots.splice(result.destination.index, 0, removed);
+
+      // Update order
+      const reorderedSlots = newSlots.map((slot, index) => ({
+        ...slot,
+        order: index,
+      }));
+
+      setLayout({ ...layout, slots: reorderedSlots });
+    },
+    [layout],
+  );
+
+  const handleAddSlot = useCallback(() => {
+    const newSlot = createDefaultSlot(SlotType.LOGO, SlotPosition.LEFT);
+    newSlot.order = layout.slots.length;
+    setEditingSlot(newSlot);
+    setCurrentSlotType(SlotType.LOGO);
+    setIsModalVisible(true);
+  }, [layout.slots.length]);
+
+  const handleEditSlot = useCallback((slot: HeaderSlot) => {
+    setEditingSlot(slot);
+    setCurrentSlotType(slot.type);
+    setIsModalVisible(true);
+  }, []);
+
+  const handleDeleteSlot = useCallback(
+    (slotId: string) => {
+      setLayout({
+        ...layout,
+        slots: layout.slots.filter(s => s.id !== slotId),
+      });
+      message.success(t('Element removed'));
+    },
+    [layout],
+  );
+
+  const handleToggleVisibility = useCallback(
+    (slotId: string) => {
+      setLayout({
+        ...layout,
+        slots: layout.slots.map(s =>
+          s.id === slotId ? { ...s, visible: !s.visible } : s,
+        ),
+      });
+    },
+    [layout],
+  );
+
+  const handleTypeChange = useCallback((newType: SlotType) => {
+    if (!editingSlot) return;
+    
+    // Create new slot with the new type, preserving position and order
+    const newSlot = createDefaultSlot(newType, editingSlot.position);
+    newSlot.id = editingSlot.id; // Keep same ID
+    newSlot.order = editingSlot.order; // Keep same order
+    newSlot.visible = editingSlot.visible; // Keep visibility
+    
+    setEditingSlot(newSlot);
+    setCurrentSlotType(newType);
+    
+    // Reset form and set new values
+    form.resetFields();
+    form.setFieldsValue({
+      type: newType,
+      position: newSlot.position,
+      visible: newSlot.visible,
+    });
+    
+    // Set type-specific initial values
+    switch (newType) {
+      case SlotType.LOGO:
+        form.setFieldsValue({
+          size: { maxHeight: 40 },
+        });
+        break;
+      case SlotType.TITLE:
+        form.setFieldsValue({
+          fontSize: 20,
+        });
+        break;
+      case SlotType.DATE:
+        form.setFieldsValue({
+          format: 'DD/MM/YYYY',
+          showTime: false,
+        });
+        break;
+      case SlotType.BADGE:
+        form.setFieldsValue({
+          badgeType: 'default',
+        });
+        break;
+    }
+  }, [editingSlot, form]);
+
+  const handleModalOk = useCallback(() => {
+    form.validateFields().then(values => {
+      // If type changed, create new slot with new type
+      let updatedSlot: HeaderSlot;
+      if (values.type && values.type !== editingSlot!.type) {
+        updatedSlot = createDefaultSlot(values.type, values.position || editingSlot!.position);
+        updatedSlot.id = editingSlot!.id; // Keep same ID
+        updatedSlot.order = editingSlot!.order; // Keep same order
+        updatedSlot.visible = editingSlot!.visible; // Keep visibility
+        // Merge other values
+        updatedSlot = {
+          ...updatedSlot,
+          ...values,
+        };
+      } else {
+        updatedSlot = {
+          ...editingSlot!,
+          ...values,
+        };
+      }
+
+      const existingIndex = layout.slots.findIndex(s => s.id === updatedSlot.id);
+      const newSlots =
+        existingIndex >= 0
+          ? layout.slots.map(s => (s.id === updatedSlot.id ? updatedSlot : s))
+          : [...layout.slots, updatedSlot];
+
+      setLayout({ ...layout, slots: newSlots });
+      setIsModalVisible(false);
+      setEditingSlot(null);
+      setCurrentSlotType(null);
+      form.resetFields();
+      message.success(t('Element saved'));
+    });
+  }, [editingSlot, form, layout]);
+
+  const handleSave = useCallback(() => {
+    onSave({ ...layout, enabled: true });
+    message.success(t('Header layout saved'));
+  }, [layout, onSave]);
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await SupersetClient.post({
+        endpoint: '/api/v1/dashboard/upload_header_image/',
+        body: formData,
+        headers: { Accept: 'application/json' },
+      });
+
+      const { url } = response.json.result;
+      form.setFieldsValue({ url });
+      message.success(t('Image uploaded successfully'));
+      return false; // Prevent default upload
+    } catch (error) {
+      getClientErrorObject(error).then(errorObj => {
+        const errorMessage = errorObj.message || errorObj.error || t('Unknown error');
+        message.error(t('Failed to upload image: ') + errorMessage);
+        console.error('Upload error:', errorObj);
+      });
+      return false;
+    } finally {
+      setUploading(false);
+    }
+  }, [form]);
+
+  const renderSlotForm = () => {
+    if (!editingSlot || !currentSlotType) return null;
+
+    const commonFields = (
+      <>
+        <Form.Item
+          name="position"
+          label={t('Position')}
+          initialValue={editingSlot.position}
+          rules={[{ required: true }]}
+        >
+          <Select>
+            <Select.Option value={SlotPosition.LEFT}>{t('Left')}</Select.Option>
+            <Select.Option value={SlotPosition.CENTER}>{t('Center')}</Select.Option>
+            <Select.Option value={SlotPosition.RIGHT}>{t('Right')}</Select.Option>
+          </Select>
+        </Form.Item>
+      </>
+    );
+
+    switch (currentSlotType) {
+      case SlotType.LOGO:
+        const logoSlot = currentSlotType === editingSlot.type ? (editingSlot as LogoSlot) : null;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="url"
+              label={t('Logo URL')}
+              initialValue={logoSlot?.url || ''}
+              rules={[{ required: true, message: t('Please enter a logo URL or upload a file') }]}
+              extra={t('Upload an image file or paste an external URL')}
+            >
+              <Input 
+                placeholder="https://example.com/logo.png or /static/uploads/dashboard_logos/..."
+                addonAfter={
+                  <Upload
+                    accept="image/*"
+                    showUploadList={false}
+                    beforeUpload={(file) => {
+                      handleImageUpload(file);
+                      return false;
+                    }}
+                    disabled={uploading}
+                  >
+                    <Button 
+                      icon={<PictureOutlined />} 
+                      loading={uploading}
+                      size="small"
+                    >
+                      {t('Upload')}
+                    </Button>
+                  </Upload>
+                }
+              />
+            </Form.Item>
+            {logoSlot?.url && (
+              <div style={{ marginBottom: 16, textAlign: 'center' }}>
+                <img 
+                  src={logoSlot.url} 
+                  alt="Preview" 
+                  style={{ maxHeight: 100, maxWidth: 200, objectFit: 'contain' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <Form.Item name="link" label={t('Link URL (optional)')} initialValue={logoSlot?.link || ''}>
+              <Input placeholder="https://example.com" />
+            </Form.Item>
+            <Form.Item
+              name={['size', 'maxHeight']}
+              label={t('Max Height (px)')}
+              initialValue={logoSlot?.size?.maxHeight || 40}
+            >
+              <InputNumber min={20} max={200} />
+            </Form.Item>
+            <Form.Item
+              name="openInNewTab"
+              label={t('Open link in new tab')}
+              initialValue={logoSlot?.openInNewTab || false}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </>
+        );
+
+      case SlotType.TITLE:
+        const titleSlot = editingSlot as TitleSlot;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="content"
+              label={t('Custom Title')}
+              initialValue={titleSlot.content}
+              extra={t('Leave empty to use dashboard title')}
+            >
+              <Input placeholder={dashboardTitle || 'Dashboard'} />
+            </Form.Item>
+            <Form.Item
+              name="fontSize"
+              label={t('Font Size')}
+              initialValue={titleSlot.fontSize || 20}
+            >
+              <InputNumber min={12} max={48} />
+            </Form.Item>
+          </>
+        );
+
+      case SlotType.TEXT:
+        const textSlot = editingSlot as TextSlot;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="content"
+              label={t('Text Content')}
+              initialValue={textSlot.content}
+              rules={[{ required: true }]}
+              extra={t('Use {date}, {time}, {datetime} for dynamic values')}
+            >
+              <Input.TextArea rows={3} placeholder={t('Enter text...')} />
+            </Form.Item>
+            <Form.Item
+              name="supportsDynamicContent"
+              label={t('Enable dynamic content')}
+              initialValue={textSlot.supportsDynamicContent}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </>
+        );
+
+      case SlotType.DATE:
+        const dateSlot = editingSlot as DateSlot;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="format"
+              label={t('Date Format')}
+              initialValue={dateSlot.format || 'DD/MM/YYYY'}
+            >
+              <Input placeholder="DD/MM/YYYY" />
+            </Form.Item>
+            <Form.Item
+              name="showTime"
+              label={t('Show Time')}
+              initialValue={dateSlot.showTime}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </>
+        );
+
+      case SlotType.BADGE:
+        const badgeSlot = editingSlot as BadgeSlot;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="label"
+              label={t('Label')}
+              initialValue={badgeSlot.label}
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Status" />
+            </Form.Item>
+            <Form.Item name="value" label={t('Value (optional)')} initialValue={badgeSlot.value}>
+              <Input placeholder="Active" />
+            </Form.Item>
+            <Form.Item
+              name="badgeType"
+              label={t('Type')}
+              initialValue={badgeSlot.badgeType || 'default'}
+            >
+              <Select>
+                <Select.Option value="default">{t('Default')}</Select.Option>
+                <Select.Option value="success">{t('Success')}</Select.Option>
+                <Select.Option value="warning">{t('Warning')}</Select.Option>
+                <Select.Option value="error">{t('Error')}</Select.Option>
+                <Select.Option value="info">{t('Info')}</Select.Option>
+              </Select>
+            </Form.Item>
+          </>
+        );
+
+      default:
+        return commonFields;
+    }
+  };
+
+  const getSlotDisplayInfo = (slot: HeaderSlot) => {
+    switch (slot.type) {
+      case SlotType.LOGO:
+        return { type: 'Logo', details: (slot as LogoSlot).url || 'No URL' };
+      case SlotType.TITLE:
+        return { type: 'Title', details: (slot as TitleSlot).content || dashboardTitle || 'Dashboard Title' };
+      case SlotType.TEXT:
+        return { type: 'Text', details: (slot as TextSlot).content };
+      case SlotType.DATE:
+        return { type: 'Date', details: (slot as DateSlot).format || 'DD/MM/YYYY' };
+      case SlotType.BADGE:
+        return { type: 'Badge', details: (slot as BadgeSlot).label };
+      case SlotType.SPACER:
+        return { type: 'Spacer', details: 'Empty space' };
+      case SlotType.DIVIDER:
+        return { type: 'Divider', details: 'Separator line' };
+      default:
+        return { type: 'Unknown', details: '' };
+    }
+  };
+
+  return (
+    <EditorContainer>
+      <h3 style={{ marginBottom: 16 }}>{t('Header Layout Editor')}</h3>
+
+      {/* Preview */}
+      <PreviewContainer>
+        <div style={{ marginBottom: 8, fontSize: 12, fontWeight: 600, color: '#666' }}>
+          {t('Preview')}
+        </div>
+        <CustomizableHeader
+          headerLayout={{ ...layout, enabled: true }}
+          dashboardTitle={dashboardTitle}
+        />
+      </PreviewContainer>
+
+      {/* Elements List */}
+      <div style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAddSlot}
+          style={{ marginBottom: 12 }}
+        >
+          {t('Add Element')}
+        </Button>
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="slots">
+            {provided => (
+              <SlotList {...provided.droppableProps} ref={provided.innerRef}>
+                {layout.slots.map((slot, index) => {
+                  const displayInfo = getSlotDisplayInfo(slot);
+                  return (
+                    <Draggable key={slot.id} draggableId={slot.id} index={index}>
+                      {(provided, snapshot) => (
+                        <SlotItem
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          isDragging={snapshot.isDragging}
+                        >
+                          <DragOutlined style={{ fontSize: 16, color: '#999', cursor: 'grab' }} />
+                          <SlotInfo>
+                            <SlotTypeLabel>{displayInfo.type}</SlotTypeLabel>
+                            <SlotDetails>{displayInfo.details}</SlotDetails>
+                          </SlotInfo>
+                          <ButtonGroup>
+                            <Button
+                              size="small"
+                              icon={slot.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                              onClick={() => handleToggleVisibility(slot.id)}
+                            />
+                            <Button
+                              size="small"
+                              icon={<EditOutlined />}
+                              onClick={() => handleEditSlot(slot)}
+                            />
+                            <Button
+                              size="small"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleDeleteSlot(slot.id)}
+                            />
+                          </ButtonGroup>
+                        </SlotItem>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </SlotList>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+
+      {/* Action Buttons */}
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <Button onClick={onCancel}>{t('Cancel')}</Button>
+        <Button type="primary" onClick={handleSave}>
+          {t('Save Layout')}
+        </Button>
+      </div>
+
+      {/* Edit Modal */}
+      <Modal
+        title={t('Edit Element')}
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setEditingSlot(null);
+          setCurrentSlotType(null);
+          form.resetFields();
+        }}
+        width={600}
+      >
+        {editingSlot && (
+          <Form form={form} layout="vertical">
+            <Form.Item 
+              name="type" 
+              label={t('Element Type')}
+              initialValue={editingSlot.type}
+            >
+              <Select onChange={handleTypeChange}>
+                <Select.Option value={SlotType.LOGO}>{t('Logo')}</Select.Option>
+                <Select.Option value={SlotType.TITLE}>{t('Title')}</Select.Option>
+                <Select.Option value={SlotType.TEXT}>{t('Text')}</Select.Option>
+                <Select.Option value={SlotType.DATE}>{t('Date')}</Select.Option>
+                <Select.Option value={SlotType.BADGE}>{t('Badge')}</Select.Option>
+                <Select.Option value={SlotType.SPACER}>{t('Spacer')}</Select.Option>
+                <Select.Option value={SlotType.DIVIDER}>{t('Divider')}</Select.Option>
+              </Select>
+            </Form.Item>
+            {renderSlotForm()}
+          </Form>
+        )}
+      </Modal>
+    </EditorContainer>
+  );
+};
+
+export default HeaderSlotEditor;
+
