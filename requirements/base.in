@@ -23,3 +23,6 @@ numexpr>=2.9.0
 # 5.0.0 has a sensitive deprecation used in other libs
 # -> https://github.com/aio-libs/async-timeout/blob/master/CHANGES.rst#500-2024-10-31
 async_timeout>=4.0.0,<5.0.0
+
+# Google Cloud Storage for dashboard logo uploads (optional, only needed if DASHBOARD_LOGO_GCP_BUCKET is configured)
+google-cloud-storage>=2.10.0

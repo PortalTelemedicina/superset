@@ -1,0 +1,577 @@
+/**
+ * Portal Telemedicina - Global Dashboard Styles
+ * 
+ * Automatically applied to all dashboards.
+ * No need to add CSS manually to each dashboard.
+ */
+
+/* === FILTER DROPDOWN IMPROVEMENTS === */
+[aria-label="Grupo"] .ant-select-dropdown {
+  min-width: 500px !important;
+  white-space: normal !important;
+  word-wrap: break-word;
+}
+
+/* === CSS VARIABLES === */
+:root {
+  --ptm-primary: #2C9FE5;
+  --ptm-primary-dark: #2075AC;
+  --ptm-secondary: #33A7B5;
+  --ptm-success: #5AD7A5;
+  --ptm-error: #EC4B60;
+  --ptm-attention: #F5C451;
+  
+  --ptm-neutral-white: #FFFFFF;
+  --ptm-neutral-100: #F7F7F6;
+  --ptm-neutral-200: #F1F1F1;
+  --ptm-neutral-300: #CACACA;
+  --ptm-neutral-400: #979797;
+  --ptm-neutral-500: #666666;
+  --ptm-neutral-600: #222222;
+  
+  --ptm-font-title: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  --ptm-radius-sm: 8px;
+  --ptm-radius-md: 12px;
+  --ptm-radius-lg: 16px;
+  
+  --ptm-shadow-card: 0 1px 2px rgba(0,0,0,0.08);
+  --ptm-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
+  
+  --dash-gutter: clamp(12px, 2vw, 32px);
+  
+  /* === FIGMA MODERN ANALYTICS THEME VARIABLES === */
+  /* Based on Figma Make: Modern Analytics Dashboard Design */
+  --ptm-figma-background: #f3f3f5;
+  --ptm-figma-primary: #030213;
+  --ptm-figma-card: #FFFFFF;
+  --ptm-figma-border: rgba(0, 0, 0, 0.1);
+  --ptm-figma-muted: #ececf0;
+  --ptm-figma-muted-foreground: #717182;
+  --ptm-figma-accent: #e9ebef;
+  --ptm-figma-radius: 0.625rem; /* 10px */
+  --ptm-figma-card-padding: 1.5rem; /* 24px */
+  --ptm-figma-grid-gap: 1.5rem; /* 24px */
+  --ptm-figma-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ptm-figma-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --ptm-figma-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --ptm-figma-shadow-hover: 0 10px 15px rgba(3, 2, 19, 0.05);
+}
+
+/* === DASHBOARD BACKGROUND === */
+.dashboard {
+  background-color: #f9fafb !important;
+}
+
+/* === CHART CARDS === */
+.dashboard-component-chart-holder {
+  background: var(--ptm-neutral-white) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: var(--ptm-radius-md) !important;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.dashboard-component-chart-holder:hover {
+  box-shadow: 0 10px 15px rgba(3, 2, 19, 0.05) !important;
+}
+
+/* === CHART TITLE === */
+.editable-title input,
+.header-medium {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 300 !important;
+  color: #717182 !important;
+}
+
+.dashboard-component-header {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 400 !important;
+  color: #717182 !important;
+  padding-bottom: 0px !important;
+}
+
+/* === HIDE BIG NUMBER PTM HEADERS === */
+/* Remove all header space for BigNumber PTM charts */
+/* Target the editable title input and header */
+[data-test-viz-type="ptm_big_number_trendline"] [data-test="slice-header"],
+[data-test-viz-type="ptm_big_number_trendline"] .header-title,
+[data-test-viz-type="ptm_big_number_trendline"] [data-test="editable-title-input"],
+[data-test-viz-type="ptm_big_number_trendline"] [data-test="editable-title"],
+[data-test-viz-type="ptm_big_number_total"] [data-test="slice-header"],
+[data-test-viz-type="ptm_big_number_total"] .header-title,
+[data-test-viz-type="ptm_big_number_total"] [data-test="editable-title-input"],
+[data-test-viz-type="ptm_big_number_total"] [data-test="editable-title"] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Hide the entire slice-header container for PTM charts */
+[data-test-viz-type^="ptm_big_number"] [data-test="slice-header"] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* === HIDE UI ELEMENTS === */
+.filter-counts {
+  display: none !important;
+}
+
+.header-controls {
+  display: none !important;
+}
+
+/* ================================================
+   EMBEDDED/STANDALONE MODE CUSTOMIZATION
+   Clean, professional view for client-facing dashboards
+   ================================================ */
+
+/* Hide Superset branding in standalone mode */
+.dashboard--standalone .navbar-brand,
+.dashboard--standalone .ant-menu-submenu-title,
+.dashboard--standalone .header-with-actions .editable-title {
+  display: none !important;
+}
+
+/* Hide the top Superset navigation bar */
+.dashboard--standalone .top-nav,
+.dashboard--standalone .navbar {
+  display: none !important;
+}
+
+/* Hide dashboard title bar if you want (we'll add custom one) */
+.dashboard--standalone .dashboard-header {
+  background: var(--ptm-neutral-white) !important;
+  border-bottom: 1px solid var(--ptm-neutral-200) !important;
+  padding: 1rem 2rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Clean up the dashboard content area */
+.dashboard--standalone .dashboard-content {
+  padding-top: 0 !important;
+}
+
+/* Custom PTM Header for Standalone Mode */
+.dashboard--standalone::before {
+  content: '';
+  display: block;
+  height: 80px;
+  background: var(--ptm-neutral-white);
+  border-bottom: 1px solid var(--ptm-neutral-200);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-image: 
+    var(--ptm-header-left-logo, none),
+    var(--ptm-header-right-logo, none);
+  background-position: 
+    2rem center,
+    calc(100% - 2rem) center;
+  background-repeat: no-repeat, no-repeat;
+  background-size: auto 50px, auto 50px;
+}
+
+/* Header Title */
+.dashboard--standalone .dashboard-title {
+  text-align: center;
+  padding: 1.5rem;
+  font-family: var(--ptm-font-title);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ptm-neutral-600);
+}
+
+/* Make tabs more prominent and professional */
+.dashboard--standalone .dashboard-component-tabs {
+  background: var(--ptm-neutral-white) !important;
+  border-bottom: 2px solid var(--ptm-neutral-200) !important;
+  padding: 0 2rem !important;
+}
+
+.dashboard--standalone .ant-tabs-nav {
+  margin: 0 !important;
+}
+
+.dashboard--standalone .ant-tabs-tab {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 500 !important;
+  font-size: 0.95rem !important;
+  padding: 1rem 1.5rem !important;
+  color: var(--ptm-neutral-500) !important;
+  transition: all 0.2s ease !important;
+}
+
+.dashboard--standalone .ant-tabs-tab:hover {
+  color: var(--ptm-primary) !important;
+}
+
+.dashboard--standalone .ant-tabs-tab-active {
+  color: var(--ptm-primary) !important;
+  font-weight: 600 !important;
+}
+
+.dashboard--standalone .ant-tabs-ink-bar {
+  background: var(--ptm-primary) !important;
+  height: 3px !important;
+}
+
+/* === CONSISTENT DASHBOARD GUTTER === */
+.dashboard .dashboard-content {
+  padding-left: var(--dash-gutter) !important;
+  padding-right: var(--dash-gutter) !important;
+}
+
+.dashboard .dashboard-content .grid-container {
+  margin-left: 17% !important;
+  margin-right: 17% !important;
+}
+
+/* ================================================
+   FIGMA MODERN ANALYTICS THEME
+   Based on Figma Make: Modern Analytics Dashboard Design
+   Apply by adding class "ptm-figma-modern" to dashboard
+   ================================================ */
+
+/* === MODERN THEME: DASHBOARD BACKGROUND === */
+.dashboard.ptm-figma-modern,
+.ptm-figma-modern .dashboard {
+  background-color: var(--ptm-figma-background) !important;
+  min-height: 100vh !important;
+}
+
+.ptm-figma-modern .dashboard-content {
+  /* Optional: Uncomment if you want max-width constraint */
+  /* max-width: 1600px !important; */
+  /* margin: 0 auto !important; */
+  /* Keep Superset's default padding to avoid breaking layouts */
+}
+
+/* === MODERN THEME: CHART CARDS === */
+.ptm-figma-modern .dashboard-component-chart-holder {
+  background: var(--ptm-figma-card) !important;
+  border: 1px solid var(--ptm-figma-border) !important;
+  border-radius: var(--ptm-figma-radius) !important;
+  box-shadow: var(--ptm-figma-shadow-sm) !important;
+  /* Keep Superset's default padding to avoid breaking layouts */
+  /* padding: var(--ptm-figma-card-padding) !important; */
+  transition: box-shadow 0.2s ease !important;
+  overflow: hidden !important;
+}
+
+.ptm-figma-modern .dashboard-component-chart-holder:hover {
+  box-shadow: var(--ptm-figma-shadow-hover) !important;
+  /* Removed transform to avoid breaking Superset's grid positioning */
+  /* transform: translateY(-1px) !important; */
+}
+
+/* === MODERN THEME: GRID CONTAINER === */
+.ptm-figma-modern .grid-container {
+  gap: var(--ptm-figma-grid-gap) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* === MODERN THEME: CHART TITLE === */
+.ptm-figma-modern .editable-title input {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 500 !important; /* font-medium */
+  line-height: 1.5 !important;
+  color: var(--ptm-figma-primary) !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* === MODERN THEME: CHART DESCRIPTION === */
+.ptm-figma-modern .dashboard-component-chart-holder p,
+.ptm-figma-modern .dashboard-component-chart-holder .text-muted-foreground {
+  font-size: 0.875rem !important; /* text-sm */
+  color: var(--ptm-figma-muted-foreground) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* === MODERN THEME: METRIC CARDS (Big Number) === */
+.ptm-figma-modern [data-test-viz-type*="big_number"] .dashboard-component-chart-holder {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.ptm-figma-modern [data-test-viz-type*="big_number"] .editable-title {
+  font-size: 0.875rem !important;
+  color: var(--ptm-figma-muted-foreground) !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.ptm-figma-modern [data-test-viz-type*="big_number"] .main-title {
+  font-size: 1.875rem !important; /* text-3xl */
+  font-weight: 600 !important; /* font-semibold */
+  letter-spacing: -0.025em !important; /* tracking-tight */
+  color: var(--ptm-figma-primary) !important;
+}
+
+/* === MODERN THEME: HEADER STYLING === */
+.ptm-figma-modern .dashboard-header {
+  background: rgba(255, 255, 255, 0.8) !important; /* bg-card/80 */
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid var(--ptm-figma-border) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  padding: 0 1.5rem !important;
+  height: 4rem !important; /* h-16 */
+}
+
+/* === MODERN THEME: FILTER BAR === */
+.ptm-figma-modern .dashboard-header .filter-container,
+.ptm-figma-modern .dashboard-header .ant-select-selector {
+  border: 1px solid var(--ptm-figma-border) !important;
+  border-radius: calc(var(--ptm-figma-radius) - 2px) !important;
+  background: var(--ptm-figma-card) !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.ptm-figma-modern .dashboard-header .filter-container:hover,
+.ptm-figma-modern .dashboard-header .ant-select-selector:hover {
+  box-shadow: var(--ptm-figma-shadow-sm) !important;
+}
+
+/* === MODERN THEME: GRID SPACING === */
+/* DON'T override grid-template-columns - it breaks Superset's positioning system */
+/* Only adjust gap spacing which is safe */
+.ptm-figma-modern .grid-container {
+  gap: var(--ptm-figma-grid-gap) !important;
+  /* DO NOT set grid-template-columns - Superset controls this via position_json */
+}
+
+/* === MODERN THEME: TYPOGRAPHY === */
+.ptm-figma-modern .dashboard h1 {
+  font-size: 1.875rem !important; /* text-2xl */
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  color: var(--ptm-figma-primary) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.ptm-figma-modern .dashboard h2 {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  color: var(--ptm-figma-primary) !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* === MODERN THEME: BUTTONS === */
+.ptm-figma-modern .dashboard button,
+.ptm-figma-modern .dashboard .ant-btn {
+  border-radius: calc(var(--ptm-figma-radius) - 2px) !important;
+  border: 1px solid var(--ptm-figma-border) !important;
+  background: var(--ptm-figma-card) !important;
+  color: var(--ptm-figma-muted-foreground) !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+.ptm-figma-modern .dashboard button:hover,
+.ptm-figma-modern .dashboard .ant-btn:hover {
+  color: var(--ptm-figma-primary) !important;
+  box-shadow: var(--ptm-figma-shadow-sm) !important;
+}
+
+/* === MODERN THEME: SCROLLBAR === */
+.ptm-figma-modern .dashboard ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ptm-figma-modern .dashboard ::-webkit-scrollbar-track {
+  background: var(--ptm-figma-muted);
+  border-radius: 4px;
+}
+
+.ptm-figma-modern .dashboard ::-webkit-scrollbar-thumb {
+  background: var(--ptm-figma-muted-foreground);
+  border-radius: 4px;
+}
+
+.ptm-figma-modern .dashboard ::-webkit-scrollbar-thumb:hover {
+  background: var(--ptm-figma-primary);
+}
+
+/* === MODERN THEME: ALTERNATIVE - APPLY GLOBALLY (SAFE VERSION) === */
+/* Uncomment the section below to apply modern theme to ALL dashboards by default */
+/* WARNING: Only uncomment if you understand the implications */
+/*
+.dashboard {
+  background-color: var(--ptm-figma-background) !important;
+}
+
+.dashboard-component-chart-holder {
+  background: var(--ptm-figma-card) !important;
+  border: 1px solid var(--ptm-figma-border) !important;
+  border-radius: var(--ptm-figma-radius) !important;
+  box-shadow: var(--ptm-figma-shadow-sm) !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.dashboard-component-chart-holder:hover {
+  box-shadow: var(--ptm-figma-shadow-hover) !important;
+}
+*/
+
+/* ================================================
+   STANDALONE MODE 3 - PROFESSIONAL EMBEDDED DASHBOARDS
+   Clean, branded view with custom header and visible tabs
+   ================================================ */
+
+/* Hide Superset top navigation and branding */
+.standalone-mode-3 .top,
+.standalone-mode-3 .menu,
+.standalone-mode-3 .navbar-brand,
+.standalone-mode-3 [class*="TopNav"],
+.standalone-mode-3 [data-test="top-navbar"],
+.standalone-mode-3 header[role="banner"],
+.standalone-mode-3 .ant-menu-horizontal {
+  display: none !important;
+}
+
+/* Hide the default dashboard header (we're using custom PTMDashboardHeader) */
+.standalone-mode-3 .dashboard-header,
+.standalone-mode-3 [data-test="dashboard-header"],
+.standalone-mode-3 .header-with-actions {
+  display: none !important;
+}
+
+/* Hide dashboard footer */
+.standalone-mode-3 footer,
+.standalone-mode-3 [role="contentinfo"] {
+  display: none !important;
+}
+
+/* Remove top padding from dashboard content */
+.standalone-mode-3 .dashboard-content,
+.standalone-mode-3 [data-test="dashboard-content"] {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Full height layout */
+.standalone-mode-3 .dashboard,
+.standalone-mode-3 [data-test="dashboard-grid"] {
+  min-height: 100vh !important;
+  padding: 0 !important;
+}
+
+/* Ensure tabs are visible and well-styled */
+.standalone-mode-3 .dashboard-component-tabs,
+.standalone-mode-3 [data-test="dashboard-component-tabs"] {
+  display: block !important;
+  visibility: visible !important;
+  background: var(--ptm-neutral-white) !important;
+  border-bottom: 2px solid var(--ptm-neutral-200) !important;
+  padding: 0 2rem !important;
+  margin: 0 !important;
+}
+
+/* Tab navigation styling */
+.standalone-mode-3 .ant-tabs,
+.standalone-mode-3 .ant-tabs-nav-wrap {
+  display: flex !important;
+  visibility: visible !important;
+  margin: 0 !important;
+}
+
+.standalone-mode-3 .ant-tabs-nav {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.standalone-mode-3 .ant-tabs-tab {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 500 !important;
+  font-size: 0.95rem !important;
+  padding: 1rem 1.5rem !important;
+  color: var(--ptm-neutral-500) !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  visibility: visible !important;
+}
+
+.standalone-mode-3 .ant-tabs-tab:hover {
+  color: var(--ptm-primary) !important;
+}
+
+.standalone-mode-3 .ant-tabs-tab-active,
+.standalone-mode-3 .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--ptm-primary) !important;
+  font-weight: 600 !important;
+}
+
+.standalone-mode-3 .ant-tabs-ink-bar {
+  background: var(--ptm-primary) !important;
+  height: 3px !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Hide sidebar in embedded mode */
+.standalone-mode-3 .dashboard-builder-sidepane,
+.standalone-mode-3 [data-test="dashboard-builder-sidepane"] {
+  display: none !important;
+}
+
+/* Filter bar styling */
+.standalone-mode-3 .filter-bar,
+.standalone-mode-3 [data-test="filter-bar"] {
+  background: var(--ptm-neutral-100) !important;
+  border-bottom: 1px solid var(--ptm-neutral-200) !important;
+  padding: 0.75rem 2rem !important;
+}
+
+.standalone-mode-3 .filter-bar__wrapper {
+  max-width: 100% !important;
+}
+
+/* Clean content area */
+.standalone-mode-3 .grid-container {
+  padding: 1.5rem 2rem !important;
+}
+
+/* Chart cards in embedded mode */
+.standalone-mode-3 .dashboard-component-chart-holder {
+  background: var(--ptm-neutral-white) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: var(--ptm-radius-md) !important;
+  box-shadow: var(--ptm-shadow-card) !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.standalone-mode-3 .dashboard-component-chart-holder:hover {
+  box-shadow: var(--ptm-shadow-hover) !important;
+}
+
+/* Ensure no Superset logo watermarks */
+.standalone-mode-3 [class*="logo"],
+.standalone-mode-3 [class*="Logo"],
+.standalone-mode-3 .superset-logo {
+  display: none !important;
+}
+
+/* Hide any "Powered by Superset" text */
+.standalone-mode-3 [class*="powered"],
+.standalone-mode-3 [class*="Powered"] {
+  display: none !important;
+}

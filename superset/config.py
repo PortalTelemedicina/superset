@@ -768,6 +768,30 @@ SCREENSHOT_PLAYWRIGHT_DEFAULT_TIMEOUT = int(
 UPLOAD_FOLDER = BASE_DIR + "/static/uploads/"
 UPLOAD_CHUNK_SIZE = 4096
 
+# GCP Cloud Storage bucket for dashboard logo uploads (secure rehosting)
+# 
+# If set, dashboard logos will be uploaded to this GCP bucket and the returned
+# GCP public URL will be used directly in HTML for rendering.
+# 
+# If not set (None), logos are stored in local static files (/static/uploads/)
+# and the static file URL is used in HTML.
+#
+# Only file uploads are supported (no URL downloads). Users must upload image
+# files directly. The returned URL is ready to use in dashboard header HTML.
+#
+# Requires: pip install google-cloud-storage
+# Uses default GCP credentials or GOOGLE_APPLICATION_CREDENTIALS env var
+# Example: DASHBOARD_LOGO_GCP_BUCKET = "my-superset-logos-bucket"
+DASHBOARD_LOGO_GCP_BUCKET = os.environ.get("DASHBOARD_LOGO_GCP_BUCKET", None)
+
+# Optional subfolder for dashboard logo uploads
+# If empty string or not set, images are stored directly in uploads root
+# If set (e.g., "dashboard_logos"), images are stored in uploads/dashboard_logos/
+# Applies to both GCP bucket and local filesystem storage
+# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # Store in uploads root
+# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"  # Store in uploads/dashboard_logos/
+DASHBOARD_LOGO_SUBFOLDER = ""
+
 # ---------------------------------------------------
 # Cache configuration
 # ---------------------------------------------------
@@ -1619,6 +1643,11 @@ TALISMAN_CONFIG = {
             "'self'",
             "blob:",
             "data:",
+            # GCP Cloud Storage for dashboard logos (secure rehosting)
+            # Wildcard allows all GCP storage buckets
+            "https://storage.googleapis.com",
+            "https://*.storage.googleapis.com",
+            # Existing Superset services
             "https://apachesuperset.gateway.scarf.sh",
             "https://static.scarf.sh/",
             # "https://cdn.brandfolder.io", # Uncomment when SLACK_ENABLE_AVATARS is True  # noqa: E501
@@ -1656,6 +1685,11 @@ TALISMAN_DEV_CONFIG = {
             "'self'",
             "blob:",
             "data:",
+            # GCP Cloud Storage for dashboard logos (secure rehosting)
+            # Wildcard allows all GCP storage buckets
+            "https://storage.googleapis.com",
+            "https://*.storage.googleapis.com",
+            # Existing Superset services
             "https://apachesuperset.gateway.scarf.sh",
             "https://static.scarf.sh/",
             "https://cdn.brandfolder.io",
