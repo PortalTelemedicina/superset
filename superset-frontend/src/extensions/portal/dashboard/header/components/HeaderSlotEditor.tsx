@@ -137,6 +137,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
   const [form] = Form.useForm();
   const [uploading, setUploading] = useState(false);
   const [currentSlotType, setCurrentSlotType] = useState<SlotType | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 
   const handleDragEnd = useCallback(
     (result: any) => {
@@ -168,6 +169,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
   const handleEditSlot = useCallback((slot: HeaderSlot) => {
     setEditingSlot(slot);
     setCurrentSlotType(slot.type);
+    setUploadedImageUrl(slot.type === SlotType.LOGO ? (slot as LogoSlot).url || null : null);
     setIsModalVisible(true);
   }, []);
 
@@ -305,6 +307,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
 
       const { url } = response.json.result;
       form.setFieldsValue({ url });
+      setUploadedImageUrl(url);
       message.success(t('Image uploaded successfully'));
       return false; // Prevent default upload
     } catch (error) {
@@ -388,49 +391,54 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
             {commonFields}
             <Form.Item
               name="url"
-              label={t('Logo URL')}
+              label={t('Logo Image')}
               initialValue={logoSlot?.url || ''}
-              rules={[{ required: true, message: t('Please enter a logo URL or upload a file') }]}
-              extra={t('Upload an image file or paste an external URL')}
+              rules={[{ required: true, message: t('Please upload an image file') }]}
+              extra={t('Upload an image file (PNG, JPG, SVG, GIF, or WebP, max 2MB)')}
             >
-              <Input 
-                placeholder="https://example.com/logo.png or /static/uploads/dashboard_logos/..."
-                addonAfter={
-                  <Upload
-                    accept="image/*"
-                    showUploadList={false}
-                    beforeUpload={(file) => {
-                      handleImageUpload(file);
-                      return false;
-                    }}
-                    disabled={uploading}
-                  >
-                    <Button 
-                      icon={<PictureOutlined />} 
-                      loading={uploading}
-                      size="small"
-                    >
-                      {t('Upload')}
-                    </Button>
-                  </Upload>
-                }
-              />
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                beforeUpload={(file) => {
+                  handleImageUpload(file);
+                  return false;
+                }}
+                disabled={uploading}
+              >
+                <Button 
+                  icon={<PictureOutlined />} 
+                  loading={uploading}
+                  type="default"
+                  block
+                >
+                  {uploading ? t('Uploading...') : t('Upload Image')}
+                </Button>
+              </Upload>
             </Form.Item>
-            {logoSlot?.url && (
-              <div style={{ marginBottom: 16, textAlign: 'center' }}>
+            {/* Show preview of uploaded/selected image */}
+            {(uploadedImageUrl || logoSlot?.url) && (
+              <div style={{ marginTop: 16, marginBottom: 16, textAlign: 'center' }}>
+                <div style={{ marginBottom: 8, fontSize: 12, color: '#666' }}>
+                  {t('Preview')}:
+                </div>
                 <img 
-                  src={logoSlot.url} 
-                  alt="Preview" 
-                  style={{ maxHeight: 100, maxWidth: 200, objectFit: 'contain' }}
+                  src={uploadedImageUrl || logoSlot?.url} 
+                  alt="Logo preview" 
+                  style={{ 
+                    maxHeight: 100, 
+                    maxWidth: 200, 
+                    objectFit: 'contain',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: 4,
+                    padding: 8,
+                    backgroundColor: '#fafafa'
+                  }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
               </div>
             )}
-            <Form.Item name="link" label={t('Link URL (optional)')} initialValue={logoSlot?.link || ''}>
-              <Input placeholder="https://example.com" />
-            </Form.Item>
             <Form.Item
               name={['size', 'maxHeight']}
               label={t('Max Height (px)')}
@@ -740,6 +748,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
           setIsModalVisible(false);
           setEditingSlot(null);
           setCurrentSlotType(null);
+          setUploadedImageUrl(null);
           form.resetFields();
         }}
         width={600}
