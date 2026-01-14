@@ -46,10 +46,34 @@ def upload_header_image_handler():
         return 400, None, f"File too large. Maximum size: 2MB. Current size: {file_size / 1024 / 1024:.2f}MB"
 
     try:
-        # Create upload directory if it doesn't exist
         upload_dir = Path(current_app.config.get("UPLOAD_FOLDER", "uploads"))
         logo_dir = upload_dir / "dashboard_logos"
-        logo_dir.mkdir(parents=True, exist_ok=True)
+        logo_dir_str = str(logo_dir)
+
+        try:
+            os.makedirs(logo_dir_str, mode=0o755, exist_ok=True)
+        except PermissionError as perm_err:
+            current_app.logger.error(
+                f"Permission denied creating upload directory: {logo_dir_str}. "
+                f"Error: {str(perm_err)}. "
+                f"Please ensure the directory exists and is writable, or run: "
+                f"mkdir -p {logo_dir_str} && chmod 755 {logo_dir_str}"
+            )
+            return 500, None, (
+                f"Permission denied: Cannot create upload directory '{logo_dir_str}'. "
+                f"In development, you may need to create it manually with proper permissions."
+            )
+        
+        if not os.access(logo_dir_str, os.W_OK):
+            current_app.logger.error(
+                f"Upload directory is not writable: {logo_dir_str}. "
+                f"Current permissions: {oct(os.stat(logo_dir_str).st_mode)}. "
+                f"Try: chmod 755 {logo_dir_str}"
+            )
+            return 500, None, (
+                f"Upload directory is not writable: {logo_dir_str}. "
+                f"Please check directory permissions."
+            )
 
         # Generate unique filename
         unique_id = str(uuid.uuid4())
@@ -65,6 +89,12 @@ def upload_header_image_handler():
         url = f"/static/uploads/dashboard_logos/{filename}"
 
         return 200, {"url": url}, "Image uploaded successfully"
+    except PermissionError as perm_err:
+        current_app.logger.error(f"Permission denied uploading header image: {str(perm_err)}")
+        return 500, None, (
+            f"Permission denied: {str(perm_err)}. "
+            f"Please check that the upload directory exists and is writable."
+        )
     except Exception as e:
         current_app.logger.error(f"Error uploading header image: {str(e)}")
         return 500, None, f"Error uploading image: {str(e)}"
