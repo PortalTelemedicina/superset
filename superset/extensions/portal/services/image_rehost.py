@@ -118,28 +118,9 @@ class ImageRehostService:
         file.seek(0)
         blob.upload_from_file(file, content_type=content_type)
         
-        # Try to make publicly readable (for legacy buckets without uniform bucket-level access)
-        # If uniform bucket-level access is enabled, this will fail but that's OK
-        # as long as the bucket has IAM policy allowing public read access
-        try:
-            blob.make_public()
-            current_app.logger.info(f"Made blob public via ACL: {blob_path}")
-        except Exception as e:
-            # Uniform bucket-level access enabled - rely on bucket IAM policy instead
-            error_msg = str(e).lower()
-            if "uniform bucket-level access" in error_msg:
-                current_app.logger.info(
-                    f"Bucket uses uniform bucket-level access. "
-                    f"Relying on bucket IAM policy for public access: {blob_path}"
-                )
-            else:
-                # Unexpected error - log but continue (bucket IAM might still allow access)
-                current_app.logger.warning(
-                    f"Could not make blob public via ACL: {error_msg}. "
-                    f"Ensure bucket IAM allows public read access."
-                )
-        
-        # Generate public URL (works if bucket has public IAM policy)
+        # Generate public URL
+        # Note: Public access is controlled by bucket IAM policy, not object ACLs
+        # Ensure bucket has IAM policy: allUsers with role Storage Object Viewer
         public_url = f"https://storage.googleapis.com/{bucket_name}/{blob_path}"
         
         current_app.logger.info(f"Uploaded image to GCP: {blob_path} -> {public_url}")
