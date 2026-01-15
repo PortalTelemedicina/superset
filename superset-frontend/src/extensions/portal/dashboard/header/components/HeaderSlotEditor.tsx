@@ -50,6 +50,7 @@ import {
   TitleSlot,
   TextSlot,
   DateSlot,
+  DataFreshnessSlot,
   BadgeSlot,
 } from '../types';
 import CustomizableHeader from './CustomizableHeader';
@@ -230,6 +231,16 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
         form.setFieldsValue({
           format: 'DD/MM/YYYY',
           showTime: false,
+        });
+        break;
+      case SlotType.DATA_FRESHNESS:
+        form.setFieldsValue({
+          label: 'Última atualização',
+          timezone: 'America/Sao_Paulo',
+          showTime: true,
+          aggregation: 'min',
+          formatPreset: 'pt_long',
+          showDetails: false,
         });
         break;
       case SlotType.BADGE:
@@ -475,6 +486,70 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
           </>
         );
 
+      case SlotType.DATA_FRESHNESS:
+        const freshnessSlot = editingSlot as DataFreshnessSlot;
+        return (
+          <>
+            {commonFields}
+            <Form.Item
+              name="label"
+              label={t('Label')}
+              initialValue={freshnessSlot.label || 'Última atualização'}
+            >
+              <Input placeholder={t('Última atualização')} />
+            </Form.Item>
+            <Form.Item
+              name="timezone"
+              label={t('Timezone')}
+              initialValue={freshnessSlot.timezone || 'America/Sao_Paulo'}
+            >
+              <Input placeholder="America/Sao_Paulo" />
+            </Form.Item>
+            <Form.Item
+              name="showTime"
+              label={t('Show Time')}
+              initialValue={freshnessSlot.showTime ?? true}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+            <Form.Item
+              name="aggregation"
+              label={t('Aggregation')}
+              initialValue={freshnessSlot.aggregation || 'min'}
+            >
+              <Select>
+                <Select.Option value="min">{t('Minimum')}</Select.Option>
+                <Select.Option value="max">{t('Maximum')}</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="formatPreset"
+              label={t('Date format')}
+              initialValue={freshnessSlot.formatPreset || 'pt_long'}
+            >
+              <Select>
+                <Select.Option value="pt_full">{t('Português (completo)')}</Select.Option>
+                <Select.Option value="pt_long">{t('Português (longo)')}</Select.Option>
+                <Select.Option value="pt_medium">{t('Português (médio)')}</Select.Option>
+                <Select.Option value="pt_short">{t('Português (curto)')}</Select.Option>
+                <Select.Option value="numeric_date">{t('Data numérica (14/01/2025)')}</Select.Option>
+                <Select.Option value="iso_date">{t('ISO (2025-01-14)')}</Select.Option>
+                <Select.Option value="iso_datetime">{t('ISO data e hora (2025-01-14 15:04:05)')}</Select.Option>
+                <Select.Option value="time_hms">{t('Hora (15:04:05)')}</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="showDetails"
+              label={t('Show details')}
+              initialValue={freshnessSlot.showDetails}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </>
+        );
+
       case SlotType.BADGE:
         const badgeSlot = editingSlot as BadgeSlot;
         return (
@@ -522,6 +597,11 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
         return { type: 'Text', details: (slot as TextSlot).content };
       case SlotType.DATE:
         return { type: 'Date', details: (slot as DateSlot).format || 'DD/MM/YYYY' };
+      case SlotType.DATA_FRESHNESS:
+        return {
+          type: 'Data Freshness',
+          details: (slot as DataFreshnessSlot).label || 'Última atualização',
+        };
       case SlotType.BADGE:
         return { type: 'Badge', details: (slot as BadgeSlot).label };
       case SlotType.SPACER:
@@ -643,6 +723,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
                 <Select.Option value={SlotType.TITLE}>{t('Title')}</Select.Option>
                 <Select.Option value={SlotType.TEXT}>{t('Text')}</Select.Option>
                 <Select.Option value={SlotType.DATE}>{t('Date')}</Select.Option>
+                <Select.Option value={SlotType.DATA_FRESHNESS}>{t('Data Freshness')}</Select.Option>
                 <Select.Option value={SlotType.BADGE}>{t('Badge')}</Select.Option>
                 <Select.Option value={SlotType.SPACER}>{t('Spacer')}</Select.Option>
                 <Select.Option value={SlotType.DIVIDER}>{t('Divider')}</Select.Option>

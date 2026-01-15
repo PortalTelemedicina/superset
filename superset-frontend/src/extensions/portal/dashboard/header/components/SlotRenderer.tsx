@@ -27,10 +27,12 @@ import {
   TitleSlot,
   TextSlot,
   DateSlot,
+  DataFreshnessSlot,
   BadgeSlot,
   SpacerSlot,
   DividerSlot,
 } from '../types';
+import DataFreshnessElement from './DataFreshnessElement';
 
 const SlotContainer = styled.div<{ customStyle?: any }>`
   display: inline-flex;
@@ -79,12 +81,14 @@ interface SlotRendererProps {
   slot: HeaderSlot;
   dashboardTitle?: string;
   onTitleChange?: (newTitle: string) => void;
+  dashboardId?: number;
 }
 
 export const SlotRenderer: React.FC<SlotRendererProps> = ({
   slot,
   dashboardTitle,
   onTitleChange,
+  dashboardId,
 }) => {
   const renderSlot = useMemo(() => {
     const customStyle = slot.style || {};
@@ -165,6 +169,26 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         );
       }
 
+      case SlotType.DATA_FRESHNESS: {
+        const freshnessSlot = slot as DataFreshnessSlot;
+        return (
+          <SlotContainer customStyle={customStyle}>
+            <DateText>
+              <DataFreshnessElement
+                dashboardId={dashboardId}
+                label={freshnessSlot.label}
+                timezone={freshnessSlot.timezone}
+                showTime={freshnessSlot.showTime}
+                aggregation={freshnessSlot.aggregation}
+                formatPreset={freshnessSlot.formatPreset}
+                dateStyle={freshnessSlot.dateStyle}
+                showDetails={freshnessSlot.showDetails}
+              />
+            </DateText>
+          </SlotContainer>
+        );
+      }
+
       case SlotType.BADGE: {
         const badgeSlot = slot as BadgeSlot;
         const statusMap = {
@@ -208,7 +232,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
       default:
         return null;
     }
-  }, [slot, dashboardTitle, onTitleChange]);
+  }, [slot, dashboardTitle, onTitleChange, dashboardId]);
 
   if (!slot.visible) {
     return null;
