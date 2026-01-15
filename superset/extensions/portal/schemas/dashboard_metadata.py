@@ -19,7 +19,9 @@ class HeaderLayoutSlotSchema(Schema):
     id = fields.Str(required=True)
     type = fields.Str(
         required=True,
-        validate=validate.OneOf(['logo', 'title', 'text', 'date', 'badge', 'spacer', 'divider'])
+        validate=validate.OneOf(
+            ['logo', 'title', 'text', 'date', 'data_freshness', 'badge', 'spacer', 'divider']
+        ),
     )
     position = fields.Str(
         required=True,
@@ -48,6 +50,37 @@ class HeaderLayoutSlotSchema(Schema):
     format = fields.Str(required=False, allow_none=True)
     showTime = fields.Bool(required=False, missing=False)
     locale = fields.Str(required=False, allow_none=True)
+
+    # DataFreshnessSlot fields
+    timezone = fields.Str(required=False, allow_none=True)
+    aggregation = fields.Str(
+        required=False,
+        allow_none=True,
+        validate=validate.OneOf(['min', 'max', None]),
+    )
+    formatPreset = fields.Str(
+        required=False,
+        allow_none=True,
+        validate=validate.OneOf(
+            [
+                'pt_full',
+                'pt_long',
+                'pt_medium',
+                'pt_short',
+                'numeric_date',
+                'iso_date',
+                'iso_datetime',
+                'time_hms',
+                None,
+            ]
+        ),
+    )
+    dateStyle = fields.Str(
+        required=False,
+        allow_none=True,
+        validate=validate.OneOf(['short', 'medium', 'long', 'full', None]),
+    )
+    showDetails = fields.Bool(required=False, allow_none=True)
     
     # BadgeSlot fields
     label = fields.Str(required=False, allow_none=True)

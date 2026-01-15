@@ -28,6 +28,7 @@ export enum SlotType {
   TITLE = 'title',
   TEXT = 'text',
   DATE = 'date',
+  DATA_FRESHNESS = 'data_freshness',
   BADGE = 'badge',
   SPACER = 'spacer',
   DIVIDER = 'divider',
@@ -99,6 +100,17 @@ export interface DateSlot extends BaseSlot {
   locale?: string;
 }
 
+export interface DataFreshnessSlot extends BaseSlot {
+  type: SlotType.DATA_FRESHNESS;
+  label?: string;
+  timezone?: string;
+  showTime?: boolean;
+  aggregation?: 'min' | 'max';
+  formatPreset?: string;
+  dateStyle?: 'short' | 'medium' | 'long' | 'full';
+  showDetails?: boolean;
+}
+
 export interface BadgeSlot extends BaseSlot {
   type: SlotType.BADGE;
   label: string;
@@ -123,6 +135,7 @@ export type HeaderSlot =
   | TitleSlot
   | TextSlot
   | DateSlot
+  | DataFreshnessSlot
   | BadgeSlot
   | SpacerSlot
   | DividerSlot;
@@ -184,6 +197,17 @@ export const createDefaultSlot = (type: SlotType, position: SlotPosition = SlotP
         format: 'DD/MM/YYYY',
         showTime: false,
       } as DateSlot;
+
+    case SlotType.DATA_FRESHNESS:
+      return {
+        ...baseSlot,
+        type: SlotType.DATA_FRESHNESS,
+        label: 'Última atualização',
+        timezone: 'America/Sao_Paulo',
+        showTime: true,
+        aggregation: 'min',
+        showDetails: false,
+      } as DataFreshnessSlot;
 
     case SlotType.BADGE:
       return {

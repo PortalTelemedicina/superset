@@ -180,6 +180,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "get_charts",
         "get_datasets",
         "get_tabs",
+        "get_freshness",
         "get_embedded",
         "set_embedded",
         "delete_embedded",
@@ -440,6 +441,61 @@ class DashboardRestApi(BaseSupersetModelRestApi):
             return self.response(200, result=result)
         except (TypeError, ValueError) as err:
             raise DatasetValidationError(err) from err
+
+    @expose("/<id_or_slug>/freshness", methods=("GET",))
+    @protect()
+    @permission_name("read")
+    @handle_api_exception
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get_freshness",
+        log_to_statsd=False,
+    )
+    @with_dashboard
+    def get_freshness(self, dash: Dashboard) -> Response:
+        """Get dashboard data freshness metadata.
+        ---
+        get:
+          summary: Get dashboard data freshness metadata
+          parameters:
+          - in: path
+            schema:
+              type: string
+            name: id_or_slug
+            description: Either the id of the dashboard, or its slug
+          responses:
+            200:
+              description: Dashboard freshness metadata
+              content:
+                application/json:
+                  schema:
+                    type: object
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            403:
+              $ref: '#/components/responses/403'
+            404:
+              $ref: '#/components/responses/404'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        # [PORTAL_EXTENSION] Use isolated handler from extension
+        try:
+            from superset.extensions.portal.api.dashboard_freshness import (
+                dashboard_freshness_handler,
+            )
+
+            status_code, result, message = dashboard_freshness_handler(dash)
+            if status_code == 200:
+                return self.response(status_code, result=result, message=message)
+            if status_code == 400:
+                return self.response_400(message=message)
+            return self.response_500(message=message)
+        except ImportError:
+            logger.warning("Portal extension not available for dashboard freshness")
+            return self.response_400(message="Dashboard freshness not available")
 
     @expose("/<id_or_slug>/tabs", methods=("GET",))
     @protect()
