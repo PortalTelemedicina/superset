@@ -58,12 +58,14 @@ interface CustomizableHeaderProps {
   headerLayout: HeaderLayout;
   dashboardTitle?: string;
   onTitleChange?: (newTitle: string) => void;
+  dashboardId?: number;
 }
 
 export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
   headerLayout,
   dashboardTitle,
   onTitleChange,
+  dashboardId,
 }) => {
   const leftSlots = useMemo(
     () => getSlotsByPosition(headerLayout.slots, SlotPosition.LEFT),
@@ -98,6 +100,7 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
               slot={slot}
               dashboardTitle={dashboardTitle}
               onTitleChange={onTitleChange}
+              dashboardId={dashboardId}
             />
           ))}
         </SlotGroup>
@@ -112,6 +115,7 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
               slot={slot}
               dashboardTitle={dashboardTitle}
               onTitleChange={onTitleChange}
+              dashboardId={dashboardId}
             />
           ))}
         </SlotGroup>
@@ -126,6 +130,7 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
               slot={slot}
               dashboardTitle={dashboardTitle}
               onTitleChange={onTitleChange}
+              dashboardId={dashboardId}
             />
           ))}
         </SlotGroup>

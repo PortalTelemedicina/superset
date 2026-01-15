@@ -172,6 +172,7 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
         <CustomizableHeader
           headerLayout={headerLayout}
           dashboardTitle={dashboardInfo?.dashboard_title}
+          dashboardId={dashboardInfo?.id}
         />
       </div>
     );
