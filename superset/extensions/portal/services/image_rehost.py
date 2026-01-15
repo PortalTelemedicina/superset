@@ -91,7 +91,13 @@ class ImageRehostService:
             )
         
         # Initialize GCP client
-        client = storage.Client()
+        credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+
+        if credentials_path:
+            client = storage.Client.from_service_account_json(credentials_path)
+        else:
+            client = storage.Client()  # fallback para ADC
+
         bucket = client.bucket(bucket_name)
         
         # Create blob path (handle empty subfolder)
