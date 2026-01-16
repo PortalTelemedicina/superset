@@ -56,19 +56,27 @@ export function getThemeDataZoom(formData: Record<string, unknown>): DataZoomCon
   };
 
   const result: DataZoomConfig = {};
+
+  // Extra bottom padding for X-axis slider so it doesn't overlap the legend
+  const xAxisBottomPadding = 10;
+  const yAxisRightPadding = 36;
   
   if (axis === 'both') {
     result.dataZoom = [...make('x'), ...make('y')];
     result.grid = {
-      right: 40,
+      right: PTM_THEME.echarts.grid.bottom + yAxisRightPadding,
+      bottom: PTM_THEME.echarts.grid.bottom + xAxisBottomPadding,
     };
   } else if (axis === 'y') {
     result.dataZoom = make('y');
     result.grid = {
-      right: 40,
+      right: PTM_THEME.echarts.grid.bottom + yAxisRightPadding,
     };
   } else {
     result.dataZoom = make('x');
+    result.grid = {
+      bottom: PTM_THEME.echarts.grid.bottom + xAxisBottomPadding,
+    };
   }
   
   result.toolbox = { show: false };
