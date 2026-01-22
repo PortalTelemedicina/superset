@@ -56,7 +56,7 @@ const LogoImage = styled.img<{ size?: any }>`
 const TitleText = styled.div<{ fontSize?: number }>`
   font-size: ${({ fontSize }) => fontSize || 20}px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.grayscale.dark2};
+  color: ${({ theme }) => theme.colorBgElevated};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -64,12 +64,12 @@ const TitleText = styled.div<{ fontSize?: number }>`
 
 const TextContent = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.grayscale.dark1};
+  color: ${({ theme }) => theme.colorTextSecondary};
 `;
 
 const DateText = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  color: ${({ theme }) => theme.colorText};
 `;
 
 const SpacerDiv = styled.div<{ width?: number }>`

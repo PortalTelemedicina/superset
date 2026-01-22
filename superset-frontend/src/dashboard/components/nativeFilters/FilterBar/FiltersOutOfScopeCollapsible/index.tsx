@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ReactNode } from 'react';
-import { css, Divider, Filter, SupersetTheme, t } from '@superset-ui/core';
+import { css, Divider, Filter, SupersetTheme } from '@superset-ui/core';
 import { Collapse } from '@superset-ui/core/components';
 
 export interface FiltersOutOfScopeCollapsibleProps {

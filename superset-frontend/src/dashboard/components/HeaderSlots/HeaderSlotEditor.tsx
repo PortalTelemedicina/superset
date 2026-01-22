@@ -56,7 +56,7 @@ import CustomizableHeader from './CustomizableHeader';
 
 const EditorContainer = styled.div`
   padding: 24px;
-  background: ${({ theme }) => theme.colors.grayscale.light5};
+  background: ${({ theme }) => theme.colorBgContainer};
   border-radius: 8px;
 `;
 
@@ -65,7 +65,7 @@ const PreviewContainer = styled.div`
   padding: 16px;
   background: white;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+  border: 1px solid ${({ theme }) => theme.colorBorderSecondary};
 `;
 
 const SlotList = styled.div`
@@ -81,13 +81,13 @@ const SlotItem = styled.div<{ isDragging?: boolean }>`
   gap: 12px;
   padding: 12px;
   background: white;
-  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+  border: 1px solid ${({ theme }) => theme.colorBorderSecondary};
   border-radius: 6px;
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
   cursor: grab;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary.base};
+    border-color: ${({ theme }) => theme.colorPrimary};
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 `;
@@ -101,12 +101,12 @@ const SlotInfo = styled.div`
 
 const SlotTypeLabel = styled.div`
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.grayscale.dark2};
+  color: ${({ theme }) => theme.colorBgElevated};
 `;
 
 const SlotDetails = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  color: ${({ theme }) => theme.colorText};
 `;
 
 const ButtonGroup = styled.div`

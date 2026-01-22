@@ -18,9 +18,9 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { css, useTheme, t } from '@superset-ui/core';
-import { Button } from 'src/components';
-import Icons from 'src/components/Icons';
-import { PageHeaderWithActions, PageHeaderWithActionsProps } from 'src/components/PageHeaderWithActions';
+import { Button } from '@superset-ui/core/components';
+import { Icons } from '@superset-ui/core/components/Icons';
+import { PageHeaderWithActions, PageHeaderWithActionsProps } from '@superset-ui/core/components/PageHeaderWithActions';
 import { CustomizableHeader } from '../components/CustomizableHeader';
 import { useStandaloneMode } from '../hooks/useStandaloneMode';
 import { useHeaderPreview } from '../hooks/useHeaderPreview';
@@ -138,9 +138,9 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
         align-items: center;
         justify-content: space-between;
         padding: 8px 16px;
-        background-color: ${theme.colors.primary.base};
+        background-color: ${theme.colorPrimary};
         color: white;
-        font-size: ${theme.typography.sizes.s}px;
+        font-size: ${theme.fontSizeSM}px;
       `}
       className="portal-header-preview-banner"
     >
@@ -151,9 +151,9 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
           color: white !important;
           padding: 0 8px;
           height: auto;
-          font-size: ${theme.typography.sizes.s}px;
+          font-size: ${theme.fontSizeSM}px;
           &:hover {
-            color: ${theme.colors.grayscale.light5} !important;
+            color: ${theme.colorBgContainer} !important;
           }
         `}
         onClick={resetPreview}

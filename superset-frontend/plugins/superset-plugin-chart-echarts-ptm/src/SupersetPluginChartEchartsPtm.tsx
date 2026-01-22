@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, createRef } from 'react';
+import { useEffect, createRef } from 'react';
 import { styled } from '@superset-ui/core';
 import { SupersetPluginChartEchartsPtmProps, SupersetPluginChartEchartsPtmStylesProps } from './types';
 
@@ -28,9 +28,9 @@ import { SupersetPluginChartEchartsPtmProps, SupersetPluginChartEchartsPtmStyles
 // https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/theme/index.ts
 
 const Styles = styled.div<SupersetPluginChartEchartsPtmStylesProps>`
-  background-color: ${({ theme }) => theme.colors.grayscale.light5};
-  padding: ${({ theme }) => theme.gridUnit * 4}px;
-  border-radius: ${({ theme }) => theme.gridUnit * 2}px;
+  background-color: ${({ theme }) => theme.colorBgContainer};
+  padding: ${({ theme }) => theme.sizeUnit * 4}px;
+  border-radius: ${({ theme }) => theme.sizeUnit * 2}px;
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
 `;

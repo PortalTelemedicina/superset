@@ -34,7 +34,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
 // Import from original table plugin source (same monorepo)
 // @ts-ignore - importing from external source directory
 import TableChart from '../../../../plugin-chart-table/src/TableChart';

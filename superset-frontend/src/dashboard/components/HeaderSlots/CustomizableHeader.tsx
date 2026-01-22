@@ -27,7 +27,7 @@ const HeaderContainer = styled.div<{ globalStyle?: any }>`
   justify-content: space-between;
   width: 100%;
   background-color: ${({ globalStyle, theme }) =>
-    globalStyle?.backgroundColor || theme.colors.grayscale.light5};
+    globalStyle?.backgroundColor || theme.colorBgContainer};
   height: ${({ globalStyle }) => globalStyle?.height || 64}px;
   padding: ${({ globalStyle }) => globalStyle?.padding || '0 24px'};
   border-bottom: ${({ globalStyle }) =>

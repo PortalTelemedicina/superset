@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChartProps } from '@superset-ui/core';
 
 export default function FlaskChart(props: ChartProps) {

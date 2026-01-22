@@ -34,7 +34,7 @@ export default styled.div`
     /* PTM Theme - Clean Minimal Table Design */
     &,
     & * {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+      font-family: 'Inter', ${theme.fontFamily} !important;
     }
 
     /* ========================================
@@ -55,7 +55,7 @@ export default styled.div`
     table.table thead th {
       padding: 12px 16px !important;
       background: transparent !important;
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+      font-family: 'Inter', ${theme.fontFamily} !important;
       font-weight: 500 !important;
       font-size: 12px !important;
       color: #9CA3AF !important;
@@ -187,7 +187,7 @@ export default styled.div`
 
     .dt-global-filter input,
     .form-control.input-sm {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+      font-family: 'Inter', ${theme.fontFamily} !important;
       border-radius: 6px !important;
       border: 1px solid #E5E7EB !important;
       padding: 8px 12px !important;
@@ -241,7 +241,7 @@ export default styled.div`
 
     .pagination > li > a,
     .pagination > li > span {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+      font-family: 'Inter', ${theme.fontFamily} !important;
       border-radius: 6px !important;
       border: none !important;
       color: #6B7280 !important;
