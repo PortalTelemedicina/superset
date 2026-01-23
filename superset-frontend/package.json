@@ -166,6 +166,7 @@
     "prop-types": "^15.8.1",
     "re-resizable": "^6.10.1",
     "react": "^17.0.2",
+    "react-beautiful-dnd": "^13.1.1",
     "react-checkbox-tree": "^1.8.0",
     "react-diff-viewer-continued": "^3.4.0",
     "react-dnd": "^11.1.3",
