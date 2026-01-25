@@ -37,7 +37,7 @@
 import React from 'react';
 // Import from original table plugin source (same monorepo)
 // @ts-ignore - importing from external source directory
-import TableChart from '../../../../plugin-chart-table/src/TableChart';
+import PtmTableChart from './PtmTableChart';
 // @ts-ignore - importing from external source directory
 import type { TableChartTransformedProps } from '../../../../plugin-chart-table/src/types';
 import TableStyles from './Styles';
@@ -51,7 +51,7 @@ import TableStyles from './Styles';
 export default function TableChartPTM(props: TableChartTransformedProps) {
   return (
     <TableStyles>
-      <TableChart {...props} />
+      <PtmTableChart {...props} />
     </TableStyles>
   );
 }

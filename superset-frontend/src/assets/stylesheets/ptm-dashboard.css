@@ -29,7 +29,7 @@
   --ptm-neutral-500: #666666;
   --ptm-neutral-600: #222222;
   
-  --ptm-font-title: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ptm-font-title: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
   --ptm-radius-sm: 8px;
@@ -73,6 +73,31 @@
   transition: box-shadow 0.2s ease !important;
 }
 
+/* =================================================
+   PTM TABLE: full-bleed inside chart card (Dashboard only)
+   Superset adds horizontal padding to chart cards; for the table we want the
+   table + footer to reach the card edges.
+
+   IMPORTANT: adjust --ptm-chart-card-pad-x if your card padding changes.
+   ================================================= */
+.dashboard-component-chart-holder {
+  --ptm-chart-card-pad-x: 16px; /* Superset default (theme.gridUnit * 4) */
+}
+
+[data-test-viz-type='ptm_table'] {
+  margin-left: -16px!important;
+  margin-right: -16px!important;
+  width: calc(100% + (2 * 16px)) !important;
+  max-width: none !important;
+}
+
+/* Ensure all wrapper divs inside PTM table extend to full width */
+[data-test-viz-type='ptm_table'] > div,
+[data-test-viz-type='ptm_table'] > div > div {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 .dashboard-component-chart-holder:hover {
   box-shadow: 0 10px 15px rgba(3, 2, 19, 0.05) !important;
 }
@@ -90,6 +115,13 @@
   font-weight: 400 !important;
   color: #717182 !important;
   padding-bottom: 0px !important;
+}
+
+/* === PTM TABLE CHART: Maintain header-title left spacing === */
+[data-test-viz-type='ptm_table'] .dashboard-component-header,
+[data-test-viz-type='ptm_table'] .header-title,
+[data-test-viz-type='ptm_table'] .editable-title {
+  padding-left: 16px !important;
 }
 
 /* === HIDE BIG NUMBER PTM HEADERS === */
