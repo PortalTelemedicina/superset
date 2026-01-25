@@ -37,6 +37,18 @@ export default styled.div`
       font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
     }
 
+    /* Ensure the wrapper itself takes full width */
+    & {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    /* Ensure all child divs take full width */
+    & > div {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
     /* ========================================
        TABLE BASE STYLES
        ======================================== */
@@ -55,7 +67,6 @@ export default styled.div`
     table.table thead th {
       padding: 12px 16px !important;
       background: transparent !important;
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
       font-weight: 500 !important;
       font-size: 12px !important;
       color: #9CA3AF !important;
@@ -185,9 +196,7 @@ export default styled.div`
       float: right !important;
     }
 
-    .dt-global-filter input,
-    .form-control.input-sm {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+    .dt-global-filter input {
       border-radius: 6px !important;
       border: 1px solid #E5E7EB !important;
       padding: 8px 12px !important;
@@ -198,81 +207,187 @@ export default styled.div`
       box-shadow: none !important;
     }
 
-    .dt-global-filter input:focus,
-    .form-control.input-sm:focus {
+    .dt-global-filter input:focus {
       border-color: #9CA3AF !important;
       box-shadow: none !important;
       outline: none !important;
-    }
-
-    .dt-select-page-size {
-      color: #6B7280 !important;
-      font-size: 13px !important;
-    }
-
-    .dt-select-page-size select {
-      border-radius: 6px !important;
-      border: 1px solid #E5E7EB !important;
-      padding: 8px 10px !important;
-      margin: 0 6px !important;
-      color: #374151 !important;
-      background: #FFFFFF !important;
-    }
-
-    .dt-select-page-size select:focus {
-      border-color: #9CA3AF !important;
-      outline: none !important;
-      box-shadow: none !important;
     }
 
     /* ========================================
-       PAGINATION - Clean
+       PTM FOOTER
        ======================================== */
-    .dt-pagination {
-      text-align: right !important;
-      padding: 12px 0 0 0 !important;
+    .ptm-dt-footer {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 12px 16px !important;
+      background: #FFFFFF !important;
+      border-top: 1px solid #F3F4F6 !important;
+      gap: 16px !important;
+      flex-wrap: wrap !important;
     }
 
-    .dt-pagination .pagination {
-      margin: 0 !important;
-      display: inline-flex !important;
-      gap: 2px !important;
+    /* Left section - Page size selector */
+    .ptm-dt-footer-left {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex-shrink: 0 !important;
     }
 
-    .pagination > li > a,
-    .pagination > li > span {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
-      border-radius: 6px !important;
-      border: none !important;
+    .ptm-dt-page-size-label {
+      font-size: 13px !important;
+      font-weight: 400 !important;
       color: #6B7280 !important;
-      padding: 8px 12px !important;
+      white-space: nowrap !important;
+    }
+
+    /* Center section - Range display */
+    .ptm-dt-footer-center {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+    }
+
+    .ptm-dt-range-bold {
       font-size: 13px !important;
       font-weight: 500 !important;
-      background: transparent !important;
-      transition: all 0.15s ease !important;
+      color: #374151 !important;
+      margin-right: 4px !important;
+    }
+
+    .ptm-dt-range-total {
+      font-size: 13px !important;
+      font-weight: 400 !important;
+      color: #6B7280 !important;
+    }
+
+    /* Right section - Navigation buttons */
+    .ptm-dt-footer-right {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Ensure consistent spacing between all navigation elements */
+    .ptm-dt-footer-right > * {
       margin: 0 !important;
     }
 
-    .pagination > li > a:hover {
-      background-color: #F3F4F6 !important;
+    /* Navigation buttons (first, prev, next, last) */
+    .ptm-dt-footer-right button.ptm-dt-nav-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 6px !important;
+      background: transparent !important;
+      color: #374151 !important;
+      font-size: 14px !important;
+      cursor: pointer !important;
+      transition: all 0.15s ease !important;
+      flex-shrink: 0 !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    .ptm-dt-footer-right button.ptm-dt-nav-btn:hover:not(:disabled) {
+      background: transparent !important;
       color: #374151 !important;
     }
 
-    .pagination > .active > a,
-    .pagination > .active > a:hover,
-    .pagination > .active > a:focus,
-    .pagination > .active > span {
-      background-color: #F3F4F6 !important;
-      color: #111827 !important;
-      font-weight: 600 !important;
+    /* Disabled state - icon only (no background) */
+    .ptm-dt-footer-right button.ptm-dt-nav-btn:disabled,
+    .ptm-dt-footer-right button.ptm-dt-nav-btn[disabled] {
+      background: transparent !important;
+      color: #9CA3AF !important;
+      cursor: not-allowed !important;
+      opacity: 1 !important;
     }
 
-    .pagination > .disabled > a,
-    .pagination > .disabled > span {
-      color: #D1D5DB !important;
+    /* Enabled state - transparent background */
+    .ptm-dt-footer-right button.ptm-dt-nav-btn:not(:disabled):not([disabled]) {
       background: transparent !important;
-      cursor: not-allowed !important;
+      color: #374151 !important;
     }
+
+    .ptm-dt-footer-right button.ptm-dt-nav-btn svg {
+      width: 12px !important;
+      height: 12px !important;
+      fill: currentColor !important;
+    }
+
+    .ptm-dt-footer-right button.ptm-dt-nav-btn:disabled svg,
+    .ptm-dt-footer-right button.ptm-dt-nav-btn[disabled] svg {
+      color: #9CA3AF !important;
+    }
+
+    /* Page number buttons container */
+    .ptm-dt-pages {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      margin: 0 4px !important;
+    }
+
+    /* Page number buttons */
+    .ptm-dt-pages button.ptm-dt-page-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 32px !important;
+      height: 32px !important;
+      padding: 0 12px !important;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 6px !important;
+      background: #FFFFFF !important;
+      color: #374151 !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.15s ease !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    .ptm-dt-pages button.ptm-dt-page-btn:hover {
+      background: #F9FAFB !important;
+      color: #374151 !important;
+    }
+
+    /* Active page button - Blue pill style */
+    .ptm-dt-pages button.ptm-dt-page-btn.is-active,
+    .ptm-dt-pages button.ptm-dt-page-btn.is-active:hover {
+      background: #0A98D5 !important;
+      color: #FFFFFF !important;
+      font-weight: 500 !important;
+    }
+
+    /* Ellipsis */
+    .ptm-dt-pages .ptm-dt-ellipsis {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 32px !important;
+      height: 32px !important;
+      color: #374151 !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      user-select: none !important;
+      border: none !important;
+      border-radius: 6px !important;
+      background: #FFFFFF !important;
+    }
+
+    
 
     /* ========================================
        MISC
