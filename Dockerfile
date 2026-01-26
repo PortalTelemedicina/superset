@@ -55,23 +55,19 @@ WORKDIR /app/superset-frontend
 RUN mkdir -p /app/superset/static/assets \
              /app/superset/translations
 
-# Mount package files and install dependencies if not in dev mode
-# NOTE: we mount packages and plugins as they are referenced in package.json as workspaces
-# ideally we'd COPY only their package.json. Here npm ci will be cached as long
-# as the full content of these folders don't change, yielding a decent cache reuse rate.
-# Note that it's not possible to selectively COPY or mount using blobs.
-RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.json \
-    --mount=type=bind,source=./superset-frontend/package-lock.json,target=./package-lock.json \
-    --mount=type=cache,target=/root/.cache \
+# Copy frontend files for build
+COPY superset-frontend /app/superset-frontend
+
+# Install dependencies with legacy peer deps flag
+RUN --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
-        npm ci; \
+        npm install --legacy-peer-deps; \
     else \
-        echo "Skipping 'npm ci' in dev mode"; \
+        echo "Skipping 'npm install' in dev mode"; \
     fi
 
 # Runs the webpack build process
-COPY superset-frontend /app/superset-frontend
 
 ######################################################################
 # superset-node is used for compiling frontend assets
