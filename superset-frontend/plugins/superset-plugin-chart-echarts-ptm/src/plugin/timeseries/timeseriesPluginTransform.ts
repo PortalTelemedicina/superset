@@ -20,7 +20,12 @@
 import merge from 'lodash.merge';
 import type { TransformConfig } from '../../shared/transformHelpers';
 import { createDefaultPluginTransform } from '../../shared';
-import { applySeriesTypeOverride, type PtmSeriesType } from './transformHelpers/seriesTypeOverride';
+import {
+  applyBarBorderRadius,
+  applySeriesTypeOverride,
+  type PtmBarBorderRadiusOptions,
+  type PtmSeriesType,
+} from './transformHelpers/seriesTypeOverride';
 import { getThemeDataZoom } from './transformHelpers/dataZoom';
 import TIMESERIES_PTM_DEFAULTS from './defaults';
 
@@ -40,10 +45,23 @@ export function timeseriesPluginTransform(
   const defaultTransform = createDefaultPluginTransform(TIMESERIES_PTM_DEFAULTS);
   let finalOptions = defaultTransform(options, formData, transforms);
 
+  const barBorderRadius: PtmBarBorderRadiusOptions | undefined = {
+    enabled: formData.ptmBarRadiusEnabled as boolean | undefined,
+    radius:
+      formData.ptmBarRadiusSize === undefined
+        ? undefined
+        : Number(formData.ptmBarRadiusSize),
+    roundTop: formData.ptmBarRadiusRoundTop as boolean | undefined,
+    roundBottom: formData.ptmBarRadiusRoundBottom as boolean | undefined,
+  };
+
   if (transforms.seriesType) {
     const ptmSeriesType = formData.ptmSeriesType as PtmSeriesType | undefined;
-    finalOptions = applySeriesTypeOverride(finalOptions, ptmSeriesType);
+    finalOptions = applySeriesTypeOverride(finalOptions, ptmSeriesType, barBorderRadius);
   }
+
+  // Even when PTM series type is "auto", bar charts should still get the PTM bar radius behavior.
+  finalOptions = applyBarBorderRadius(finalOptions, barBorderRadius) as EchartOptions;
 
   if (transforms.dataZoom) {
     const themeZoomOverrides = getThemeDataZoom(formData);

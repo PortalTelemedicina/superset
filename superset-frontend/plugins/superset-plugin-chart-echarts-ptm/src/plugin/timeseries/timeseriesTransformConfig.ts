@@ -55,6 +55,65 @@ export const timeseriesSeriesTypeControl: ControlSetRow = [
   },
 ];
 
+export const timeseriesBarRadiusControlRow1: ControlSetRow = [
+  {
+    name: 'ptm_bar_radius_enabled',
+    config: {
+      type: 'CheckboxControl',
+      label: t('Rounded bars'),
+      default: true,
+      renderTrigger: true,
+      visibility: ({ controls }: any) => {
+        const v = controls?.ptm_series_type?.value;
+        return v === 'bar' || v === 'auto';
+      },
+    },
+  },
+  {
+    name: 'ptm_bar_radius_size',
+    config: {
+      type: 'TextControl',
+      label: t('Radius (px)'),
+      default: '8',
+      isInt: true,
+      renderTrigger: true,
+      visibility: ({ controls }: any) =>
+        (controls?.ptm_series_type?.value === 'bar' ||
+          controls?.ptm_series_type?.value === 'auto') &&
+        controls?.ptm_bar_radius_enabled?.value === true,
+    },
+  },
+];
+
+export const timeseriesBarRadiusControlRow2: ControlSetRow = [
+  {
+    name: 'ptm_bar_radius_round_top',
+    config: {
+      type: 'CheckboxControl',
+      label: t('Round top'),
+      default: true,
+      renderTrigger: true,
+      visibility: ({ controls }: any) =>
+        (controls?.ptm_series_type?.value === 'bar' ||
+          controls?.ptm_series_type?.value === 'auto') &&
+        controls?.ptm_bar_radius_enabled?.value === true,
+    },
+  },
+  {
+    name: 'ptm_bar_radius_round_bottom',
+    config: {
+      type: 'CheckboxControl',
+      label: t('Round bottom'),
+      default: true,
+      renderTrigger: true,
+      visibility: ({ controls }: any) =>
+        (controls?.ptm_series_type?.value === 'bar' ||
+          controls?.ptm_series_type?.value === 'auto') &&
+        controls?.ptm_bar_radius_enabled?.value === true,
+    },
+  },
+];
+
 export const zoomAxisChoices: [string, string][] = [
   ['x', t('X axis (horizontal)')],
   ['y', t('Y axis (vertical)')],
