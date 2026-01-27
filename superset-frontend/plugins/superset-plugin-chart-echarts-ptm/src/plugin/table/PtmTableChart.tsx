@@ -49,7 +49,6 @@ import {
     styled,
     css,
     t,
-    tn,
     useTheme,
   } from '@superset-ui/core';
   import { Dropdown, Menu, Tooltip } from '@superset-ui/chart-controls';
@@ -60,6 +59,7 @@ import {
     MinusCircleOutlined,
     PlusCircleOutlined,
     TableOutlined,
+    SearchOutlined,
   } from '@ant-design/icons';
   import { isEmpty } from 'lodash';
   import {
@@ -178,16 +178,16 @@ import {
   
   function SearchInput({ count, value, onChange }: SearchInputProps) {
     return (
-      <span className="dt-global-filter">
-        {t('Search')}{' '}
+      <div className="ptm-dt-search" role="search">
+        <SearchOutlined className="ptm-dt-search-icon" />
         <input
           aria-label={t('Search %s records', count)}
-          className="form-control input-sm"
-          placeholder={tn('search.num_records', count)}
+          className="ptm-dt-search-input"
+          placeholder="Buscar..."
           value={value}
           onChange={onChange}
         />
-      </span>
+      </div>
     );
   }
   

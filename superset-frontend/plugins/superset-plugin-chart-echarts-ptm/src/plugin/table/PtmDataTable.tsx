@@ -431,33 +431,24 @@ export default typedMemo(function DataTable<D extends object>({
             style={{ width: initialWidth, height: initialHeight }}
         >
             {hasGlobalControl ? (
-                <div ref={globalControlRef} className="form-inline dt-controls">
-                    <div className="row">
-                        <div
-                            className={renderTimeComparisonDropdown ? 'col-sm-5' : 'col-sm-6'}
-                        >
+                <div ref={globalControlRef} className="ptm-dt-toolbar">
+                    {searchInput ? (
+                        <div className="ptm-dt-toolbar-left">
+                            <GlobalFilter<D>
+                                searchInput={
+                                    typeof searchInput === 'boolean' ? undefined : searchInput
+                                }
+                                preGlobalFilteredRows={preGlobalFilteredRows}
+                                setGlobalFilter={setGlobalFilter}
+                                filterValue={filterValue}
+                            />
                         </div>
-                        {searchInput ? (
-                            <div className="col-sm-6">
-                                <GlobalFilter<D>
-                                    searchInput={
-                                        typeof searchInput === 'boolean' ? undefined : searchInput
-                                    }
-                                    preGlobalFilteredRows={preGlobalFilteredRows}
-                                    setGlobalFilter={setGlobalFilter}
-                                    filterValue={filterValue}
-                                />
-                            </div>
-                        ) : null}
-                        {renderTimeComparisonDropdown ? (
-                            <div
-                                className="col-sm-1"
-                                style={{ float: 'right', marginTop: '6px' }}
-                            >
-                                {renderTimeComparisonDropdown()}
-                            </div>
-                        ) : null}
-                    </div>
+                    ) : null}
+                    {renderTimeComparisonDropdown ? (
+                        <div className="ptm-dt-toolbar-right">
+                            {renderTimeComparisonDropdown()}
+                        </div>
+                    ) : null}
                 </div>
             ) : null}
             {wrapStickyTable ? wrapStickyTable(renderTable) : renderTable()}
