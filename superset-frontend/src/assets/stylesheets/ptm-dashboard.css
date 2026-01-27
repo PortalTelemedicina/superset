@@ -12,6 +12,11 @@
   word-wrap: break-word;
 }
 
+/* =========
+  Dashboard CSS Template
+  Cor alvo: #4B5563
+  ========= */
+
 /* === CSS VARIABLES === */
 :root {
   --ptm-primary: #2C9FE5;
@@ -59,6 +64,40 @@
   --ptm-figma-shadow-hover: 0 10px 15px rgba(3, 2, 19, 0.05);
 }
 
+div[data-test-id="96"] + div {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.dashboard-header {
+  box-shadow: none !important;
+  border-bottom: 0px !important;
+}
+
+.editable-title {
+  color: #4B5563 !important;
+}
+
+.dashboard-header-container {
+  border-bottom: 0px !important;
+}
+
+.portal-header-custom {
+  border-bottom: 0px !important;
+}
+
+.ptm-icon-container {
+  background-color: #EFF6FF !important;
+}
+
+.ptm-title {
+  color: #4B5563 !important;
+}
+
+.additional-text {
+  color: #6B7280 !important;
+}
+
 /* === DASHBOARD BACKGROUND === */
 .dashboard {
   background-color: #f9fafb !important;
@@ -100,6 +139,65 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 [data-test-viz-type='ptm_table'] .ptm_table div[role='table'] {
   width: 100% !important;
   max-width: none !important;
+}
+
+/* === PTM TABLE: top controls row (Search) === */
+[data-test-viz-type='ptm_table'] .ptm-dt-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-toolbar-left {
+  flex: 0 1 auto;
+  min-width: 240px;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-toolbar-right {
+  flex: 0 0 auto;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  width: min(420px, 100%);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+}
+
+@media (max-width: 520px) {
+  [data-test-viz-type='ptm_table'] .ptm-dt-toolbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  [data-test-viz-type='ptm_table'] .ptm-dt-search {
+    width: 100%;
+  }
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-search-icon {
+  color: #9CA3AF;
+  font-size: 16px;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-search-input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #111827;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-dt-search-input::placeholder {
+  color: #9CA3AF;
 }
 
 .dashboard-component-chart-holder:hover {
@@ -146,6 +244,7 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   overflow: hidden !important;
   opacity: 0 !important;
   visibility: hidden !important;
+  font-family: 'Inter';
 }
 
 /* Hide the entire slice-header container for PTM charts */
@@ -248,18 +347,6 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 }
 
 
-/* === CONSISTENT DASHBOARD GUTTER === */
-.dashboard .dashboard-content {
-  padding-left: var(--dash-gutter) !important;
-  padding-right: var(--dash-gutter) !important;
-}
-
-.dashboard .dashboard-content .grid-container {
-  margin-left: 5% !important;
-  margin-right: 5% !important;
-}
-
-
 /* === PTM TABLE: Modern "Actions" trigger (no dots) === */
 
 /* Make the trigger a pill and allow it to expand */
@@ -315,4 +402,64 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   outline-offset: 2px;
 }
 
+/* Título do filtro (ex: "Health Center") */
+h4[id^="filter-name-NATIVE_FILTER"] {
+  color: #4B5563 !important;
+}
+
+.filter-clear-all-button .dragdroppable .dragdroppable-column {
+  color: #4B5563 !important;
+}
+
+/* Nuclear option - override all fonts in dashboard */
+.dashboard-component-chart-holder * {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Layout vertical: label em cima do input (somente Native Filters) */
+div[id^="filter-control-NATIVE_FILTER"] .ant-row.ant-form-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+/* Ajustes de espaçamento do label */
+div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-label {
+  padding: 0 !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.1 !important;
+}
+
+/* Faz o controle ocupar a largura */
+div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-control,
+div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-control-input,
+div[id^="filter-control-NATIVE_FILTER"] .ant-select,
+div[id^="filter-control-NATIVE_FILTER"] .ant-picker {
+  width: 100% !important;
+}
+
+/* Remove o “gutter” horizontal que o Ant coloca na row */
+div[id^="filter-control-NATIVE_FILTER"] .ant-row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.grid-row {
+  margin-top: 20px;
+  margin-bottom: 0px !important;
+}
+
+/* Center the dashboard and keep consistent max width */
+.grid-container {
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+/* Garantir que o container pai também respeite */
+.dashboard-content {
+  display: flex;
+  justify-content: center;
+}
 
