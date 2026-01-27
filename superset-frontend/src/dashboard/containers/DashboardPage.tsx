@@ -77,6 +77,15 @@ type PageProps = {
   idOrSlug: string;
 };
 
+const PTM_TAG_NAME = 'PTM';
+const PTM_CSS_URL = '/static/assets/stylesheets/ptm-dashboard.css';
+
+function isPtmDashboardFromTags(dashboard: any): boolean {
+  const tags = dashboard?.tags;
+  if (!Array.isArray(tags)) return false;
+  return tags.some((t: any) => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
+}
+
 // TODO: move to Dashboard.jsx when it's refactored to functional component
 const selectRelevantDatamask = createSelector(
   (state: RootState) => state.dataMask, // the first argument accesses relevant data from global state
@@ -132,6 +141,7 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);
   const { dashboard_title, css, id = 0 } = dashboard || {};
+  const enablePtmTheme = isPtmDashboardFromTags(dashboard);
 
   useEffect(() => {
     // mark tab id as redundant when user closes browser tab - a new id will be
@@ -209,13 +219,20 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   }, [dashboard_title]);
 
   useEffect(() => {
-    if (typeof css === 'string') {
+    const dashboardCss = typeof css === 'string' ? css : '';
+    const ptmImport =
+      enablePtmTheme && dashboardCss.indexOf(PTM_CSS_URL) === -1
+        ? `@import url("${PTM_CSS_URL}");\n`
+        : '';
+    const finalCss = `${ptmImport}${dashboardCss}`.trim();
+
+    if (finalCss.length > 0) {
       // returning will clean up custom css
       // when dashboard unmounts or changes
-      return injectCustomCss(css);
+      return injectCustomCss(finalCss);
     }
     return () => {};
-  }, [css]);
+  }, [css, enablePtmTheme]);
 
   useEffect(() => {
     if (datasetsApiError) {

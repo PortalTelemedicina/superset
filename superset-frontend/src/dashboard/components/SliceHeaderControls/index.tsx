@@ -352,6 +352,10 @@ const SliceHeaderControls = (
       onSelect={({ selectedKeys: keys }) => setSelectedKeys(keys)}
       openKeys={openKeys}
       id={`slice_${slice.slice_id}-menu`}
+      className={`ptm-slice-menu ptm-slice-menu--${String(slice.viz_type).replace(
+        /[^a-zA-Z0-9_-]/g,
+        '-',
+      )}`}
       // submenus must be rendered for handleDropdownNavigation
       forceSubMenuRender
       {...openKeysProps}
@@ -557,6 +561,9 @@ const SliceHeaderControls = (
             align-items: center;
           `}
           id={`slice_${slice.slice_id}-controls`}
+          className={`ptm-slice-controls ptm-slice-controls--${String(
+            slice.viz_type,
+          ).replace(/[^a-zA-Z0-9_-]/g, '-')}`}
           role="button"
           aria-label="More Options"
           aria-haspopup="true"
