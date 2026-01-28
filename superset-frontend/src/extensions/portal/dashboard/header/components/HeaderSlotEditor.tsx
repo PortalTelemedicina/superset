@@ -28,6 +28,7 @@ import {
   Upload,
   Form,
   message,
+  Divider,
 } from 'antd';
 import {
   PlusOutlined,
@@ -336,6 +337,47 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
             <Select.Option value={SlotPosition.LEFT}>{t('Left')}</Select.Option>
             <Select.Option value={SlotPosition.CENTER}>{t('Center')}</Select.Option>
             <Select.Option value={SlotPosition.RIGHT}>{t('Right')}</Select.Option>
+          </Select>
+        </Form.Item>
+        
+        <Divider orientation="left" style={{ margin: '12px 0', fontSize: 12, color: '#999' }}>
+          {t('Layout Controls (Advanced)')}
+        </Divider>
+        
+        <Form.Item
+          name="align"
+          label={t('Alignment within section')}
+          initialValue={editingSlot.align || undefined}
+          extra={t('Fine-tune position within the selected section')}
+        >
+          <Select allowClear placeholder={t('Auto')}>
+            <Select.Option value="start">{t('Start (Left)')}</Select.Option>
+            <Select.Option value="center">{t('Center')}</Select.Option>
+            <Select.Option value="end">{t('End (Right)')}</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="flexShrink"
+          label={t('Shrink behavior')}
+          initialValue={editingSlot.flexShrink ?? 0}
+          extra={t('Can element shrink if space is limited?')}
+        >
+          <Select>
+            <Select.Option value={0}>{t('Fixed - Keep size')}</Select.Option>
+            <Select.Option value={1}>{t('Flexible - Can shrink')}</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="flexGrow"
+          label={t('Grow behavior')}
+          initialValue={editingSlot.flexGrow ?? 0}
+          extra={t('Can element grow to fill space?')}
+        >
+          <Select>
+            <Select.Option value={0}>{t('Fixed - Keep size')}</Select.Option>
+            <Select.Option value={1}>{t('Flexible - Can grow')}</Select.Option>
           </Select>
         </Form.Item>
       </>
