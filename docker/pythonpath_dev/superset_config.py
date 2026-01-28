@@ -115,7 +115,11 @@ class CeleryConfig:
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True, "TAGGING_SYSTEM": True,}
+FEATURE_FLAGS = {
+    "ALERT_REPORTS": True,
+    "TAGGING_SYSTEM": True,
+    "HORIZONTAL_FILTER_BAR": True,
+}
 
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
