@@ -63,6 +63,9 @@ export interface BaseSlot {
     x: number;
     y: number;
   };
+  align?: 'start' | 'center' | 'end'; // Individual alignment within the slot group
+  flexShrink?: number; // Control if slot can shrink (default 0)
+  flexGrow?: number; // Control if slot can grow (default 0)
 }
 
 export interface LogoSlot extends BaseSlot {

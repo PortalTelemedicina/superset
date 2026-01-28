@@ -39,7 +39,7 @@ const SlotGroup = styled.div<{ position: SlotPosition }>`
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: ${({ position }) => (position === SlotPosition.CENTER ? '1' : '0')};
+  flex: ${({ position }) => (position === SlotPosition.CENTER ? '1 1 auto' : '0 0 auto')};
   justify-content: ${({ position }) => {
     switch (position) {
       case SlotPosition.LEFT:
@@ -52,6 +52,9 @@ const SlotGroup = styled.div<{ position: SlotPosition }>`
         return 'flex-start';
     }
   }};
+  flex-wrap: nowrap;
+  overflow: hidden;
+  min-width: 0;
 `;
 
 interface CustomizableHeaderProps {

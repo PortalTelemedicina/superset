@@ -32,9 +32,22 @@ import {
   DividerSlot,
 } from '../types';
 
-const SlotContainer = styled.div<{ customStyle?: any }>`
+const SlotContainer = styled.div<{ 
+  customStyle?: any;
+  align?: 'start' | 'center' | 'end';
+  flexShrink?: number;
+  flexGrow?: number;
+}>`
   display: inline-flex;
   align-items: center;
+  flex-shrink: ${({ flexShrink }) => flexShrink ?? 0};
+  flex-grow: ${({ flexGrow }) => flexGrow ?? 0};
+  min-width: 0;
+  ${({ align }) => align && `
+    align-self: ${align === 'start' ? 'flex-start' : align === 'end' ? 'flex-end' : 'center'};
+    margin-left: ${align === 'end' ? 'auto' : align === 'center' ? 'auto' : '0'};
+    margin-right: ${align === 'start' ? 'auto' : align === 'center' ? 'auto' : '0'};
+  `};
   ${({ customStyle }) => customStyle && { ...customStyle }};
 `;
 
@@ -88,6 +101,12 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
 }) => {
   const renderSlot = useMemo(() => {
     const customStyle = slot.style || {};
+    const containerProps = {
+      customStyle,
+      align: slot.align,
+      flexShrink: slot.flexShrink,
+      flexGrow: slot.flexGrow,
+    };
 
     switch (slot.type) {
       case SlotType.LOGO: {
@@ -112,7 +131,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         );
 
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             {logo}
           </SlotContainer>
         );
@@ -123,7 +142,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         const title = titleSlot.content || dashboardTitle || 'Dashboard';
 
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <TitleText fontSize={titleSlot.fontSize}>
               {title}
             </TitleText>
@@ -144,7 +163,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         }
 
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <TextContent>{content}</TextContent>
           </SlotContainer>
         );
@@ -159,7 +178,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         const dateStr = moment().format(format);
 
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <DateText>{dateStr}</DateText>
           </SlotContainer>
         );
@@ -176,7 +195,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
         };
 
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <Badge
               status={statusMap[badgeSlot.badgeType || 'default'] as any}
               text={`${badgeSlot.label}${badgeSlot.value ? `: ${badgeSlot.value}` : ''}`}
@@ -193,7 +212,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
       case SlotType.DIVIDER: {
         const dividerSlot = slot as DividerSlot;
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <Divider
               type={dividerSlot.orientation || 'vertical'}
               style={{
