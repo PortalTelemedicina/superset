@@ -176,6 +176,18 @@ export const iconColor: CustomControlItem = {
   },
 };
 
+export const iconBackgroundColor: CustomControlItem = {
+  name: 'icon_background_color',
+  config: {
+    type: 'TextControl',
+    label: t('Icon Background Color'),
+    renderTrigger: true,
+    default: '#F5F5F5',
+    description: t('Background color of the icon container (hex code)'),
+    visibility: ({ controls }: any) => controls?.show_icon?.value === true,
+  },
+};
+
 export const additionalText: CustomControlItem = {
   name: 'additional_text',
   config: {

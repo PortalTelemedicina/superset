@@ -78,6 +78,7 @@ export default function transformProps(
     iconName = 'Activity',
     iconSize = 24,
     iconColor = '#666666',
+    iconBackgroundColor = '#F5F5F5',
     additionalText = '',
     additionalTextFontSize = 12,
   } = formData;
@@ -296,6 +297,7 @@ export default function transformProps(
     iconName,
     iconSize,
     iconColor,
+    iconBackgroundColor,
     additionalText,
     additionalTextFontSize,
   };

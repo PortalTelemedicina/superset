@@ -27,11 +27,13 @@ import {
 import {
   headerFontSize,
   subheaderFontSize,
+  titleFontSize,
   layoutMode,
   showIcon,
   iconName,
   iconSize,
   iconColor,
+  iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
 } from '../sharedControls';
@@ -53,10 +55,10 @@ export default {
             name: 'subheader',
             config: {
               type: 'TextControl',
-              label: t('Subheader'),
+              label: t('Card Title'),
               renderTrigger: true,
               description: t(
-                'Description text that shows up below your Big Number',
+                'Title text to display above the number',
               ),
             },
           },
@@ -68,6 +70,7 @@ export default {
       expanded: true,
       controlSetRows: [
         [layoutMode],
+        [titleFontSize],
         [headerFontSize],
         [subheaderFontSize],
         ['y_axis_format'],
@@ -152,6 +155,7 @@ export default {
         [iconName],
         [iconSize],
         [iconColor],
+        [iconBackgroundColor],
         [additionalText],
         [additionalTextFontSize],
       ],

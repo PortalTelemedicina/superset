@@ -46,6 +46,7 @@ export default function transformProps(
     metric = 'value',
     subheader = '',
     subheaderFontSize,
+    titleFontSize = 14,
     forceTimestampFormatting,
     timeFormat,
     yAxisFormat,
@@ -56,6 +57,7 @@ export default function transformProps(
     iconName = 'Activity',
     iconSize = 24,
     iconColor = '#666666',
+    iconBackgroundColor = '#F5F5F5',
     additionalText = '',
     additionalTextFontSize = 12,
   } = formData;
@@ -111,6 +113,8 @@ export default function transformProps(
     headerFontSize,
     subheaderFontSize,
     subheader: formattedSubheader,
+    title: subheader,
+    titleFontSize,
     onContextMenu,
     refs,
     colorThresholdFormatters,
@@ -119,6 +123,7 @@ export default function transformProps(
     iconName,
     iconSize,
     iconColor,
+    iconBackgroundColor,
     additionalText,
     additionalTextFontSize,
   };
