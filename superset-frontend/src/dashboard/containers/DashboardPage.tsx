@@ -19,7 +19,7 @@
 import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
-import { t, useTheme } from '@superset-ui/core';
+import { getExtensionsRegistry, t, useTheme } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
@@ -77,14 +77,7 @@ type PageProps = {
   idOrSlug: string;
 };
 
-const PTM_TAG_NAME = 'PTM';
-const PTM_CSS_URL = '/static/assets/stylesheets/ptm-dashboard.css';
-
-function isPtmDashboardFromTags(dashboard: any): boolean {
-  const tags = dashboard?.tags;
-  if (!Array.isArray(tags)) return false;
-  return tags.some((t: any) => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
-}
+const extensionsRegistry = getExtensionsRegistry();
 
 // TODO: move to Dashboard.jsx when it's refactored to functional component
 const selectRelevantDatamask = createSelector(
@@ -141,7 +134,6 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);
   const { dashboard_title, css, id = 0 } = dashboard || {};
-  const enablePtmTheme = isPtmDashboardFromTags(dashboard);
 
   useEffect(() => {
     // mark tab id as redundant when user closes browser tab - a new id will be
@@ -220,19 +212,25 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
 
   useEffect(() => {
     const dashboardCss = typeof css === 'string' ? css : '';
-    const ptmImport =
-      enablePtmTheme && dashboardCss.indexOf(PTM_CSS_URL) === -1
-        ? `@import url("${PTM_CSS_URL}");\n`
-        : '';
-    const finalCss = `${ptmImport}${dashboardCss}`.trim();
+    const transformDashboardCss = extensionsRegistry.get(
+      'dashboard.css.transform' as any,
+    ) as
+      | ((args: { css: string; dashboard: any }) => string)
+      | undefined;
 
-    if (finalCss.length > 0) {
+    const finalCss = (
+      transformDashboardCss
+        ? transformDashboardCss({ css: dashboardCss, dashboard })
+        : dashboardCss
+    ).trim();
+
+    if (finalCss) {
       // returning will clean up custom css
       // when dashboard unmounts or changes
       return injectCustomCss(finalCss);
     }
     return () => {};
-  }, [css, enablePtmTheme]);
+  }, [css, dashboard]);
 
   useEffect(() => {
     if (datasetsApiError) {

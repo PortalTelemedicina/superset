@@ -23,8 +23,15 @@
  * It should be imported once during application startup.
  */
 
-import { isPortalHeaderCustomEnabled } from './config/featureFlags';
+import {
+  isPortalFilterBarCustomEnabled,
+  isPortalHeaderCustomEnabled,
+  isPortalPtmThemeEnabled,
+} from './config/featureFlags';
 import { registerCustomHeaderExtension } from './dashboard/registries/dashboardHeaderRegistry';
+import { registerCustomFilterBarExtensions } from './dashboard/registries/filterBarRegistry';
+import { registerDashboardCssExtensions } from './dashboard/registries/dashboardCssRegistry';
+import { registerSliceHeaderControlsExtensions } from './dashboard/registries/sliceHeaderControlsRegistry';
 import './dashboard/header/styles/header-custom.css';
 
 let initialized = false;
@@ -38,6 +45,8 @@ let initialized = false;
  */
 export const initializePortalExtensions = (options?: {
   enableHeaderCustom?: boolean;
+  enableFilterBarCustom?: boolean;
+  enablePtmTheme?: boolean;
 }) => {
   if (initialized) {
     if (process.env.NODE_ENV === 'development') {
@@ -48,11 +57,29 @@ export const initializePortalExtensions = (options?: {
 
   const headerCustomEnabled = 
     options?.enableHeaderCustom ?? isPortalHeaderCustomEnabled();
+  const filterBarCustomEnabled =
+    options?.enableFilterBarCustom ?? isPortalFilterBarCustomEnabled();
+  const ptmThemeEnabled = options?.enablePtmTheme ?? isPortalPtmThemeEnabled();
 
   if (headerCustomEnabled) {
     registerCustomHeaderExtension();
     if (process.env.NODE_ENV === 'development') {
       console.info('[Portal Extensions] Custom header extension registered');
+    }
+  }
+
+  if (filterBarCustomEnabled) {
+    registerCustomFilterBarExtensions();
+    if (process.env.NODE_ENV === 'development') {
+      console.info('[Portal Extensions] Custom filter bar extensions registered');
+    }
+  }
+
+  if (ptmThemeEnabled) {
+    registerDashboardCssExtensions();
+    registerSliceHeaderControlsExtensions();
+    if (process.env.NODE_ENV === 'development') {
+      console.info('[Portal Extensions] PTM theme extensions registered');
     }
   }
 

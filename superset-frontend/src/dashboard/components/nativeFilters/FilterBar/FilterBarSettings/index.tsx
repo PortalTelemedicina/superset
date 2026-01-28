@@ -21,6 +21,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   FeatureFlag,
+  getExtensionsRegistry,
   isFeatureEnabled,
   styled,
   t,
@@ -72,7 +73,9 @@ const ADD_EDIT_FILTERS_MENU_KEY = 'add-edit-filters-menu-key';
 const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
   o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
 
-const FilterBarSettings = () => {
+const extensionsRegistry = getExtensionsRegistry();
+
+export const DefaultFilterBarSettings = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
@@ -240,6 +243,18 @@ const FilterBarSettings = () => {
       />
       {scopingModal}
     </>
+  );
+};
+
+const FilterBarSettings = () => {
+  const FilterBarSettingsExtension = extensionsRegistry.get(
+    'dashboard.filterbar.settings.replacement' as any,
+  ) as (() => JSX.Element | null) | undefined;
+
+  return FilterBarSettingsExtension ? (
+    <FilterBarSettingsExtension />
+  ) : (
+    <DefaultFilterBarSettings />
   );
 };
 
