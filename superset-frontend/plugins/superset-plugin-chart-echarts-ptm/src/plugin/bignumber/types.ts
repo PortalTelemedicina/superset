@@ -102,6 +102,7 @@ export type BigNumberVizProps = {
   iconName?: string;
   iconSize?: number;
   iconColor?: string;
+  iconBackgroundColor?: string;
   additionalText?: string;
   additionalTextFontSize?: number;
 };

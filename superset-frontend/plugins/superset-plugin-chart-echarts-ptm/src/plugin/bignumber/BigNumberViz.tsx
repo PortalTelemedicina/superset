@@ -307,7 +307,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderIcon() {
-    const { showIcon, iconName, iconSize, iconColor } = this.props;
+    const { showIcon, iconName, iconSize, iconColor, iconBackgroundColor } = this.props;
     
     if (!showIcon || !iconName) return null;
 
@@ -324,7 +324,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       const padding = size / 2; // Padding is half the icon size
 
       return (
-        <div className="ptm-icon-container" style={{ padding }}>
+        <div 
+          className="ptm-icon-container" 
+          style={{ 
+            padding,
+            backgroundColor: iconBackgroundColor || '#F5F5F5',
+          }}
+        >
           <IconComponent 
             size={size} 
             color={iconColor || '#666666'}
@@ -358,10 +364,12 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   renderTrendBadge(fontSize: number) {
     const { subheader, className } = this.props;
     
-    if (!subheader) return null;
-
+    // Only show trend badge if there's a positive or negative trend (comparison data)
     const isPositive = className?.includes('positive');
     const isNegative = className?.includes('negative');
+    
+    // Don't render if no trend data (neither positive nor negative)
+    if (!subheader || (!isPositive && !isNegative)) return null;
     
     const TrendIcon = isPositive ? TrendingUp : isNegative ? TrendingDown : null;
 
@@ -602,7 +610,6 @@ export default styled(BigNumberVis)`
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: ${theme.colors.grayscale.light3};
         border-radius: ${theme.gridUnit * 2}px;
       }
 

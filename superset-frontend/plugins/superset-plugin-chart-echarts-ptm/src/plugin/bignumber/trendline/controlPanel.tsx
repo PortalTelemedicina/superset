@@ -34,6 +34,7 @@ import {
   iconName,
   iconSize,
   iconColor,
+  iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
 } from '../sharedControls';
@@ -198,6 +199,7 @@ const config: ControlPanelConfig = {
         [iconName],
         [iconSize],
         [iconColor],
+        [iconBackgroundColor],
         [additionalText],
         [additionalTextFontSize],
       ],
