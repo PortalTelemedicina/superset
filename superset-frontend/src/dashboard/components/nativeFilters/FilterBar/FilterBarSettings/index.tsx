@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { styled, t, useTheme, css } from '@superset-ui/core';
+import { css, getExtensionsRegistry, styled, t, useTheme } from '@superset-ui/core';
 import { MenuProps } from '@superset-ui/core/components/Menu';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
@@ -54,7 +54,9 @@ const ADD_EDIT_FILTERS_MENU_KEY = 'add-edit-filters-menu-key';
 const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
   o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
 
-const FilterBarSettings = () => {
+const extensionsRegistry = getExtensionsRegistry();
+
+export const DefaultFilterBarSettings = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
@@ -160,7 +162,7 @@ const FilterBarSettings = () => {
   );
 
   const menuItems = useMemo(() => {
-    const items: MenuProps['items'] = [];
+    const items: any[] = [];
 
     if (canEdit) {
       items.push({
@@ -250,7 +252,7 @@ const FilterBarSettings = () => {
           selectedKeys: [selectedFilterBarOrientation],
         }}
         trigger={['click']}
-        popupRender={menu => (
+        popupRender={(menu: ReactNode) => (
           <div
             css={css`
               .filter-bar-orientation-submenu.ant-dropdown-menu-submenu-selected
@@ -279,6 +281,18 @@ const FilterBarSettings = () => {
       {scopingModal}
       {FilterConfigModalComponent}
     </>
+  );
+};
+
+const FilterBarSettings = () => {
+  const FilterBarSettingsExtension = extensionsRegistry.get(
+    'dashboard.filterbar.settings.replacement' as any,
+  ) as (() => JSX.Element | null) | undefined;
+
+  return FilterBarSettingsExtension ? (
+    <FilterBarSettingsExtension />
+  ) : (
+    <DefaultFilterBarSettings />
   );
 };
 

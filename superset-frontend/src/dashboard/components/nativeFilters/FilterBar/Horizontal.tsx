@@ -18,7 +18,12 @@
  */
 
 import { FC, memo, useMemo } from 'react';
-import { DataMaskStateWithId, styled, t } from '@superset-ui/core';
+import {
+  DataMaskStateWithId,
+  getExtensionsRegistry,
+  styled,
+  t,
+} from '@superset-ui/core';
 import { Loading } from '@superset-ui/core/components';
 import { RootState } from 'src/dashboard/types';
 import { useChartLayoutItems } from 'src/dashboard/util/useChartLayoutItems';
@@ -63,7 +68,9 @@ const FilterBarEmptyStateContainer = styled.div`
   `}
 `;
 
-const HorizontalFilterBar: FC<HorizontalBarProps> = ({
+const extensionsRegistry = getExtensionsRegistry();
+
+export const DefaultHorizontalFilterBar: FC<HorizontalBarProps> = ({
   actions,
   dataMaskSelected,
   filterValues,
@@ -120,4 +127,17 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
     </HorizontalBar>
   );
 };
+
+const HorizontalFilterBar: FC<HorizontalBarProps> = props => {
+  const HorizontalFilterBarExtension = extensionsRegistry.get(
+    'dashboard.filterbar.horizontal.replacement' as any,
+  ) as FC<HorizontalBarProps> | undefined;
+
+  return HorizontalFilterBarExtension ? (
+    <HorizontalFilterBarExtension {...props} />
+  ) : (
+    <DefaultHorizontalFilterBar {...props} />
+  );
+};
+
 export default memo(HorizontalFilterBar);

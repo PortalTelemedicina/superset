@@ -34,6 +34,7 @@ import {
   FeatureFlag,
   useTheme,
   getChartMetadataRegistry,
+  getExtensionsRegistry,
   styled,
   t,
   VizType,
@@ -154,6 +155,7 @@ const dropdownIconsStyles = css`
 const SliceHeaderControls = (
   props: SliceHeaderControlsPropsWithRouter | SliceHeaderControlsProps,
 ) => {
+  const extensionsRegistry = getExtensionsRegistry();
   const [drillModalIsOpen, setDrillModalIsOpen] = useState(false);
   // setting openKeys undefined falls back to uncontrolled behaviour
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -398,6 +400,17 @@ const SliceHeaderControls = (
     });
   }
 
+  const sliceHeaderControlsClassNamesExtension = extensionsRegistry.get(
+    'dashboard.sliceHeaderControls.classNames' as any,
+  ) as
+    | ((args: { slice: SliceHeaderControlsProps['slice'] }) => {
+        menu?: string;
+        controls?: string;
+      })
+    | undefined;
+
+  const extensionClassNames = sliceHeaderControlsClassNamesExtension?.({ slice });
+
   if (canEditCrossFilters) {
     newMenuItems.push({
       key: MenuKeys.CrossFilterScoping,
@@ -553,24 +566,31 @@ const SliceHeaderControls = (
         />
       )}
       <NoAnimationDropdown
-        popupRender={() => (
-          <Menu
-            onClick={handleMenuClick}
-            data-test={`slice_${slice.slice_id}-menu`}
-            id={`slice_${slice.slice_id}-menu`}
-            selectable={false}
-            items={newMenuItems}
-          />
-        )}
+        // Cast to any to stay compatible across AntD typings during upgrade.
+        {...({
+          popupRender: () => (
+            <Menu
+              {...({
+                onClick: handleMenuClick,
+                'data-test': `slice_${slice.slice_id}-menu`,
+                id: `slice_${slice.slice_id}-menu`,
+                selectable: false,
+                items: newMenuItems,
+                className: extensionClassNames?.menu,
+              } as any)}
+            />
+          ),
+        } as any)}
         overlayStyle={dropdownOverlayStyle}
         trigger={['click']}
         placement="bottomRight"
         open={isDropdownVisible}
-        onOpenChange={visible => setIsDropdownVisible(visible)}
+        onOpenChange={(visible: boolean) => setIsDropdownVisible(visible)}
       >
         <Button
           id={`slice_${slice.slice_id}-controls`}
           buttonStyle="link"
+          className={extensionClassNames?.controls}
           aria-label="More Options"
           aria-haspopup="true"
           css={theme => css`

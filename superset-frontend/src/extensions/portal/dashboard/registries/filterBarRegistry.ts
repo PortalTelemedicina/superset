@@ -17,23 +17,29 @@
  * under the License.
  */
 
-// For individual deployments to add custom overrides
+import { getExtensionsRegistry } from '@superset-ui/core';
 
-// [PORTAL_EXTENSION] Import portal extensions
-// This ensures portal extensions are initialized during app startup
-// See: src/extensions/portal/index.ts
-try {
-  const portalExtensions = require('src/extensions/portal');
-  // Ensure registry-based extensions are available before first render.
-  portalExtensions?.initializePortalExtensions?.();
-} catch (error) {
-  // Portal extensions not available, continue without them
-  // This is expected in development or when extensions are not installed
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[Setup Extensions] Portal extensions not available');
-  }
-}
+import PortalHorizontalFilterBar from '../filterBar/components/HorizontalFilterBar';
+import PortalFilterBarSettings from '../filterBar/components/FilterBarSettings';
 
-export default function setupExtensions() {
-  // Additional extension setup can be added here
-}
+/**
+ * Registers portal filter bar extensions in Superset's extensions registry.
+ *
+ * Keys used:
+ * - dashboard.filterbar.horizontal.replacement
+ * - dashboard.filterbar.settings.replacement
+ */
+export const registerCustomFilterBarExtensions = () => {
+  const extensionsRegistry = getExtensionsRegistry();
+
+  extensionsRegistry.set(
+    'dashboard.filterbar.horizontal.replacement',
+    PortalHorizontalFilterBar,
+  );
+
+  extensionsRegistry.set(
+    'dashboard.filterbar.settings.replacement',
+    PortalFilterBarSettings,
+  );
+};
+

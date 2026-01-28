@@ -19,7 +19,7 @@
 import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
-import { t, useTheme } from '@superset-ui/core';
+import { getExtensionsRegistry, t, useTheme } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
@@ -76,6 +76,7 @@ type PageProps = {
   idOrSlug: string;
 };
 
+const extensionsRegistry = getExtensionsRegistry();
 // TODO: move to Dashboard.jsx when it's refactored to functional component
 const selectRelevantDatamask = createSelector(
   (state: RootState) => state.dataMask, // the first argument accesses relevant data from global state
@@ -216,13 +217,26 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   }, [dashboard_title]);
 
   useEffect(() => {
-    if (typeof css === 'string') {
+    const dashboardCss = typeof css === 'string' ? css : '';
+    const transformDashboardCss = extensionsRegistry.get(
+      'dashboard.css.transform' as any,
+    ) as
+      | ((args: { css: string; dashboard: any }) => string)
+      | undefined;
+
+    const finalCss = (
+      transformDashboardCss
+        ? transformDashboardCss({ css: dashboardCss, dashboard })
+        : dashboardCss
+    ).trim();
+
+    if (finalCss) {
       // returning will clean up custom css
       // when dashboard unmounts or changes
-      return injectCustomCss(css);
+      return injectCustomCss(finalCss);
     }
     return () => {};
-  }, [css]);
+  }, [css, dashboard]);
 
   useEffect(() => {
     if (datasetsApiError) {

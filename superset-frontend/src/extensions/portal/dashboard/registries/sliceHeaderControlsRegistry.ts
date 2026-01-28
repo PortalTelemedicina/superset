@@ -17,23 +17,29 @@
  * under the License.
  */
 
-// For individual deployments to add custom overrides
+import { getExtensionsRegistry } from '@superset-ui/core';
 
-// [PORTAL_EXTENSION] Import portal extensions
-// This ensures portal extensions are initialized during app startup
-// See: src/extensions/portal/index.ts
-try {
-  const portalExtensions = require('src/extensions/portal');
-  // Ensure registry-based extensions are available before first render.
-  portalExtensions?.initializePortalExtensions?.();
-} catch (error) {
-  // Portal extensions not available, continue without them
-  // This is expected in development or when extensions are not installed
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[Setup Extensions] Portal extensions not available');
-  }
-}
+const sanitizeVizType = (vizType: string) =>
+  String(vizType || '').replace(/[^a-zA-Z0-9_-]/g, '-');
 
-export default function setupExtensions() {
-  // Additional extension setup can be added here
-}
+/**
+ * Registers SliceHeaderControls className overrides.
+ *
+ * Key used:
+ * - dashboard.sliceHeaderControls.classNames
+ */
+export const registerSliceHeaderControlsExtensions = () => {
+  const extensionsRegistry = getExtensionsRegistry();
+
+  extensionsRegistry.set(
+    'dashboard.sliceHeaderControls.classNames' as any,
+    ({ slice }: { slice: { viz_type: string } }) => {
+      const viz = sanitizeVizType(slice?.viz_type);
+      return {
+        menu: `ptm-slice-menu ptm-slice-menu--${viz}`,
+        controls: `ptm-slice-controls ptm-slice-controls--${viz}`,
+      };
+    },
+  );
+};
+
