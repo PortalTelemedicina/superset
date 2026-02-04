@@ -28,6 +28,7 @@ export const TIMESERIES_TRANSFORM_CONFIG: TransformConfig = {
   colorPalette: true,
   pillFormat: false,
   userOverrides: true,
+  textCasing: true,
 };
 
 export const seriesTypeChoices: [string, string][] = [

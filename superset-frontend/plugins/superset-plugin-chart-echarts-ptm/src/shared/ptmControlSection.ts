@@ -71,6 +71,53 @@ export const ptmColorPaletteControl: ControlSetRow = [
   },
 ];
 
+export const ptmTextCaseChoices: [string, string][] = [
+  ['none', t('None')],
+  ['upper', t('UPPERCASE')],
+  ['lower', t('lowercase')],
+  ['capitalize', t('Title Case')],
+];
+
+/** Text casing controls for axis labels, legend labels, and table text. Add to additionalPtmControls. */
+export const ptmTextCasingControls: ControlSetRow = [
+  {
+    name: 'ptm_axis_text_case',
+    config: {
+      type: 'SelectControl',
+      label: t('Axis labels casing'),
+      description: t('Standardize casing for axis tick labels.'),
+      default: 'none',
+      clearable: false,
+      choices: ptmTextCaseChoices,
+      renderTrigger: true,
+    },
+  },
+  {
+    name: 'ptm_legend_text_case',
+    config: {
+      type: 'SelectControl',
+      label: t('Legend labels casing'),
+      description: t('Standardize casing for legend item labels.'),
+      default: 'none',
+      clearable: false,
+      choices: ptmTextCaseChoices,
+      renderTrigger: true,
+    },
+  },
+  {
+    name: 'ptm_table_text_case',
+    config: {
+      type: 'SelectControl',
+      label: t('Table text casing'),
+      description: t('Standardize casing for table headers and cell text (Table / Pivot Table).'),
+      default: 'none',
+      clearable: false,
+      choices: ptmTextCaseChoices,
+      renderTrigger: true,
+    },
+  },
+];
+
 export const ptmJsonOverrideControl: ControlSetRow = [
   {
     name: 'ptm_options_json',

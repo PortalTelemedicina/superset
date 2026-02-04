@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ChartProps } from '@superset-ui/core';
-import { createPtmPlugin } from '../../shared';
+import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import { applyPillFormatting } from './pillFormat';
 import { TABLE_TRANSFORM_CONFIG, tablePillColumnsControl } from './tableTransformConfig';
 import thumbnail from './images/thumbnail.png';
@@ -37,11 +37,14 @@ function wrapTableTransformProps(baseTransformProps: (chartProps: ChartProps) =>
   return (chartProps: ChartProps) => {
     const result = baseTransformProps(chartProps);
     const { formData } = chartProps;
-    
+    const tableCase =
+      (formData.ptm_table_text_case ?? formData.ptmTableTextCase) ?? 'none';
+    result.ptmTableTextCase = tableCase;
+
     if (result.data && result.columns) {
       result.data = applyPillFormatting(result.data, result.columns, formData);
     }
-    
+
     return result;
   };
 }
@@ -60,7 +63,7 @@ const PtmTableChartPlugin = createPtmPlugin({
   },
   transforms: TABLE_TRANSFORM_CONFIG,
   ptmDefaults: TABLE_PTM_DEFAULTS,
-  additionalPtmControls: [tablePillColumnsControl],
+  additionalPtmControls: [tablePillColumnsControl, ptmTextCasingControls],
 });
 
 export default PtmTableChartPlugin;

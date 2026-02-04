@@ -21,6 +21,7 @@ import merge from 'lodash.merge';
 import {
   type TransformConfig,
   resolveTransformConfig,
+  applyTextCasingToEchartOptions,
 } from './transformHelpers';
 import { safeParseJson } from './transformHelpers/utils';
 import { createDefaultPluginTransform } from './defaultPluginTransform';
@@ -69,6 +70,9 @@ export function wrapTransformProps<T extends ChartProps>(
 
     finalOptions = transform(finalOptions, formData, transforms);
 
+    if (transforms.textCasing) {
+      finalOptions = applyTextCasingToEchartOptions(finalOptions, formData);
+    }
 
     if (transforms.userOverrides) {
       const ptmJson = formData.ptmOptionsJson as string | undefined;

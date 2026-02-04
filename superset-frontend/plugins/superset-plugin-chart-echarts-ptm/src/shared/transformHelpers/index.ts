@@ -40,4 +40,10 @@ export {
   DEFAULT_TRANSFORMS,
   resolveTransformConfig,
 } from './transformRegistry';
+export {
+  applyTextCasing,
+  applyTextCasingToEchartOptions,
+  getCasingFromFormData,
+  type PtmTextCase,
+} from './textCasing';
 

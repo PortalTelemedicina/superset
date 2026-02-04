@@ -51,7 +51,8 @@ import {
     t,
     useTheme,
   } from '@superset-ui/core';
-  import { Dropdown, Menu, Tooltip } from '@superset-ui/chart-controls';
+  import { Dropdown, Menu } from '@superset-ui/chart-controls';
+  import { Tooltip } from '@superset-ui/core/components/Tooltip';
   import {
     CheckOutlined,
     InfoCircleOutlined,
@@ -74,8 +75,11 @@ import {
     SizeOption,
   } from './PtmDataTable';
   
-  import Styles from './Styles';
-  import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/formatValue';
+import Styles from './Styles';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
+import { applyTextCasing } from '../../shared/transformHelpers';
+import type { PtmTextCase } from '../../shared/transformHelpers';
+import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/formatValue';
   import { PAGE_SIZE_OPTIONS } from '../../../../plugin-chart-table/src/consts';
   import { updateExternalFormData } from '../../../../plugin-chart-table/src/DataTable/utils/externalAPIs';
   import getScrollBarSize from '../../../../plugin-chart-table/src/DataTable/utils/getScrollBarSize';
@@ -258,7 +262,7 @@ import {
       showCellBars = true,
       sortDesc = false,
       filters,
-      sticky = true, // whether to use sticky header
+      // sticky header disabled for PTM table (we want full-width responsive layout)
       columnColorFormatters,
       allowRearrangeColumns = false,
       allowRenderHtml = true,
@@ -267,7 +271,8 @@ import {
       isUsingTimeComparison,
       basicColorFormatters,
       basicColorColumnFormatters,
-    } = props;
+      ptmTableTextCase = 'none',
+    } = props as TableChartTransformedProps & { ptmTableTextCase?: PtmTextCase };
     const comparisonColumns = [
       { key: 'all', label: t('Display all') },
       { key: '#', label: '#' },
@@ -290,7 +295,8 @@ import {
     ]);
     const [hideComparisonKeys, setHideComparisonKeys] = useState<string[]>([]);
     const theme = useTheme();
-  
+    const tok = useMemo(() => getThemeTokens(theme), [theme]);
+
     // only take relevant page size options
     const pageSizeOptions = useMemo(() => {
       const getServerPagination = (n: number) => n <= rowCount;
@@ -557,9 +563,9 @@ import {
               <div
                 css={css`
                   max-width: 242px;
-                  padding: 0 ${theme.gridUnit * 2}px;
-                  color: ${theme.colors.grayscale.base};
-                  font-size: ${theme.typography.sizes.s}px;
+                  padding: 0 ${tok.sizeUnit * 2}px;
+                  color: ${tok.colorTextSecondary};
+                  font-size: ${tok.fontSizeSM}px;
                 `}
               >
                 {t(
@@ -570,7 +576,7 @@ import {
                 <Menu.Item key={column.key}>
                   <span
                     css={css`
-                      color: ${theme.colors.grayscale.dark2};
+                      color: ${tok.colorTextHeading};
                     `}
                   >
                     {column.label}
@@ -578,7 +584,7 @@ import {
                   <span
                     css={css`
                       float: right;
-                      font-size: ${theme.typography.sizes.s}px;
+                      font-size: ${tok.fontSizeSM}px;
                     `}
                   >
                     {selectedComparisonColumns.includes(column.key) && (
@@ -591,7 +597,7 @@ import {
           }
           trigger={['click']}
         >
-          <span>
+          <span className="ptm-dt-actions-trigger" role="button" tabIndex={0}>
             <TableOutlined /> <DownOutlined />
           </span>
         </Dropdown>
@@ -629,7 +635,7 @@ import {
               css={css`
                 float: right;
                 & svg {
-                  color: ${theme.colors.grayscale.base} !important;
+                  color: ${tok.colorTextSecondary} !important;
                 }
               `}
             >
@@ -660,7 +666,7 @@ import {
         <tr
           css={css`
             th {
-              border-right: 2px solid ${theme.colors.grayscale.light2};
+              border-right: 2px solid ${tok.colorBorder};
             }
             th:first-child {
               border-left: none;
@@ -742,6 +748,8 @@ import {
             className += ' right-border-only';
           }
         }
+
+        const displayLabel = applyTextCasing(label, ptmTableTextCase as PtmTextCase);
   
         return {
           id: String(i), // to allow duplicate column keys
@@ -751,6 +759,10 @@ import {
           accessor: ((datum: D) => datum[key]) as never,
           Cell: ({ value, row }: { value: DataRecordValue; row: Row<D> }) => {
             const [isHtml, text] = formatColumnValue(column, value);
+            const displayText =
+              !isHtml && text != null
+                ? applyTextCasing(String(text), ptmTableTextCase as PtmTextCase)
+                : text;
             const html = isHtml && allowRenderHtml ? { __html: text } : undefined;
   
             let backgroundColor;
@@ -827,11 +839,11 @@ import {
               color: ${basicColorFormatters &&
               basicColorFormatters[row.index][originKey]?.arrowColor ===
                 ColorSchemeEnum.Green
-                ? theme.colors.success.base
-                : theme.colors.error.base};
-              margin-right: ${theme.gridUnit}px;
+                ? tok.colorSuccess
+                : tok.colorError};
+              margin-right: ${tok.sizeUnit}px;
             `;
-  
+
             if (
               basicColorColumnFormatters &&
               basicColorColumnFormatters?.length > 0
@@ -839,9 +851,9 @@ import {
               arrowStyles = css`
                 color: ${basicColorColumnFormatters[row.index][column.key]
                   ?.arrowColor === ColorSchemeEnum.Green
-                  ? theme.colors.success.base
-                  : theme.colors.error.base};
-                margin-right: ${theme.gridUnit}px;
+                  ? tok.colorSuccess
+                  : tok.colorError};
+                margin-right: ${tok.sizeUnit}px;
               `;
             }
   
@@ -917,12 +929,12 @@ import {
                     style={columnWidth ? { width: columnWidth } : undefined}
                   >
                     {arrow && <span css={arrowStyles}>{arrow}</span>}
-                    {text}
+                    {displayText}
                   </div>
                 ) : (
                   <>
                     {arrow && <span css={arrowStyles}>{arrow}</span>}
-                    {text}
+                    {displayText}
                   </>
                 )}
               </StyledCell>
@@ -972,7 +984,7 @@ import {
                   alignItems: 'flex-end',
                 }}
               >
-                <span data-column-name={col.id}>{label}</span>
+                <span data-column-name={col.id}>{displayLabel}</span>
                 <SortIcon column={col} />
               </div>
             </th>
@@ -985,14 +997,14 @@ import {
                     display: flex;
                     align-items: center;
                     & svg {
-                      margin-left: ${theme.gridUnit}px;
-                      color: ${theme.colors.grayscale.dark1} !important;
+                      margin-left: ${tok.sizeUnit}px;
+                      color: ${tok.colorText} !important;
                     }
                   `}
                 >
                   {t('Summary')}
                   <Tooltip
-                    overlay={t(
+                    title={t(
                       'Show total aggregations of selected metrics. Note that row limit does not apply to the result.',
                     )}
                   >
@@ -1002,7 +1014,12 @@ import {
               </th>
             ) : (
               <td key={`footer-total-${i}`} style={sharedStyle}>
-                <strong>{formatColumnValue(column, totals[key])[1]}</strong>
+                <strong>
+                  {applyTextCasing(
+                    String(formatColumnValue(column, totals[key])[1]),
+                    ptmTableTextCase as PtmTextCase,
+                  )}
+                </strong>
               </td>
             )
           ) : undefined,
@@ -1019,10 +1036,12 @@ import {
         isRawRecords,
         showCellBars,
         sortDesc,
+        tok,
         toggleFilter,
         totals,
         columnColorFormatters,
         columnOrderToggle,
+        ptmTableTextCase,
       ],
     );
   
@@ -1077,7 +1096,7 @@ import {
       <Styles>
         <PtmDataTable<D>
           columns={columns}
-          data={data}
+          data={data as D[]}
           rowCount={rowCount}
           tableClassName="table table-striped table-condensed"
           pageSize={pageSize}
@@ -1093,8 +1112,8 @@ import {
           noResults={getNoResultsMessage}
           searchInput={includeSearch && SearchInput}
           selectPageSize={pageSize !== null && SelectPageSize}
-          // not in use in Superset, but needed for unit tests
-          sticky={sticky}
+          // PTM: Enable sticky so table body scrolls when rows exceed height, keeping footer visible
+          sticky={true}
           renderGroupingHeaders={
             !isEmpty(groupHeaderColumns) ? renderGroupingHeaders : undefined
           }
