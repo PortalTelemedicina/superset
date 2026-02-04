@@ -20,7 +20,6 @@
 import { styled } from '@superset-ui/core';
 import cls from 'classnames';
 import { Spin } from 'antd';
-import { Loading as Loader } from '../assets';
 import type { LoadingProps } from './types';
 
 const LoaderImg = styled.img`
