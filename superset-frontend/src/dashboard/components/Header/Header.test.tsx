@@ -26,6 +26,7 @@ import setupExtensions from 'src/setup/setupExtensions';
 import getOwnerName from 'src/utils/getOwnerName';
 import { render, createStore } from 'spec/helpers/testing-library';
 import reducerIndex from 'spec/helpers/reducerIndex';
+import { DashboardExtensionsContext } from 'src/dashboard/components/DashboardExtensionsContext';
 import Header from '.';
 import { DASHBOARD_HEADER_ID } from '../../util/constants';
 import { UPDATE_COMPONENTS } from '../../actions/dashboardLayout';
@@ -840,5 +841,44 @@ test('should sync theme ref when navigating between dashboards', async () => {
 
   await waitFor(() => {
     expect(setUnsavedChanges).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe('dashboard header extensions', () => {
+  test('renders default header when no extension provided', () => {
+    const testStore = createStore(initialState, reducerIndex);
+    render(
+      <div className="dashboard">
+        <DashboardExtensionsContext.Provider value={{}}>
+          <Header />
+        </DashboardExtensionsContext.Provider>
+      </div>,
+      {
+        useRedux: true,
+        useTheme: true,
+        store: testStore,
+      },
+    );
+    expect(screen.getByText('Dashboard Title')).toBeInTheDocument();
+  });
+
+  test('renders custom header when headerComponent provided via context', () => {
+    const CustomHeader = () => <div data-test="custom-header" />;
+    const testStore = createStore(initialState, reducerIndex);
+    render(
+      <div className="dashboard">
+        <DashboardExtensionsContext.Provider
+          value={{ headerComponent: CustomHeader }}
+        >
+          <Header />
+        </DashboardExtensionsContext.Provider>
+      </div>,
+      {
+        useRedux: true,
+        useTheme: true,
+        store: testStore,
+      },
+    );
+    expect(screen.getByTestId('custom-header')).toBeInTheDocument();
   });
 });

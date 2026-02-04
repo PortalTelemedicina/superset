@@ -27,6 +27,7 @@ import {
   t,
   getExtensionsRegistry,
 } from '@superset-ui/core';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { Global } from '@emotion/react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -783,6 +784,24 @@ const Header = () => {
     lastModifiedTime: actualLastModifiedTime,
     logEvent: boundActionCreators.logEvent,
   });
+
+  const { headerComponent: DashboardHeaderExtension } =
+    useDashboardExtensions();
+  const headerProps = {
+    editableTitleProps,
+    certificatiedBadgeProps: certifiedBadgeProps,
+    faveStarProps,
+    titlePanelAdditionalItems,
+    rightPanelAdditionalItems,
+    menuDropdownProps: {
+      open: isDropdownVisible,
+      onOpenChange: setIsDropdownVisible,
+    },
+    additionalActionsMenu: menu,
+    showFaveStar: user?.userId && dashboardInfo?.id,
+    showTitlePanelItems: true,
+  };
+
   return (
     <div
       css={headerContainerStyle}
@@ -790,20 +809,16 @@ const Header = () => {
       data-test-id={dashboardInfo.id}
       className="dashboard-header-container"
     >
-      <PageHeaderWithActions
-        editableTitleProps={editableTitleProps}
-        certificatiedBadgeProps={certifiedBadgeProps}
-        faveStarProps={faveStarProps}
-        titlePanelAdditionalItems={titlePanelAdditionalItems}
-        rightPanelAdditionalItems={rightPanelAdditionalItems}
-        menuDropdownProps={{
-          open: isDropdownVisible,
-          onOpenChange: setIsDropdownVisible,
-        }}
-        additionalActionsMenu={menu}
-        showFaveStar={user?.userId && dashboardInfo?.id}
-        showTitlePanelItems
-      />
+      {DashboardHeaderExtension ? (
+        <DashboardHeaderExtension
+          {...headerProps}
+          dashboardInfo={dashboardInfo}
+          editMode={editMode}
+          isEmbedded={isEmbedded}
+        />
+      ) : (
+        <PageHeaderWithActions {...headerProps} />
+      )}
       {showingPropertiesModal && (
         <PropertiesModal
           dashboardId={dashboardInfo.id}

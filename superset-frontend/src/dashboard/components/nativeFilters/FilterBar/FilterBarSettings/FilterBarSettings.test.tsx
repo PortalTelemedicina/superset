@@ -22,6 +22,7 @@ import { waitFor, render, screen, within } from 'spec/helpers/testing-library';
 import userEvent from '@testing-library/user-event';
 import { DashboardInfo, FilterBarOrientation } from 'src/dashboard/types';
 import * as mockedMessageActions from 'src/components/MessageToasts/actions';
+import { DashboardExtensionsContext } from 'src/dashboard/components/DashboardExtensionsContext';
 import FilterBarSettings from '.';
 
 const initialState: { dashboardInfo: DashboardInfo } = {
@@ -259,4 +260,26 @@ test('On failed request, restore previous selection', async () => {
       within(horizontalItemAfter.closest('li')!).queryByLabelText('check'),
     ).not.toBeInTheDocument();
   });
+});
+
+test('renders custom filter bar settings when filterBarSettingsComponent provided via context', async () => {
+  const CustomFilterBarSettings = () => (
+    <div data-test="custom-filter-bar-settings" />
+  );
+  await waitFor(() =>
+    render(
+      <DashboardExtensionsContext.Provider
+        value={{ filterBarSettingsComponent: CustomFilterBarSettings }}
+      >
+        <FilterBarSettings />
+      </DashboardExtensionsContext.Provider>,
+      {
+        useRedux: true,
+        initialState: { dashboardInfo: initialState.dashboardInfo },
+      },
+    ),
+  );
+  expect(
+    screen.getByTestId('custom-filter-bar-settings'),
+  ).toBeInTheDocument();
 });

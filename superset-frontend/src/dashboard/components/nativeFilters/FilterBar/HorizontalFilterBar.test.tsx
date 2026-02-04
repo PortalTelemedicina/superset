@@ -18,6 +18,7 @@
  */
 import { NativeFilterType } from '@superset-ui/core';
 import { render, screen, waitFor } from 'spec/helpers/testing-library';
+import { DashboardExtensionsContext } from 'src/dashboard/components/DashboardExtensionsContext';
 import HorizontalBar from './Horizontal';
 
 const defaultProps = {
@@ -88,4 +89,26 @@ test('should render the loading icon', async () => {
     isInitialized: false,
   });
   expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
+});
+
+test('renders custom filter bar when filterBarComponent provided via context', async () => {
+  const CustomFilterBar = () => <div data-test="custom-filter-bar" />;
+  await waitFor(() =>
+    render(
+      <DashboardExtensionsContext.Provider
+        value={{ filterBarComponent: CustomFilterBar }}
+      >
+        <HorizontalBar {...defaultProps} />
+      </DashboardExtensionsContext.Provider>,
+      {
+        useRedux: true,
+        initialState: {
+          dashboardState: { sliceIds: [] },
+          dashboardInfo: { dash_edit_perm: true },
+          dashboardLayout: { present: {}, past: [], future: [] },
+        },
+      },
+    ),
+  );
+  expect(screen.getByTestId('custom-filter-bar')).toBeInTheDocument();
 });

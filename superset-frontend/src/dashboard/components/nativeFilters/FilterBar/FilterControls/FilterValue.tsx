@@ -45,6 +45,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isEqual, isEqualWith } from 'lodash';
 import { getChartDataRequest } from 'src/components/Chart/chartAction';
 import { ErrorAlert, ErrorMessageWithStackTrace } from 'src/components';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { Loading, Constants } from '@superset-ui/core/components';
 import { waitForAsyncData } from 'src/middleware/asyncEvent';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
@@ -110,6 +111,8 @@ const FilterValue: FC<FilterControlProps> = ({
   const metadata = getChartMetadataRegistry().get(filterType);
   const dependencies = useFilterDependencies(id, dataMaskSelected);
   const shouldRefresh = useShouldFilterRefresh();
+  const { filterValueLoadingComponent: FilterValueLoading } =
+    useDashboardExtensions();
   const [state, setState] = useState<ChartDataResponseResult[]>([]);
   const dashboardId = useSelector<RootState, number>(
     state => state.dashboardInfo.id,
@@ -367,7 +370,11 @@ const FilterValue: FC<FilterControlProps> = ({
       overflow={overflow}
     >
       {isLoading ? (
-        <Loading position="inline-centered" />
+        FilterValueLoading ? (
+          <FilterValueLoading />
+        ) : (
+          <Loading position="inline-centered" />
+        )
       ) : (
         <SuperChart
           height={HEIGHT}

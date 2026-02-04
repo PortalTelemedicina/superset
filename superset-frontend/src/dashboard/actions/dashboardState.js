@@ -342,6 +342,10 @@ export function saveDashboardRequest(data, id, saveType) {
         cross_filters_enabled: isCrossFiltersEnabled(
           metadataCrossFiltersEnabled,
         ),
+        // Preserve extension-owned header layout so it persists across save
+        ...(data.metadata?.headerLayout != null && {
+          headerLayout: data.metadata.headerLayout,
+        }),
       },
     };
 
@@ -383,7 +387,14 @@ export function saveDashboardRequest(data, id, saveType) {
       // syncing with the backend transformations of the metadata
       if (updatedDashboard.json_metadata) {
         const metadata = JSON.parse(updatedDashboard.json_metadata);
-        dispatch(setDashboardMetadata(metadata));
+        // Preserve client headerLayout if server omitted it (e.g. when extension flag is off)
+        const clientHeaderLayout =
+          getState().dashboardInfo?.metadata?.headerLayout;
+        const mergedMetadata =
+          clientHeaderLayout != null && metadata.headerLayout == null
+            ? { ...metadata, headerLayout: clientHeaderLayout }
+            : metadata;
+        dispatch(setDashboardMetadata(mergedMetadata));
         if (metadata.chart_configuration) {
           dispatch({
             type: SAVE_CHART_CONFIG_COMPLETE,

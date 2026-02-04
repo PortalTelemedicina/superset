@@ -34,13 +34,13 @@ import {
   FeatureFlag,
   useTheme,
   getChartMetadataRegistry,
-  getExtensionsRegistry,
   styled,
   t,
   VizType,
   BinaryQueryObjectFilterClause,
   QueryFormData,
 } from '@superset-ui/core';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { useSelector } from 'react-redux';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import {
@@ -155,7 +155,10 @@ const dropdownIconsStyles = css`
 const SliceHeaderControls = (
   props: SliceHeaderControlsPropsWithRouter | SliceHeaderControlsProps,
 ) => {
-  const extensionsRegistry = getExtensionsRegistry();
+  const {
+    sliceHeaderControlsClassNamesFn: sliceHeaderControlsClassNamesExtension,
+    sliceHeaderControlsTriggerFn: sliceHeaderControlsTriggerExtension,
+  } = useDashboardExtensions();
   const [drillModalIsOpen, setDrillModalIsOpen] = useState(false);
   // setting openKeys undefined falls back to uncontrolled behaviour
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -400,16 +403,11 @@ const SliceHeaderControls = (
     });
   }
 
-  const sliceHeaderControlsClassNamesExtension = extensionsRegistry.get(
-    'dashboard.sliceHeaderControls.classNames' as any,
-  ) as
-    | ((args: { slice: SliceHeaderControlsProps['slice'] }) => {
-        menu?: string;
-        controls?: string;
-      })
-    | undefined;
-
-  const extensionClassNames = sliceHeaderControlsClassNamesExtension?.({ slice });
+  const extensionClassNames = sliceHeaderControlsClassNamesExtension?.({
+    slice,
+  });
+  const extensionTriggerNode = sliceHeaderControlsTriggerExtension?.({ slice });
+  const triggerNode = extensionTriggerNode ?? <VerticalDotsTrigger />;
 
   if (canEditCrossFilters) {
     newMenuItems.push({
@@ -593,12 +591,14 @@ const SliceHeaderControls = (
           className={extensionClassNames?.controls}
           aria-label="More Options"
           aria-haspopup="true"
-          css={theme => css`
-            padding: ${theme.sizeUnit * 2}px;
-            padding-right: 0px;
-          `}
+          css={theme =>
+            css`
+              padding: ${theme.sizeUnit * 2}px;
+              padding-right: 0px;
+            `
+          }
         >
-          <VerticalDotsTrigger />
+          {triggerNode}
         </Button>
       </NoAnimationDropdown>
       <DrillDetailModal

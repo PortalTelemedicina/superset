@@ -19,7 +19,8 @@
 
 import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { css, getExtensionsRegistry, styled, t, useTheme } from '@superset-ui/core';
+import { css, styled, t, useTheme } from '@superset-ui/core';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { MenuProps } from '@superset-ui/core/components/Menu';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
@@ -53,8 +54,6 @@ const ADD_EDIT_FILTERS_MENU_KEY = 'add-edit-filters-menu-key';
 
 const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
   o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
-
-const extensionsRegistry = getExtensionsRegistry();
 
 export const DefaultFilterBarSettings = () => {
   const theme = useTheme();
@@ -285,9 +284,8 @@ export const DefaultFilterBarSettings = () => {
 };
 
 const FilterBarSettings = () => {
-  const FilterBarSettingsExtension = extensionsRegistry.get(
-    'dashboard.filterbar.settings.replacement' as any,
-  ) as (() => JSX.Element | null) | undefined;
+  const { filterBarSettingsComponent: FilterBarSettingsExtension } =
+    useDashboardExtensions();
 
   return FilterBarSettingsExtension ? (
     <FilterBarSettingsExtension />
