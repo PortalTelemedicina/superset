@@ -20,7 +20,7 @@ from typing import Any, Mapping, Union
 from marshmallow import fields, post_dump, post_load, pre_load, Schema
 from marshmallow.validate import Length, ValidationError
 
-from superset import security_manager
+from superset import is_feature_enabled, security_manager
 from superset.tags.models import TagType
 from superset.utils import json
 
@@ -115,6 +115,39 @@ def validate_json_metadata(value: Union[bytes, bytearray, str]) -> None:
         raise ValidationError(errors)
 
 
+EXTENSION_METADATA_KEYS = ("headerLayout", "portal_header_layout", "portalHeaderLayout")
+
+
+def normalize_dashboard_metadata(
+    data: dict[str, Any],
+    *,
+    extensions_enabled: bool,
+) -> dict[str, Any]:
+    """
+    Normalizes dashboard JSON metadata for extension compatibility.
+
+    - When extensions are disabled, extension-owned fields are removed.
+    - When enabled, legacy field names are mapped to `headerLayout`.
+    """
+    if not isinstance(data, dict):
+        return data
+
+    if extensions_enabled:
+        header_layout = data.get("headerLayout")
+        legacy_layout = (
+            data.get("portal_header_layout")
+            if "portal_header_layout" in data
+            else data.get("portalHeaderLayout")
+        )
+        if header_layout is None and legacy_layout is not None:
+            data["headerLayout"] = legacy_layout
+        return data
+
+    for key in EXTENSION_METADATA_KEYS:
+        data.pop(key, None)
+    return data
+
+
 class SharedLabelsColorsField(fields.Field):
     """
     A custom field that accepts either a list of strings or a dictionary.
@@ -167,29 +200,29 @@ class DashboardJSONMetadataSchema(Schema):
     remote_id = fields.Integer()
     filter_bar_orientation = fields.Str(allow_none=True)
     native_filter_migration = fields.Dict()
-    # PTM branding configuration for custom dashboard headers and logos
-    ptm_branding = fields.Dict()
-    # [PORTAL_EXTENSION] Header layout configuration for customizable dashboard headers
-    # This field is used by portal extensions for customizable dashboard headers.
-    # The field is defined here for backward compatibility, but the schema validation
-    # is handled by PortalDashboardMetadataExtension when available.
-    # See: superset/extensions/portal/schemas/dashboard_metadata.py
+    # Extension-owned dashboard metadata (kept for backward compatibility)
     headerLayout = fields.Dict(allow_none=True)
 
-    @classmethod
-    def register_extensions(cls):
-        """
-        Register portal extensions for dashboard metadata schema.
-        
-        This method should be called once during Superset initialization
-        to merge extension fields into the base schema.
-        """
-        try:
-            from superset.extensions.portal import register_extensions as register_portal_extensions
-            register_portal_extensions()
-        except ImportError:
-            # Portal extensions not available, continue without them
-            pass
+    @pre_load
+    def normalize_extension_metadata(  # pylint: disable=unused-argument
+        self,
+        data: dict[str, Any],
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        return normalize_dashboard_metadata(
+            data,
+            extensions_enabled=is_feature_enabled("PTM_EXTENSION_ENABLED"),
+        )
+
+    @post_dump
+    def strip_extension_metadata_when_disabled(  # pylint: disable=unused-argument
+        self,
+        data: dict[str, Any],
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        if is_feature_enabled("PTM_EXTENSION_ENABLED"):
+            return data
+        return normalize_dashboard_metadata(data, extensions_enabled=False)
 
     @pre_load
     def remove_show_native_filters(  # pylint: disable=unused-argument
