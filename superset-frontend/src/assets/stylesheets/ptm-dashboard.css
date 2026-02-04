@@ -108,7 +108,7 @@ div[data-test-id="96"] + div {
   background: var(--ptm-neutral-white) !important;
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
   border-radius: var(--ptm-radius-md) !important;
-  overflow: hidden;
+  overflow: visible;
   transition: box-shadow 0.2s ease !important;
 }
 
@@ -141,64 +141,7 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   max-width: none !important;
 }
 
-/* === PTM TABLE: top controls row (Search) === */
-[data-test-viz-type='ptm_table'] .ptm-dt-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 16px 16px;
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-toolbar-left {
-  flex: 0 1 auto;
-  min-width: 240px;
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-toolbar-right {
-  flex: 0 0 auto;
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 44px;
-  padding: 0 14px;
-  width: min(420px, 100%);
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  background: #FFFFFF;
-}
-
-@media (max-width: 520px) {
-  [data-test-viz-type='ptm_table'] .ptm-dt-toolbar-left {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  [data-test-viz-type='ptm_table'] .ptm-dt-search {
-    width: 100%;
-  }
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-search-icon {
-  color: #9CA3AF;
-  font-size: 16px;
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-search-input {
-  flex: 1 1 auto;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #111827;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-[data-test-viz-type='ptm_table'] .ptm-dt-search-input::placeholder {
-  color: #9CA3AF;
-}
+/* Table toolbar/search/footer styles live in the PTM table plugin (Styles.tsx). */
 
 .dashboard-component-chart-holder:hover {
   box-shadow: 0 10px 15px rgba(3, 2, 19, 0.05) !important;
@@ -258,6 +201,12 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   overflow: hidden !important;
 }
 
+/* PTM BigNumber: don't vertically center content (use default/normal) */
+[data-test-viz-type^="ptm_big_number"] .superset-legacy-chart-big-number,
+[data-test-viz-type^="ptm_big_number"] .superset-legacy-chart-big-number .text-container {
+  justify-content: normal !important;
+}
+
 /* === HIDE UI ELEMENTS === */
 .filter-counts {
   display: none !important;
@@ -271,8 +220,23 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 [data-test-viz-type='ptm_table'] .header-controls {
   display: flex !important;
   margin-left: auto !important;
-  padding-right: 16px !important;
   justify-content: flex-end !important;
+  align-items: center !important;
+  height: auto !important; /* default header-controls is height: 24px */
+  padding-right: 16px !important;
+}
+
+/* PTM TABLE: hide applied-filters badge in header controls */
+[data-test-viz-type='ptm_table'] .header-controls .filter-counts {
+  display: none !important;
+}
+
+/* PTM TABLE: ensure header uses full width and right padding */
+[data-test-viz-type='ptm_table'] .dashboard-component-header {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-right: 16px !important;
+  align-items: center !important;
 }
 
 /* === PTM TABLE: keep only Share + Download entries in the 3-dots menu ===
@@ -294,14 +258,13 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 
 /* === PTM TABLE: restyle the 3-dots trigger button === */
 [data-test-viz-type='ptm_table'] .ptm-slice-controls {
-  width: 44px !important;
   height: 44px !important;
   border-radius: 10px !important;
   border: 1px solid #E5E7EB !important;
   background: #FFFFFF !important;
   justify-content: center !important;
   align-items: center !important;
-  padding: 0 !important;
+  padding: 0 1px 0 1px !important;
   transition: background-color 0.15s ease, border-color 0.15s ease !important;
 }
 
@@ -317,14 +280,6 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 [data-test-viz-type='ptm_table'] .ptm-slice-controls:hover {
   background: #F9FAFB !important;
   border-color: #D1D5DB !important;
-}
-
-/* Make the dots a bit subtler */
-[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot {
-  background-color: #6B7280 !important;
-  height: 3px !important;
-  width: 3px !important;
-  margin: 2px 0 !important;
 }
 
 /* Remove extra dot margins from the default trigger */
@@ -347,68 +302,46 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
 }
 
 
-/* === PTM TABLE: Modern "Actions" trigger (no dots) === */
+/* === PTM TABLE: "Actions" trigger ===
+   NOTE: Avoid using ::before/::after on AntD Button triggers because AntD uses
+   pseudo-elements internally (wave/interaction). Injecting labels that way can
+   result in missing content. Instead, keep the real icon visible and style it.
+*/
 
-/* Make the trigger a pill and allow it to expand */
+/* Keep the trigger as a small pill */
 [data-test-viz-type='ptm_table'] .ptm-slice-controls {
   height: 36px !important;
-  min-width: 44px !important;      /* keeps a decent hit target */
-  width: auto !important;          /* allow text */
+  min-width: 44px !important;
+  width: auto !important;
   border-radius: 10px !important;
   border: 1px solid #E5E7EB !important;
   background: #FFFFFF !important;
-
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 0 10px !important;
-  gap: 6px !important;
-
   transition: background-color 0.15s ease, border-color 0.15s ease !important;
 }
 
-/* Hide the inner vertical dots container entirely */
-[data-test-viz-type='ptm_table'] .ptm-slice-controls > div,
+/* Ensure the icon is visible (it's an SVG, not 3 div dots anymore) */
 [data-test-viz-type='ptm_table'] .ptm-slice-controls .dot {
-  display: none !important;
+  display: inline-flex !important;
+  color: #6B7280 !important;
 }
 
-/* Inject label */
-[data-test-viz-type='ptm_table'] .ptm-slice-controls::before {
-  content: "Ações";
-  font-size: 12px;
-  font-weight: 600;
-  color: #4B5563;
-  letter-spacing: 0.2px;
+[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot svg {
+  width: 20px !important;
+  height: 20px !important;
 }
 
-/* Inject chevron */
-[data-test-viz-type='ptm_table'] .ptm-slice-controls::after {
-  content: "▾";
-  font-size: 12px;
-  color: #6B7280;
-  transform: translateY(-0.5px);
-}
-
-/* Hover */
 [data-test-viz-type='ptm_table'] .ptm-slice-controls:hover {
   background: #F9FAFB !important;
   border-color: #D1D5DB !important;
 }
 
-/* Focus (keyboard accessibility) */
 [data-test-viz-type='ptm_table'] .ptm-slice-controls:focus-visible {
   outline: 2px solid rgba(44, 159, 229, 0.35);
   outline-offset: 2px;
-}
-
-/* Título do filtro (ex: "Health Center") */
-h4[id^="filter-name-NATIVE_FILTER"] {
-  color: #4B5563 !important;
-}
-
-.filter-clear-all-button .dragdroppable .dragdroppable-column {
-  color: #4B5563 !important;
 }
 
 /* Nuclear option - override all fonts in dashboard */
@@ -416,396 +349,9 @@ h4[id^="filter-name-NATIVE_FILTER"] {
   font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Layout vertical: label em cima do input (somente Native Filters) */
-div[id^="filter-control-NATIVE_FILTER"] .ant-row.ant-form-item {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-}
-
-/* Ajustes de espaçamento do label */
-div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-label {
-  padding: 0 !important;
-  margin: 0 0 4px 0 !important;
-  line-height: 1.1 !important;
-}
-
-/* Faz o controle ocupar a largura */
-div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-control,
-div[id^="filter-control-NATIVE_FILTER"] .ant-form-item-control-input,
-div[id^="filter-control-NATIVE_FILTER"] .ant-select,
-div[id^="filter-control-NATIVE_FILTER"] .ant-picker {
-  width: 100% !important;
-}
-
-/* Remove o “gutter” horizontal que o Ant coloca na row */
-div[id^="filter-control-NATIVE_FILTER"] .ant-row {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
 .grid-row {
   margin-top: 20px;
   margin-bottom: 0px !important;
-}
-
-/* =================================================
-   PTM: HORIZONTAL FILTER BAR AS PART OF HEADER
-   Works without extra attributes by targeting:
-   `.dashboard-header-container + [data-test="filter-bar"]`
-   ================================================= */
-
-/* The horizontal filter bar is rendered immediately after the header */
-.dashboard-header-container + [data-test="filter-bar"] {
-  padding: 0 !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
-  border: 0 !important;
-}
-
-/* Layout: same max width as header, allow 2 rows */
-.dashboard-header-container + [data-test="filter-bar"] > div {
-  padding: 0 24px;
-
-  flex-wrap: wrap !important; /* override nowrap */
-  line-height: normal !important; /* override line-height: 0 */
-  gap: 16px;
-  align-items: center !important;
-  overflow: visible !important;
-  min-height: 45px; /* prevent inputs being visually clipped */
-}
-
-/* Remove extra internal padding from FilterControls horizontal wrapper */
-.dashboard-header-container + [data-test="filter-bar"] > div > div {
-  padding-left: 10px!important;
-  padding-right: 10px !important;
-}
-
-/* Remove the horizontal padding (gridUnit*4) from FilterControls' container that holds the kebab */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="horizontal-filter-controls-container"] {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-/* Horizontal filter sizing: each filter lives inside .filter-item-wrapper */
-.dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper {
-  flex: 0 0 240px;        /* default width per filter */
-  max-width: 260px;
-}
-
-@media (max-width: 900px) {
-  .dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper {
-    flex-basis: 200px;
-    max-width: 240px;
-  }
-}
-
-@media (max-width: 640px) {
-  .dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper {
-    flex: 1 1 100%;
-    max-width: none;
-  }
-}
-
-/* Make filter labels sit above inputs (override HorizontalFormItem styles) */
-.dashboard-header-container + [data-test="filter-bar"] .ant-form-item {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  margin-bottom: 0 !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-form-item-label {
-  padding: 0 !important;
-  margin: 0 0 4px 0 !important;
-  line-height: 1.1 !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-form-item-label > label {
-  color: #4B5563 !important;
-  font-weight: 500 !important;
-  font-size: 12px !important;
-  text-transform: none !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-form-item-control {
-  width: auto !important; /* override fixed width in HorizontalFormItem */
-}
-
-/* Ensure controls fill the wrapper width */
-.dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper .ant-form-item-control,
-.dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper .ant-form-item-control-input,
-.dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper .ant-select,
-.dashboard-header-container + [data-test="filter-bar"] .filter-item-wrapper .ant-picker {
-  width: 100% !important;
-}
-
-/* PTM look for controls inside horizontal filter bar */
-.dashboard-header-container + [data-test="filter-bar"] .ant-select-selector,
-.dashboard-header-container + [data-test="filter-bar"] .ant-picker,
-.dashboard-header-container + [data-test="filter-bar"] input.ant-input,
-.dashboard-header-container + [data-test="filter-bar"] .ant-picker input {
-  height: 40px !important;
-  min-height: 40px !important;
-  border-radius: 10px !important;
-  border: 1px solid #E5E7EB !important;
-  background: #FFFFFF !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-single:not(.ant-select-customize-input)
-  .ant-select-selector {
-  height: 40px !important;
-  min-height: 40px !important;
-  padding: 0 12px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-select-multiple .ant-select-selector {
-  min-height: 40px !important;
-  padding: 4px 12px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-/* Style chips only for multi-select (avoid making single-select look weird) */
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-multiple
-  .ant-select-selection-item {
-  border-radius: 6px !important;
-  background: #F3F4F6 !important;
-  border: 1px solid #E5E7EB !important;
-  height: 24px !important;
-  line-height: 22px !important;
-  padding: 0 8px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/* Keep the selected pill vertically centered inside the selector */
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-multiple
-  .ant-select-selector {
-  align-items: center !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-picker {
-  padding: 0 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  height: 40px !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-picker-input > input {
-  height: 38px !important;
-  line-height: 38px !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-select-selector {
-  align-items: center !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-picker-input > input {
-  font-size: 14px !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .ant-select-selection-item,
-.dashboard-header-container + [data-test="filter-bar"] .ant-select-selection-placeholder {
-  font-size: 14px !important;
-}
-
-/* Time range filter (Período) uses a custom trigger, not Ant DatePicker */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="time-range-trigger"] {
-  width: 100% !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  padding: 0 12px !important;
-  border: 1px solid #E5E7EB !important;
-  border-radius: 10px !important;
-  background: #FFFFFF !important;
-
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  cursor: pointer;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] [data-test="time-range-trigger"]:hover {
-  border-color: #D1D5DB !important;
-  background: #F9FAFB !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"]
-  [data-test="time-range-trigger"]
-  .date-label-content {
-  font-size: 14px !important;
-  color: #111827 !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"]
-  [data-test="time-range-trigger"]
-  .anticon {
-  color: #9CA3AF !important;
-  display: flex !important;
-}
-
-/* Keep single-select text vertically centered even when empty */
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-single
-  .ant-select-selection-item,
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-single
-  .ant-select-selection-placeholder {
-  line-height: 38px !important;
-}
-
-/* Keep multi-select stable height even when no tags */
-.dashboard-header-container + [data-test="filter-bar"]
-  .ant-select-multiple
-  .ant-select-selection-overflow {
-  align-items: center !important;
-}
-
-/* Container for filters */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="container"] {
-  width: 100%;
-}
-
-/* More Filters button - positioned at end of first row */
-.dashboard-header-container + [data-test="filter-bar"]
-  [data-test="container"]
-  > button[data-test="dropdown-container-btn"] {
-  margin-left: auto !important;
-}
-
-/* More Filters button - minimal icon style */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] {
-  height: 28px !important;
-  width: 28px !important;
-  min-width: 28px !important;
-  border-radius: 6px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  transition: all 0.2s ease;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"]:hover {
-  background: #F3F4F6 !important;
-  border: 1px solid #E5E7EB !important;
-}
-
-/* Hide all content (text, icons, badge), show only 3 dots */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] span,
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] .ant-badge,
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] .anticon {
-  display: none !important;
-}
-
-/* Remove the default 16px spacing before kebab (DropdownContainer container margin-right) */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="container"] {
-  margin-right: 0 !important;
-}
-
-/* Add 3 dots icon */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"]::after {
-  content: '⋮';
-  font-size: 20px;
-  color: #9CA3AF;
-  line-height: 1;
-  font-weight: 700;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] {
-  /* Push the "More filters" kebab to the far right of the filters row,
-     right next to the Apply/Clear actions. */
-  margin-left: auto !important;
-  flex: 0 0 auto;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"]:hover::after {
-  color: #6B7280;
-}
-
-/* DropdownContainer popovers: always constrain height to viewport */
-.ant-popover [data-test="dropdown-content"] {
-  max-height: min(500px, calc(100vh - 160px));
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-
-/* Action buttons - inline with filters (right aligned) */
-.dashboard-header-container + [data-test="filter-bar"] [data-test="filterbar-action-buttons"] {
-  width: auto;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0;
-  margin-top: 0;
-  transition: opacity 0.3s ease, max-height 0.3s ease;
-}
-
-
-/* Hide "More filters" button in presentation mode */
-.dashboard--viewing .dashboard-header-container + [data-test="filter-bar"] [data-test="dropdown-container-btn"] {
-  display: none !important;
-}
-
-/* Hide action buttons in presentation mode */
-.dashboard--viewing .dashboard-header-container + [data-test="filter-bar"] [data-test="filterbar-action-buttons"] {
-  display: none !important;
-}
-
-/* Apply button - text link style with state colors */
-.dashboard-header-container + [data-test="filter-bar"] .filter-apply-button {
-  height: auto !important;
-  padding: 4px 8px !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: var(--ptm-primary) !important;
-  transition: all 0.2s ease;
-  text-decoration: none !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .filter-apply-button:hover:not(:disabled) {
-  background: transparent !important;
-  text-decoration: underline !important;
-  color: var(--ptm-primary-dark) !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .filter-apply-button:disabled {
-  color: #D1D5DB !important;
-  cursor: not-allowed !important;
-}
-
-/* Clear button - text link style */
-.dashboard-header-container + [data-test="filter-bar"] .filter-clear-all-button {
-  height: auto !important;
-  padding: 4px 8px !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: #6B7280 !important;
-  transition: all 0.2s ease;
-  text-decoration: none !important;
-}
-
-.dashboard-header-container + [data-test="filter-bar"] .filter-clear-all-button:hover {
-  background: transparent !important;
-  text-decoration: underline !important;
-  color: #374151 !important;
 }
 
 /* Center the dashboard and keep consistent max width */
