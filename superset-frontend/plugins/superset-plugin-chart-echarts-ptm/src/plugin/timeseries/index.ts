@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { createPtmPlugin } from '../../shared';
+import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import thumbnail from './images/thumbnail.png';
-import { 
-  TIMESERIES_TRANSFORM_CONFIG, 
+import {
+  TIMESERIES_TRANSFORM_CONFIG,
   timeseriesSeriesTypeControl,
   timeseriesBarRadiusControlRow1,
   timeseriesBarRadiusControlRow2,
@@ -54,6 +54,7 @@ const PtmTimeseriesChartPlugin = createPtmPlugin({
     timeseriesBarRadiusControlRow1,
     timeseriesBarRadiusControlRow2,
     timeseriesZoomControl,
+    ptmTextCasingControls,
   ],
 });
 

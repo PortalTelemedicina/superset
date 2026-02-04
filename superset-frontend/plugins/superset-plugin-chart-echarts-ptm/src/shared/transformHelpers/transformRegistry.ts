@@ -25,8 +25,9 @@ export interface TransformConfig {
   colorPalette?: boolean;
   pillFormat?: boolean;
   userOverrides?: boolean;
+  /** Apply PTM text casing to axis/legend labels (ECharts). */
+  textCasing?: boolean;
 }
-
 
 export const DEFAULT_TRANSFORMS: TransformConfig = {
   defaults: true,
@@ -35,6 +36,7 @@ export const DEFAULT_TRANSFORMS: TransformConfig = {
   colorPalette: true,
   pillFormat: false,
   userOverrides: true,
+  textCasing: false,
 };
 
 

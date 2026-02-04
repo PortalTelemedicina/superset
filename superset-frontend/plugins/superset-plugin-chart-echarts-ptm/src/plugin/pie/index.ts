@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { createPtmPlugin } from '../../shared';
+import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import { PIE_TRANSFORM_CONFIG } from './pieTransformConfig';
 import thumbnail from './images/thumbnail.png';
 
@@ -41,6 +41,7 @@ const PtmPieChartPlugin = createPtmPlugin({
   },
   transforms: PIE_TRANSFORM_CONFIG,
   ptmDefaults: PIE_PTM_DEFAULTS,
+  additionalPtmControls: [ptmTextCasingControls],
 });
 
 export default PtmPieChartPlugin;

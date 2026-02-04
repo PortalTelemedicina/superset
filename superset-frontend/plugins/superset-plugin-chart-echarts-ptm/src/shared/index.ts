@@ -53,5 +53,7 @@ export { createDefaultPluginTransform } from './defaultPluginTransform';
 export {
   createPtmControlSection,
   ptmJsonOverrideControl,
+  ptmTextCasingControls,
+  ptmTextCaseChoices,
 } from './ptmControlSection';
 

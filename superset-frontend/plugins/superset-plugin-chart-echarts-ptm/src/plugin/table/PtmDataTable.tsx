@@ -40,11 +40,13 @@ import {
 } from 'react-table';
 import { matchSorter, rankings } from 'match-sorter';
 import { typedMemo, usePrevious } from '@superset-ui/core';
+import { Input, type InputRef } from '@superset-ui/core/components';
 import {
   DoubleLeftOutlined,
   DoubleRightOutlined,
   LeftOutlined,
   RightOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 
 import { isEqual } from 'lodash';
@@ -58,9 +60,38 @@ import useSticky from '../../../../plugin-chart-table/src/DataTable/hooks/useSti
 import { PAGE_SIZE_OPTIONS } from '../../../../plugin-chart-table/src/consts';
 import { sortAlphanumericCaseInsensitive } from '../../../../plugin-chart-table/src/DataTable/utils/sortAlphanumericCaseInsensitive';
 
+/** Incremental id for PTM table global filter (deterministic per mount, SSR-safe). */
+let ptmDtIdSeq = 0;
+
 // Re-export types for compatibility with TableChart imports
 export type { SearchInputProps } from '../../../../plugin-chart-table/src/DataTable/components/GlobalFilter';
 export type { SelectPageSizeRendererProps, SizeOption } from '../../../../plugin-chart-table/src/DataTable/components/SelectPageSize';
+
+const PtmSearchInput = ({
+  value,
+  onChange,
+  onBlur,
+  inputRef,
+}: {
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: () => void;
+  inputRef?: React.Ref<InputRef>;
+}) => (
+  <div className="ptm-dt-search">
+    <Input
+      size="small"
+      ref={inputRef}
+      placeholder="Buscar..."
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      allowClear
+      prefix={<SearchOutlined />}
+      className="ptm-dt-search-input"
+    />
+  </div>
+);
 
 const PtmSelectPageSizeRenderer = ({
   current,
@@ -205,6 +236,7 @@ export default typedMemo(function DataTable<D extends object>({
     const paginationRef = useRef<HTMLDivElement>(null);
     const wrapperRef = userWrapperRef || defaultWrapperRef;
     const paginationData = JSON.stringify(serverPaginationData);
+    const globalFilterIdRef = useRef(`ptm-dt-${++ptmDtIdSeq}`);
 
     const defaultGetTableSize = useCallback(() => {
         if (wrapperRef.current) {
@@ -400,9 +432,13 @@ export default typedMemo(function DataTable<D extends object>({
         setPageSize(initialPageSize);
     }
 
-    const paginationStyle: CSSProperties = sticky.height
-        ? {}
-        : { visibility: 'hidden' };
+    // When sticky headers are enabled we hide pagination until sticky sizes are computed,
+    // otherwise layout can "jump". If sticky is disabled, always show footer.
+    const paginationStyle: CSSProperties = doSticky
+        ? sticky.height
+          ? {}
+          : { visibility: 'hidden' }
+        : {};
 
     let resultPageCount = pageCount;
     let resultCurrentPageSize = pageSize;
@@ -436,9 +472,12 @@ export default typedMemo(function DataTable<D extends object>({
                         <div className="ptm-dt-toolbar-left">
                             <GlobalFilter<D>
                                 searchInput={
-                                    typeof searchInput === 'boolean' ? undefined : searchInput
+                                    typeof searchInput === 'boolean' ? PtmSearchInput : searchInput
                                 }
                                 preGlobalFilteredRows={preGlobalFilteredRows}
+                                id={globalFilterIdRef.current}
+                                serverPagination={!!serverPagination}
+                                rowCount={rowCount}
                                 setGlobalFilter={setGlobalFilter}
                                 filterValue={filterValue}
                             />
@@ -452,7 +491,7 @@ export default typedMemo(function DataTable<D extends object>({
                 </div>
             ) : null}
             {wrapStickyTable ? wrapStickyTable(renderTable) : renderTable()}
-            {hasPagination && resultPageCount > 1 ? (() => {
+            {hasPagination ? (() => {
                 const total = resultsSize;
                 const pageSizeValue =
                     resultCurrentPageSize === 0 ? total : resultCurrentPageSize;

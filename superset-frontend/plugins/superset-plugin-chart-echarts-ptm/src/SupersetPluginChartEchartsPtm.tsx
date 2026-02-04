@@ -18,6 +18,7 @@
  */
 import React, { useEffect, createRef } from 'react';
 import { styled } from '@superset-ui/core';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import { SupersetPluginChartEchartsPtmProps, SupersetPluginChartEchartsPtmStylesProps } from './types';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
@@ -28,9 +29,9 @@ import { SupersetPluginChartEchartsPtmProps, SupersetPluginChartEchartsPtmStyles
 // https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/theme/index.ts
 
 const Styles = styled.div<SupersetPluginChartEchartsPtmStylesProps>`
-  background-color: ${({ theme }) => theme.colors.grayscale.light5};
-  padding: ${({ theme }) => theme.gridUnit * 4}px;
-  border-radius: ${({ theme }) => theme.gridUnit * 2}px;
+  background-color: ${({ theme }) => getThemeTokens(theme).colorBgContainer};
+  padding: ${({ theme }) => getThemeTokens(theme).sizeUnit * 4}px;
+  border-radius: ${({ theme }) => getThemeTokens(theme).borderRadiusLG}px;
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
 `;

@@ -27,6 +27,7 @@ import {
   styled,
   BinaryQueryObjectFilterClause,
 } from '@superset-ui/core';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import * as LucideIcons from 'lucide-react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import Echart from './EchartWrapper';
@@ -490,14 +491,16 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 }
 
 export default styled(BigNumberVis)`
-  ${({ theme }) => `
-    font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+  ${({ theme }) => {
+    const tok = getThemeTokens(theme);
+    return `
+    font-family: 'Montserrat', ${tok.fontFamily};
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 3}px;
+    padding: ${tok.sizeUnit * 2}px ${tok.sizeUnit * 3}px;
 
     &.no-trendline .subheader-line {
       padding-bottom: 0.3em;
@@ -510,46 +513,46 @@ export default styled(BigNumberVis)`
       align-items: flex-start;
       width: 100%;
       .alert {
-        font-size: ${theme.typography.sizes.s};
+        font-size: ${tok.fontSizeSM}px;
         margin: -0.5em 0 0.4em;
         line-height: 1;
-        padding: ${theme.gridUnit}px;
-        border-radius: ${theme.gridUnit}px;
+        padding: ${tok.sizeUnit}px;
+        border-radius: ${tok.sizeUnit}px;
       }
     }
 
     /* PTM: Card title above the number */
     .card-title {
-      font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+      font-family: 'Montserrat', ${tok.fontFamily};
       font-weight: 500;
       font-size: 14px;
-      color: ${theme.colors.grayscale.base};
+      color: ${tok.colorTextSecondary};
       line-height: 1.4em;
-      margin-bottom: ${theme.gridUnit * 2}px;
+      margin-bottom: ${tok.sizeUnit * 2}px;
       width: 100%;
     }
 
     /* PTM: Kicker/Headline - shows timestamp */
     .kicker {
-      font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+      font-family: 'Montserrat', ${tok.fontFamily};
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: ${theme.colors.grayscale.base};
+      color: ${tok.colorTextSecondary};
       line-height: 1.4em;
-      margin-bottom: ${theme.gridUnit}px;
+      margin-bottom: ${tok.sizeUnit}px;
       padding-bottom: 0;
     }
 
     /* PTM: Main big number */
     .header-line {
-      font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+      font-family: 'Montserrat', ${tok.fontFamily};
       font-weight: 700;
       position: relative;
       line-height: 1em;
       white-space: nowrap;
-      color: ${theme.colors.grayscale.dark2};
-      margin-bottom: ${theme.gridUnit}px;
+      color: ${tok.colorTextHeading};
+      margin-bottom: ${tok.sizeUnit}px;
       span {
         position: absolute;
         bottom: 0;
@@ -558,10 +561,10 @@ export default styled(BigNumberVis)`
 
     /* PTM: Subheader below the number - description/percentage */
     .subheader-line {
-      font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+      font-family: 'Montserrat', ${tok.fontFamily};
       font-weight: 500;
       line-height: 1.4em;
-      color: ${theme.colors.grayscale.base};
+      color: ${tok.colorTextSecondary};
       padding-bottom: 0;
     }
 
@@ -569,71 +572,71 @@ export default styled(BigNumberVis)`
       .kicker,
       .header-line,
       .subheader-line {
-        opacity: ${theme.opacity.mediumHeavy};
+        opacity: 0.65;
       }
     }
 
     /* PTM: Positive trend styling - green for growth */
     &.positive .subheader-line {
-      color: ${theme.colors.success.base};
+      color: ${tok.colorSuccess};
       font-weight: 600;
     }
     
     &.positive .subheader-line .trend-icon {
-      color: ${theme.colors.success.base};
+      color: ${tok.colorSuccess};
     }
     
     /* PTM: Negative trend styling - red for decline */
     &.negative .subheader-line {
-      color: ${theme.colors.error.base};
+      color: ${tok.colorError};
       font-weight: 600;
     }
     
     &.negative .subheader-line .trend-icon {
-      color: ${theme.colors.error.base};
+      color: ${tok.colorError};
     }
 
     /* PTM Layout Specific Styles */
     &.ptm-layout {
-      padding: ${theme.gridUnit * 3}px;
-      gap: ${theme.gridUnit * 2}px;
+      padding: ${tok.sizeUnit * 3}px;
+      gap: ${tok.sizeUnit * 2}px;
 
       .ptm-header-row {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         width: 100%;
-        margin-bottom: ${theme.gridUnit * 2}px;
+        margin-bottom: ${tok.sizeUnit * 2}px;
       }
 
       .ptm-icon-container {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: ${theme.gridUnit * 2}px;
+        border-radius: ${tok.sizeUnit * 2}px;
       }
 
       .trend-badge {
         display: flex;
         align-items: center;
-        gap: ${theme.gridUnit}px;
-        padding: ${theme.gridUnit}px ${theme.gridUnit * 2}px;
-        border-radius: ${theme.gridUnit * 1.5}px;
+        gap: ${tok.sizeUnit}px;
+        padding: ${tok.sizeUnit}px ${tok.sizeUnit * 2}px;
+        border-radius: ${tok.sizeUnit * 1.5}px;
         transition: all 0.2s ease;
 
         &.positive {
-          background-color: ${theme.colors.success.light2};
-          color: ${theme.colors.success.dark1};
+          background-color: ${tok.colorSuccessBg};
+          color: ${tok.colorSuccessText};
         }
 
         &.negative {
-          background-color: ${theme.colors.error.light2};
-          color: ${theme.colors.error.dark1};
+          background-color: ${tok.colorErrorBg};
+          color: ${tok.colorErrorText};
         }
 
         &.neutral {
-          background-color: ${theme.colors.grayscale.light3};
-          color: ${theme.colors.grayscale.dark1};
+          background-color: ${tok.colorFillTertiary};
+          color: ${tok.colorText};
         }
 
         .trend-badge-icon {
@@ -641,39 +644,40 @@ export default styled(BigNumberVis)`
         }
 
         .trend-badge-text {
-          font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+          font-family: 'Montserrat', ${tok.fontFamily};
           font-weight: 500;
           line-height: 1;
         }
       }
 
       .ptm-title {
-        font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+        font-family: 'Montserrat', ${tok.fontFamily};
         font-weight: 400;
-        color: ${theme.colors.grayscale.base};
-        margin-bottom: ${theme.gridUnit}px;
+        color: ${tok.colorTextSecondary};
+        margin-bottom: ${tok.sizeUnit}px;
         line-height: 1.3;
       }
 
       .header-line {
-        margin-bottom: ${theme.gridUnit}px;
+        margin-bottom: ${tok.sizeUnit}px;
       }
 
       .additional-text {
-        font-family: 'Montserrat', ${theme.typography.families.sansSerif};
+        font-family: 'Montserrat', ${tok.fontFamily};
         font-weight: 400;
-        color: ${theme.colors.grayscale.base};
+        color: ${tok.colorTextSecondary};
         line-height: 1.5;
-        margin-top: ${theme.gridUnit}px;
+        margin-top: ${tok.sizeUnit}px;
       }
 
       .ptm-bottom-trendline {
-        margin-top: ${theme.gridUnit * 2}px;
+        margin-top: ${tok.sizeUnit * 2}px;
         width: 100%;
         height: 60px;
         overflow: hidden;
       }
     }
-  `}
+  `;
+  }}
 `;
 

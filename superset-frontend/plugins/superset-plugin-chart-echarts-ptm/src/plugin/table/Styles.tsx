@@ -18,6 +18,7 @@
  */
 
 import { css, styled } from '@superset-ui/core';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 // PTM: Load Inter font for tables
 const PTM_INTER_FONT_ID = 'ptm-inter-font';
@@ -30,11 +31,13 @@ if (typeof document !== 'undefined' && !document.getElementById(PTM_INTER_FONT_I
 }
 
 export default styled.div`
-  ${({ theme }) => css`
+  ${({ theme }) => {
+    const tok = getThemeTokens(theme);
+    return css`
     /* PTM Theme - Clean Minimal Table Design */
     &,
     & * {
-      font-family: 'Inter', ${theme.typography.families.sansSerif} !important;
+      font-family: 'Inter', ${tok.fontFamily} !important;
     }
 
     /* Ensure the wrapper itself takes full width */
@@ -43,8 +46,14 @@ export default styled.div`
       max-width: none !important;
     }
 
-    /* Ensure all child divs take full width */
-    & > div {
+    /* Only force width on the immediate data table wrapper, not all nested divs */
+    & > div:first-child {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    /* Sticky table: force presentation divs (header/body/footer) to full width */
+    & div[role="table"] > div[role="presentation"] {
       width: 100% !important;
       max-width: none !important;
     }
@@ -67,13 +76,13 @@ export default styled.div`
     table.table thead th {
       padding: 12px 16px !important;
       background: transparent !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
       font-size: 12px !important;
-      color: #9CA3AF !important;
+      color: #6B7280 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.05em !important;
       border: none !important;
-      border-bottom: 1px solid #F3F4F6 !important;
+      border-bottom: 1px solid #E5E7EB !important;
       text-align: left !important;
       white-space: nowrap !important;
     }
@@ -104,11 +113,14 @@ export default styled.div`
       padding: 8px 16px !important;
       font-size: 14px !important;
       color: #374151 !important;
+      line-height: 1.25 !important;
       border: none !important;
       border-bottom: 1px solid #F3F4F6 !important;
       background: transparent !important;
       font-feature-settings: 'tnum' 1 !important;
       vertical-align: middle !important;
+      white-space: normal !important;
+      word-wrap: break-word !important;
     }
 
     /* Row styling - NO alternating colors */
@@ -186,31 +198,110 @@ export default styled.div`
     }
 
     /* ========================================
-       CONTROLS (Search, Page Size) - Minimal
+       TOOLBAR (Search / Time comparison)
        ======================================== */
-    .dt-controls {
-      padding: 0 0 12px 0 !important;
+    .ptm-dt-toolbar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 12px !important;
+      padding: 0 0 12px 16px !important;
+      flex-wrap: wrap !important;
     }
 
-    .dt-global-filter {
-      float: right !important;
+    .ptm-dt-toolbar-left,
+    .ptm-dt-toolbar-right {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-width: 0 !important;
     }
 
-    .dt-global-filter input {
+    /* Search */
+    .ptm-dt-search {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-width: 220px !important;
+      max-width: 340px !important;
+      width: 100% !important;
+      height: 34px !important;
+      padding: 0 12px 0 16px !important;
       border-radius: 6px !important;
       border: 1px solid #E5E7EB !important;
-      padding: 8px 12px !important;
-      font-size: 13px !important;
-      color: #374151 !important;
       background: #FFFFFF !important;
-      transition: all 0.15s ease !important;
-      box-shadow: none !important;
     }
 
-    .dt-global-filter input:focus {
+    .ptm-dt-search:focus-within {
+      border-color: #9CA3AF !important;
+    }
+
+    .ptm-dt-search-icon {
+      color: #9CA3AF !important;
+      font-size: 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
+    }
+
+    .ptm-dt-search-input {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      font-size: 13px !important;
+      color: #374151 !important;
+      padding: 0 !important;
+    }
+
+    /* Actions button (time comparison dropdown trigger) */
+    .ptm-dt-actions-trigger {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      height: 28px !important;
+      padding: 0 10px !important;
+      border-radius: 6px !important;
+      border: 1px solid #E5E7EB !important;
+      background: #FFFFFF !important;
+      color: #374151 !important;
+      font-size: 13px !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      transition: background 0.15s ease !important;
+      white-space: nowrap !important;
+    }
+
+    .ptm-dt-actions-trigger:hover {
+      background: #F9FAFB !important;
+    }
+
+    /* Page size select */
+    .ptm-dt-footer-left .dt-select-page-size,
+    .ptm-dt-footer-left .form-inline {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      margin: 0 !important;
+    }
+
+    .ptm-dt-footer-left select.form-control {
+      height: 28px !important;
+      border-radius: 6px !important;
+      border: 1px solid #E5E7EB !important;
+      background: #FFFFFF !important;
+      color: #374151 !important;
+      font-size: 13px !important;
+      padding: 0 8px !important;
+      outline: none !important;
+    }
+
+    .ptm-dt-footer-left select.form-control:focus {
       border-color: #9CA3AF !important;
       box-shadow: none !important;
-      outline: none !important;
     }
 
     /* ========================================
@@ -247,8 +338,9 @@ export default styled.div`
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      flex: 1 !important;
+      flex: 1 1 auto !important;
       min-width: 0 !important;
+      gap: 4px !important;
     }
 
     .ptm-dt-range-bold {
@@ -441,6 +533,7 @@ export default styled.div`
       background: #F3F4F6 !important;
       color: #6B7280 !important;
     }
-  `}
+  `;
+  }}
 `;
 
