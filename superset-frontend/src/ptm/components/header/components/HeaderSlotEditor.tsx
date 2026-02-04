@@ -39,7 +39,7 @@ import {
   EyeInvisibleOutlined,
   PictureOutlined,
 } from '@ant-design/icons';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import {
   HeaderLayout,
   HeaderSlot,
@@ -55,47 +55,96 @@ import {
   BadgeSlot,
 } from '../types';
 import CustomizableHeader from './CustomizableHeader';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 const EditorContainer = styled.div`
   padding: 24px;
-  background: ${({ theme }) => theme.colors.grayscale.light5};
+  background: ${({ theme }) => getThemeTokens(theme).colorBgLayout};
   border-radius: 8px;
 `;
 
-const PreviewContainer = styled.div`
-  margin-bottom: 24px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+const PreviewSectionLabel = styled.div`
+  ${({ theme }) => `
+    font-size: ${theme.fontSizeSM}px;
+    font-weight: ${theme.fontWeightStrong};
+    color: ${getThemeTokens(theme).colorTextSecondary};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: ${theme.sizeUnit * 2}px;
+  `}
+`;
+
+const PreviewBarFrame = styled.div`
+  ${({ theme }) => `
+    min-height: 64px;
+    background: ${getThemeTokens(theme).colorBgContainer};
+    border: 1px solid ${getThemeTokens(theme).colorBorder};
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 0 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  `}
+`;
+
+const PreviewBarInner = styled.div`
+  width: 100%;
+  min-width: 0;
+  /* CustomizableHeader provides its own padding; constrain width for modal */
+  max-width: 100%;
+`;
+
+const EditorLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+`;
+
+const EditorContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const EditorActions = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 `;
 
 const SlotList = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  gap: 12px;
   margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
 `;
 
 const SlotItem = styled.div<{ isDragging?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 12px;
   background: white;
-  border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+  border: 1px solid ${({ theme }) => getThemeTokens(theme).colorBorder};
   border-radius: 6px;
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
   cursor: grab;
+  min-width: 260px;
+  max-width: 320px;
+  overflow: hidden;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary.base};
+    border-color: ${({ theme }) => getThemeTokens(theme).colorPrimary};
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 `;
 
 const SlotInfo = styled.div`
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -103,18 +152,50 @@ const SlotInfo = styled.div`
 
 const SlotTypeLabel = styled.div`
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.grayscale.dark2};
+  color: ${({ theme }) => getThemeTokens(theme).colorTextHeading};
 `;
 
 const SlotDetails = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  color: ${({ theme }) => getThemeTokens(theme).colorTextSecondary};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
 `;
+
+/** Wrapper so Form.Item injects value/onChange but Upload receives fileList (antd expects fileList, not value). */
+const LogoUrlUpload: React.FC<{
+  value?: string;
+  onUpload: (file: File) => void;
+  uploading: boolean;
+}> = ({ value, onUpload, uploading }) => (
+  <Upload
+    accept="image/*"
+    fileList={value ? [{ uid: 'logo', name: 'logo', url: value }] : []}
+    showUploadList={false}
+    beforeUpload={(file) => {
+      onUpload(file as File);
+      return false;
+    }}
+    disabled={uploading}
+  >
+    <Button
+      icon={<PictureOutlined />}
+      loading={uploading}
+      type="default"
+      block
+    >
+      {uploading ? t('Uploading...') : t('Upload Image')}
+    </Button>
+  </Upload>
+);
 
 interface HeaderSlotEditorProps {
   headerLayout: HeaderLayout;
@@ -138,6 +219,15 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
   const [uploading, setUploading] = useState(false);
   const [currentSlotType, setCurrentSlotType] = useState<SlotType | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const previewLayout: HeaderLayout = {
+    ...layout,
+    enabled: true,
+    globalStyle: {
+      ...layout.globalStyle,
+      // Provide breathing room inside the preview frame so right edge never clips logos.
+      padding: '0 16px',
+    },
+  };
 
   const handleDragEnd = useCallback(
     (result: any) => {
@@ -396,24 +486,10 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
               rules={[{ required: true, message: t('Please upload an image file') }]}
               extra={t('Upload an image file (PNG, JPG, SVG, GIF, or WebP, max 2MB)')}
             >
-              <Upload
-                accept="image/*"
-                showUploadList={false}
-                beforeUpload={(file) => {
-                  handleImageUpload(file);
-                  return false;
-                }}
-                disabled={uploading}
-              >
-                <Button 
-                  icon={<PictureOutlined />} 
-                  loading={uploading}
-                  type="default"
-                  block
-                >
-                  {uploading ? t('Uploading...') : t('Upload Image')}
-                </Button>
-              </Upload>
+              <LogoUrlUpload
+                onUpload={handleImageUpload}
+                uploading={uploading}
+              />
             </Form.Item>
             {/* Show preview of uploaded/selected image */}
             {(uploadedImageUrl || logoSlot?.url) && (
@@ -659,90 +735,93 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
     <EditorContainer>
       <h3 style={{ marginBottom: 16 }}>{t('Header Layout Editor')}</h3>
 
-      {/* Preview */}
-      <PreviewContainer>
-        <div style={{ marginBottom: 8, fontSize: 12, fontWeight: 600, color: '#666' }}>
-          {t('Preview')}
-        </div>
-        <CustomizableHeader
-          headerLayout={{ ...layout, enabled: true }}
-          dashboardTitle={dashboardTitle}
-        />
-      </PreviewContainer>
+      <EditorLayout>
+        <EditorContent>
+          <div>
+            <PreviewSectionLabel>{t('Preview')}</PreviewSectionLabel>
+            <PreviewBarFrame>
+              <PreviewBarInner>
+                <CustomizableHeader
+                  headerLayout={previewLayout}
+                  dashboardTitle={dashboardTitle}
+                />
+              </PreviewBarInner>
+            </PreviewBarFrame>
+          </div>
 
-      {/* Elements List */}
-      <div style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAddSlot}
-          style={{ marginBottom: 12 }}
-        >
-          {t('Add Element')}
-        </Button>
+          <div>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddSlot}
+              style={{ marginBottom: 12 }}
+            >
+              {t('Add Element')}
+            </Button>
 
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="slots">
-            {provided => (
-              <SlotList {...provided.droppableProps} ref={provided.innerRef}>
-                {layout.slots.map((slot, index) => {
-                  const displayInfo = getSlotDisplayInfo(slot);
-                  return (
-                    <Draggable key={slot.id} draggableId={slot.id} index={index}>
-                      {(provided, snapshot) => (
-                        <SlotItem
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          isDragging={snapshot.isDragging}
-                        >
-                          <DragOutlined style={{ fontSize: 16, color: '#999', cursor: 'grab' }} />
-                          <SlotInfo>
-                            <SlotTypeLabel>{displayInfo.type}</SlotTypeLabel>
-                            <SlotDetails>{displayInfo.details}</SlotDetails>
-                          </SlotInfo>
-                          <ButtonGroup>
-                            <Button
-                              size="small"
-                              icon={slot.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                              onClick={() => handleToggleVisibility(slot.id)}
-                            />
-                            <Button
-                              size="small"
-                              icon={<EditOutlined />}
-                              onClick={() => handleEditSlot(slot)}
-                            />
-                            <Button
-                              size="small"
-                              danger
-                              icon={<DeleteOutlined />}
-                              onClick={() => handleDeleteSlot(slot.id)}
-                            />
-                          </ButtonGroup>
-                        </SlotItem>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </SlotList>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </div>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="slots" direction="horizontal">
+                {provided => (
+                  <SlotList {...provided.droppableProps} ref={provided.innerRef}>
+                    {layout.slots.map((slot, index) => {
+                      const displayInfo = getSlotDisplayInfo(slot);
+                      return (
+                        <Draggable key={slot.id} draggableId={slot.id} index={index}>
+                          {(provided, snapshot) => (
+                            <SlotItem
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              isDragging={snapshot.isDragging}
+                            >
+                              <DragOutlined style={{ fontSize: 16, color: '#999', cursor: 'grab' }} />
+                              <SlotInfo>
+                                <SlotTypeLabel>{displayInfo.type}</SlotTypeLabel>
+                                <SlotDetails>{displayInfo.details}</SlotDetails>
+                              </SlotInfo>
+                              <ButtonGroup>
+                                <Button
+                                  size="small"
+                                  icon={slot.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                                  onClick={() => handleToggleVisibility(slot.id)}
+                                />
+                                <Button
+                                  size="small"
+                                  icon={<EditOutlined />}
+                                  onClick={() => handleEditSlot(slot)}
+                                />
+                                <Button
+                                  size="small"
+                                  danger
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => handleDeleteSlot(slot.id)}
+                                />
+                              </ButtonGroup>
+                            </SlotItem>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </SlotList>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </div>
+        </EditorContent>
 
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-        <Button onClick={onCancel}>{t('Cancel')}</Button>
-        <Button type="primary" onClick={handleSave}>
-          {t('Save Layout')}
-        </Button>
-      </div>
+        <EditorActions>
+          <Button onClick={onCancel}>{t('Cancel')}</Button>
+          <Button type="primary" onClick={handleSave}>
+            {t('Save Layout')}
+          </Button>
+        </EditorActions>
+      </EditorLayout>
 
       {/* Edit Modal */}
       <Modal
         title={t('Edit Element')}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleModalOk}
         onCancel={() => {
           setIsModalVisible(false);
@@ -775,6 +854,7 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
           </Form>
         )}
       </Modal>
+
     </EditorContainer>
   );
 };

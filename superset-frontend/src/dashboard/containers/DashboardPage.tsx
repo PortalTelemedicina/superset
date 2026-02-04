@@ -20,6 +20,13 @@ import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
 import { getExtensionsRegistry, t, useTheme } from '@superset-ui/core';
+import {
+  DashboardExtensionsContext,
+  type DashboardExtensionsValue,
+} from 'src/dashboard/components/DashboardExtensionsContext';
+import {
+  DefaultDashboardCssInjector,
+} from 'src/dashboard/components/DashboardCssInjector';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
@@ -31,7 +38,6 @@ import {
 } from 'src/hooks/apiResources';
 import { hydrateDashboard } from 'src/dashboard/actions/hydrate';
 import { setDatasources } from 'src/dashboard/actions/datasources';
-import injectCustomCss from 'src/dashboard/util/injectCustomCss';
 import {
   getAllActiveFilters,
   getRelevantDataMask,
@@ -76,7 +82,6 @@ type PageProps = {
   idOrSlug: string;
 };
 
-const extensionsRegistry = getExtensionsRegistry();
 // TODO: move to Dashboard.jsx when it's refactored to functional component
 const selectRelevantDatamask = createSelector(
   (state: RootState) => state.dataMask, // the first argument accesses relevant data from global state
@@ -216,27 +221,36 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
     };
   }, [dashboard_title]);
 
-  useEffect(() => {
-    const dashboardCss = typeof css === 'string' ? css : '';
-    const transformDashboardCss = extensionsRegistry.get(
-      'dashboard.css.transform' as any,
-    ) as
-      | ((args: { css: string; dashboard: any }) => string)
-      | undefined;
+  // Dashboard extensions: read registry once at root and provide via context
+  const dashboardExtensions = useMemo((): DashboardExtensionsValue => {
+    const registry = getExtensionsRegistry();
+    return {
+      headerComponent: registry.get('dashboard.header.replacement'),
+      filterBarComponent: registry.get(
+        'dashboard.filterbar.horizontal.replacement',
+      ),
+      filterValueLoadingComponent: registry.get(
+        'dashboard.filterbar.filterValue.loading',
+      ),
+      filterBarSettingsComponent: registry.get(
+        'dashboard.filterbar.settings.replacement',
+      ),
+      sliceHeaderControlsClassNamesFn: registry.get(
+        'dashboard.sliceHeaderControls.classNames',
+      ),
+      sliceHeaderControlsTriggerFn: registry.get(
+        'dashboard.sliceHeaderControls.trigger',
+      ),
+      dashboardCssInjectorComponent: registry.get(
+        'dashboard.css.injector',
+      ) as DashboardExtensionsValue['dashboardCssInjectorComponent'],
+    };
+  }, []);
 
-    const finalCss = (
-      transformDashboardCss
-        ? transformDashboardCss({ css: dashboardCss, dashboard })
-        : dashboardCss
-    ).trim();
-
-    if (finalCss) {
-      // returning will clean up custom css
-      // when dashboard unmounts or changes
-      return injectCustomCss(finalCss);
-    }
-    return () => {};
-  }, [css, dashboard]);
+  const DashboardCssInjector =
+    dashboardExtensions.dashboardCssInjectorComponent ??
+    DefaultDashboardCssInjector;
+  const dashboardCss = typeof css === 'string' ? css : '';
 
   useEffect(() => {
     if (datasetsApiError) {
@@ -274,20 +288,23 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
         <>
           <SyncDashboardState dashboardPageId={dashboardPageId} />
           <DashboardPageIdContext.Provider value={dashboardPageId}>
-            <CrudThemeProvider
-              themeId={
-                dashboardTheme !== undefined
-                  ? dashboardTheme?.id
-                  : dashboard?.theme?.id
-              }
-            >
-              <DashboardContainer
-                activeFilters={activeFilters}
-                ownDataCharts={relevantDataMask}
+            <DashboardExtensionsContext.Provider value={dashboardExtensions}>
+              <DashboardCssInjector css={dashboardCss} dashboard={dashboard} />
+              <CrudThemeProvider
+                themeId={
+                  dashboardTheme !== undefined
+                    ? dashboardTheme?.id
+                    : dashboard?.theme?.id
+                }
               >
-                {DashboardBuilderComponent}
-              </DashboardContainer>
-            </CrudThemeProvider>
+                <DashboardContainer
+                  activeFilters={activeFilters}
+                  ownDataCharts={relevantDataMask}
+                >
+                  {DashboardBuilderComponent}
+                </DashboardContainer>
+              </CrudThemeProvider>
+            </DashboardExtensionsContext.Provider>
           </DashboardPageIdContext.Provider>
         </>
       ) : (

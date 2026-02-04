@@ -17,29 +17,23 @@
  * under the License.
  */
 
+import type { ComponentType } from 'react';
 import { getExtensionsRegistry } from '@superset-ui/core';
-
-import PortalHorizontalFilterBar from '../filterBar/components/HorizontalFilterBar';
-import PortalFilterBarSettings from '../filterBar/components/FilterBarSettings';
+import type { HorizontalBarProps } from 'src/dashboard/components/nativeFilters/FilterBar/types';
+import { FilterBarAdapter } from 'src/ptm/components/filterBar/adapters/FilterBarAdapter';
+import { FilterValueLoading } from 'src/ptm/components/filterBar/components/FilterValueLoading';
 
 /**
- * Registers portal filter bar extensions in Superset's extensions registry.
- *
- * Keys used:
- * - dashboard.filterbar.horizontal.replacement
- * - dashboard.filterbar.settings.replacement
+ * Registers the PTM horizontal filter bar (collapsible + chips) and filter value loading when enabled.
  */
-export const registerCustomFilterBarExtensions = () => {
-  const extensionsRegistry = getExtensionsRegistry();
-
-  extensionsRegistry.set(
+export function registerPtmFilterBarExtension(): void {
+  const registry = getExtensionsRegistry();
+  registry.set(
     'dashboard.filterbar.horizontal.replacement',
-    PortalHorizontalFilterBar,
+    FilterBarAdapter as ComponentType<HorizontalBarProps>,
   );
-
-  extensionsRegistry.set(
-    'dashboard.filterbar.settings.replacement',
-    PortalFilterBarSettings,
+  registry.set(
+    'dashboard.filterbar.filterValue.loading',
+    FilterValueLoading as ComponentType,
   );
-};
-
+}

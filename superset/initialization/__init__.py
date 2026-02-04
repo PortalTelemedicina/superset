@@ -523,6 +523,10 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 
         self.init_views()
 
+        # Dashboard extension schema registration (runs after all models/views
+        # are loaded to avoid "App not initialized" and duplicate table defs)
+        self.configure_dashboard_extensions()
+
     def check_secret_key(self) -> None:
         def log_default_secret_key_warning() -> None:
             top_banner = 80 * "-" + "\n" + 36 * " " + "WARNING\n" + 80 * "-"
@@ -690,6 +694,14 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 
     def configure_feature_flags(self) -> None:
         feature_flag_manager.init_app(self.superset_app)
+
+    def configure_dashboard_extensions(self) -> None:
+        try:
+            from superset.extensions.portal import register_dashboard_extension_fields
+
+            register_dashboard_extension_fields(self.superset_app)
+        except Exception as ex:
+            logger.warning("Dashboard extension registration skipped: %s", ex)
 
     def configure_sqlglot_dialects(self) -> None:
         extensions = self.config["SQLGLOT_DIALECTS_EXTENSIONS"]

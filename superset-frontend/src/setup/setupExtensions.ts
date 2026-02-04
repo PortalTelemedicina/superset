@@ -18,22 +18,34 @@
  */
 
 // For individual deployments to add custom overrides
+// PTM: single integration point — only this file imports PTM and calls applyPTMExtensions().
 
-// [PORTAL_EXTENSION] Import portal extensions
-// This ensures portal extensions are initialized during app startup
-// See: src/extensions/portal/index.ts
-try {
-  const portalExtensions = require('src/extensions/portal');
-  // Ensure registry-based extensions are available before first render.
-  portalExtensions?.initializePortalExtensions?.();
-} catch (error) {
-  // Portal extensions not available, continue without them
-  // This is expected in development or when extensions are not installed
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('[Setup Extensions] Portal extensions not available');
-  }
-}
+import getBootstrapData from 'src/utils/getBootstrapData';
+import { applyPTMExtensions } from 'src/ptm';
+
+let extensionsInitialized = false;
 
 export default function setupExtensions() {
-  // Additional extension setup can be added here
+  if (extensionsInitialized) {
+    return;
+  }
+
+  const bootstrapData = getBootstrapData();
+  const flags = bootstrapData?.common?.feature_flags as Record<string, boolean> | undefined;
+  const ptmExtensionEnabled = flags?.PTM_EXTENSION_ENABLED === true;
+
+  if (ptmExtensionEnabled) {
+    try {
+      applyPTMExtensions();
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[Setup Extensions] PTM extensions applied');
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Setup Extensions] PTM extensions failed:', error);
+      }
+    }
+  }
+
+  extensionsInitialized = true;
 }

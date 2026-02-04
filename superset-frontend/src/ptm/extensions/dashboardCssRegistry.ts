@@ -17,29 +17,16 @@
  * under the License.
  */
 
+import type { ComponentType } from 'react';
 import { getExtensionsRegistry } from '@superset-ui/core';
-
-const sanitizeVizType = (vizType: string) =>
-  String(vizType || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+import PtmDashboardCssInjector from 'src/ptm/css/PtmDashboardCssInjector';
 
 /**
- * Registers SliceHeaderControls className overrides.
- *
- * Key used:
- * - dashboard.sliceHeaderControls.classNames
+ * Registers the PTM dashboard CSS injector component (injects ptm-dashboard.css for tagged dashboards).
  */
-export const registerSliceHeaderControlsExtensions = () => {
-  const extensionsRegistry = getExtensionsRegistry();
-
-  extensionsRegistry.set(
-    'dashboard.sliceHeaderControls.classNames' as any,
-    ({ slice }: { slice: { viz_type: string } }) => {
-      const viz = sanitizeVizType(slice?.viz_type);
-      return {
-        menu: `ptm-slice-menu ptm-slice-menu--${viz}`,
-        controls: `ptm-slice-controls ptm-slice-controls--${viz}`,
-      };
-    },
+export function registerPtmDashboardCssExtension(): void {
+  getExtensionsRegistry().set(
+    'dashboard.css.injector',
+    PtmDashboardCssInjector as ComponentType,
   );
-};
-
+}

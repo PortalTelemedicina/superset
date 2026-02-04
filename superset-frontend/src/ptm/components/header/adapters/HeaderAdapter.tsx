@@ -16,15 +16,24 @@
  * specific language governing limitations under the License.
  */
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { css, useTheme, t } from '@superset-ui/core';
-import { Button } from 'src/components';
-import Icons from 'src/components/Icons';
-import { PageHeaderWithActions, PageHeaderWithActionsProps } from 'src/components/PageHeaderWithActions';
+import { Button } from '@superset-ui/core/components';
+import { Icons } from '@superset-ui/core/components/Icons';
+import {
+  PageHeaderWithActions,
+  PageHeaderWithActionsProps,
+} from '@superset-ui/core/components/PageHeaderWithActions';
+import { useDispatch } from 'react-redux';
 import { CustomizableHeader } from '../components/CustomizableHeader';
+import { HeaderSlotEditor } from '../components/HeaderSlotEditor';
 import { useStandaloneMode } from '../hooks/useStandaloneMode';
 import { useHeaderPreview } from '../hooks/useHeaderPreview';
 import { HeaderLayout, getDefaultHeaderLayout } from '../types';
+import {
+  setDashboardMetadata,
+  setUnsavedChanges,
+} from 'src/dashboard/actions/dashboardState';
 import '../styles/header-custom.css';
 
 export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
@@ -63,7 +72,9 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
   onPreviewToggle,
   ...pageHeaderProps
 }) => {
-  const theme = useTheme();
+  const theme = useTheme() as any;
+  const dispatch = useDispatch();
+  const [showHeaderEditorModal, setShowHeaderEditorModal] = useState(false);
   const isStandaloneMode = useStandaloneMode(isEmbedded);
   const {
     previewMode,
@@ -71,18 +82,36 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
     resetPreview,
   } = useHeaderPreview();
 
-  const headerLayout = useMemo<HeaderLayout>(
-    () => dashboardInfo?.metadata?.headerLayout || getDefaultHeaderLayout(),
-    [dashboardInfo?.metadata?.headerLayout]
-  );
+  const headerLayout = useMemo<HeaderLayout>(() => {
+    const raw = dashboardInfo?.metadata?.headerLayout || getDefaultHeaderLayout();
+    return {
+      enabled: Boolean(raw?.enabled),
+      slots: Array.isArray(raw?.slots) ? raw.slots : [],
+      globalStyle: raw?.globalStyle ?? getDefaultHeaderLayout().globalStyle,
+    };
+  }, [dashboardInfo?.metadata?.headerLayout]);
 
-  const shouldShowCustomHeader = 
+  const shouldShowCustomHeader =
     headerLayout.enabled && (isStandaloneMode || previewMode);
 
   const handlePreviewToggle = useCallback(() => {
     togglePreview();
     onPreviewToggle?.(!previewMode);
   }, [previewMode, togglePreview, onPreviewToggle]);
+
+  const handleSaveHeaderLayout = useCallback(
+    (layout: HeaderLayout) => {
+      try {
+        dispatch(setDashboardMetadata({ headerLayout: layout }));
+        dispatch(setUnsavedChanges(true));
+        setShowHeaderEditorModal(false);
+      } catch (err) {
+        console.error('[HeaderAdapter] Failed to save header layout:', err);
+        setShowHeaderEditorModal(false);
+      }
+    },
+    [dispatch],
+  );
 
   // Add preview button to title panel when custom header is enabled (view mode only)
   // IMPORTANT: All hooks must be called before any conditional returns
@@ -130,6 +159,36 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
     t,
   ]);
 
+  // Add "Customize header" button to right panel when in edit mode (so user can enable/edit header)
+  const enhancedRightPanelItems = useMemo(() => {
+    const original = pageHeaderProps.rightPanelAdditionalItems;
+    if (editMode) {
+      const customizeButton = (
+        <Button
+          key="customize-header"
+          buttonStyle="secondary"
+          buttonSize="small"
+          onClick={() => setShowHeaderEditorModal(true)}
+          css={css`
+            margin-right: ${theme.sizeUnit * 2}px;
+          `}
+          data-test="customize-header-button"
+          aria-label={t('Customize header')}
+        >
+          <Icons.SettingOutlined iconSize="m" />
+          {t('Customize header')}
+        </Button>
+      );
+      return (
+        <>
+          {customizeButton}
+          {original}
+        </>
+      );
+    }
+    return original;
+  }, [editMode, pageHeaderProps.rightPanelAdditionalItems, theme.sizeUnit]);
+
   // Render preview banner when in preview mode (not standalone)
   const PreviewBanner = previewMode && !isStandaloneMode ? (
     <div
@@ -138,9 +197,9 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
         align-items: center;
         justify-content: space-between;
         padding: 8px 16px;
-        background-color: ${theme.colors.primary.base};
+        background-color: ${theme.colorPrimary};
         color: white;
-        font-size: ${theme.typography.sizes.s}px;
+        font-size: ${theme.fontSizeSM}px;
       `}
       className="portal-header-preview-banner"
     >
@@ -151,9 +210,9 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
           color: white !important;
           padding: 0 8px;
           height: auto;
-          font-size: ${theme.typography.sizes.s}px;
+          font-size: ${theme.fontSizeSM}px;
           &:hover {
-            color: ${theme.colors.grayscale.light5} !important;
+            color: ${theme.colorBgContainer} !important;
           }
         `}
         onClick={resetPreview}
@@ -178,12 +237,35 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
     );
   }
 
-  // Fallback to original header
+  // Fallback to original header (with optional "Customize header" button and inline editor)
   return (
-    <PageHeaderWithActions
-      {...pageHeaderProps}
-      titlePanelAdditionalItems={enhancedTitlePanelItems}
-    />
+    <>
+      <PageHeaderWithActions
+        {...pageHeaderProps}
+        titlePanelAdditionalItems={enhancedTitlePanelItems}
+        rightPanelAdditionalItems={enhancedRightPanelItems}
+      />
+      {showHeaderEditorModal && (
+        <div
+          data-test="header-layout-editor-inline"
+          css={css`
+            margin: ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px;
+            padding: ${theme.sizeUnit * 4}px;
+            background: ${theme.colorBgContainer};
+            border: 1px solid ${theme.colorBorder};
+            border-radius: ${theme.sizeUnit * 2}px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+          `}
+        >
+          <HeaderSlotEditor
+            headerLayout={headerLayout}
+            dashboardTitle={dashboardInfo?.dashboard_title}
+            onSave={handleSaveHeaderLayout}
+            onCancel={() => setShowHeaderEditorModal(false)}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

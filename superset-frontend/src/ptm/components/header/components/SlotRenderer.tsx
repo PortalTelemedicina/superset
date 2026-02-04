@@ -33,6 +33,7 @@ import {
   DividerSlot,
 } from '../types';
 import DataFreshnessElement from './DataFreshnessElement';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 const SlotContainer = styled.div<{ 
   customStyle?: any;
@@ -69,7 +70,7 @@ const LogoImage = styled.img<{ size?: any }>`
 const TitleText = styled.div<{ fontSize?: number }>`
   font-size: ${({ fontSize }) => fontSize || 20}px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.grayscale.dark2};
+  color: ${({ theme }) => getThemeTokens(theme).colorTextHeading};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -77,12 +78,12 @@ const TitleText = styled.div<{ fontSize?: number }>`
 
 const TextContent = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.grayscale.dark1};
+  color: ${({ theme }) => getThemeTokens(theme).colorText};
 `;
 
 const DateText = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  color: ${({ theme }) => getThemeTokens(theme).colorTextSecondary};
 `;
 
 const SpacerDiv = styled.div<{ width?: number }>`
@@ -191,7 +192,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
       case SlotType.DATA_FRESHNESS: {
         const freshnessSlot = slot as DataFreshnessSlot;
         return (
-          <SlotContainer customStyle={customStyle}>
+          <SlotContainer {...containerProps}>
             <DateText>
               <DataFreshnessElement
                 dashboardId={dashboardId}
