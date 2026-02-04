@@ -23,6 +23,7 @@ import {
   ComponentType,
 } from 'react';
 import type { Editor } from 'brace';
+import type { PageHeaderWithActionsProps } from '../components/PageHeaderWithActions';
 import type { QueryData } from '../chart/types/QueryResponse';
 import type {
   BaseFormData,
@@ -50,8 +51,12 @@ export type LoadDrillByOptions = (
  * Namespace the keys here to follow the form of 'some_domain.functionality.item'.
  * Take care to name your keys well, as the name describes what this extension point's role is in Superset.
  *
- * When defining a new option here, take care to keep any parameters to functions (or components) minimal.
- * Any removal or alteration to a parameter will be considered a breaking change.
+ * Keys here are a public contract. Avoid changing names or signatures without
+ * clear deprecation paths.
+ *
+ * When defining a new option here, take care to keep any parameters to functions
+ * (or components) minimal. Any removal or alteration to a parameter will be
+ * considered a breaking change.
  */
 interface MenuObjectChildProps {
   label: string;
@@ -237,6 +242,42 @@ export interface ExploreChartHeaderProps {
   triggerQuery: boolean;
 }
 
+export interface DashboardHeaderExtensionProps
+  extends PageHeaderWithActionsProps {
+  dashboardInfo?: {
+    id?: number;
+    dashboard_title?: string;
+    metadata?: {
+      headerLayout?: Record<string, unknown>;
+    };
+  };
+  editMode?: boolean;
+  isEmbedded?: boolean;
+  onPreviewToggle?: (preview: boolean) => void;
+}
+
+export interface DashboardCssTransformArgs {
+  css: string;
+  dashboard: {
+    id?: number;
+    tags?: Array<{ name?: string | null }>;
+    metadata?: Record<string, unknown>;
+  } | null;
+}
+
+export interface SliceHeaderControlsTriggerArgs {
+  slice: {
+    slice_id: number;
+    viz_type: string;
+    slice_name?: string;
+  };
+}
+
+export interface SliceHeaderControlsClassNamesResult {
+  menu?: string;
+  controls?: string;
+}
+
 export type Extensions = Partial<{
   'alertsreports.header.icon': ComponentType;
   'load.drillby.options': LoadDrillByOptions;
@@ -270,4 +311,17 @@ export type Extensions = Partial<{
   ][];
   'filter.dateFilterControl': ComponentType<DateFilterControlProps>;
   'explore.chart.header': ComponentType<ExploreChartHeaderProps>;
+  'dashboard.filterbar.horizontal.replacement': ComponentType<any>;
+  'dashboard.filterbar.settings.replacement': ComponentType<any>;
+  'dashboard.filterbar.filterValue.loading': ComponentType;
+  'dashboard.header.replacement': ComponentType<DashboardHeaderExtensionProps>;
+  'dashboard.css.transform': (args: DashboardCssTransformArgs) => string;
+  'dashboard.css.injector': ComponentType;
+  'dashboard.sliceHeaderControls.classNames': (
+    args: SliceHeaderControlsTriggerArgs,
+  ) => SliceHeaderControlsClassNamesResult;
+  'dashboard.sliceHeaderControls.trigger': (
+    args: SliceHeaderControlsTriggerArgs,
+  ) => ReactNode;
+  'dashboard.sliceHeaderControls.decorator': ComponentType;
 }>;

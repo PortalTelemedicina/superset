@@ -19,6 +19,7 @@
 
 import { styled } from '@superset-ui/core';
 import cls from 'classnames';
+import { Spin } from 'antd';
 import { Loading as Loader } from '../assets';
 import type { LoadingProps } from './types';
 
@@ -47,21 +48,59 @@ const LoaderImg = styled.img`
     transform: translate(-50%, -50%);
   }
 `;
+
+const SpinWrapper = styled.div`
+  z-index: 99;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  &.inline {
+    margin: 0;
+  }
+  &.inline-centered {
+    margin: 0 auto;
+  }
+  &.floating {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
+
 export function Loading({
   position = 'floating',
   image,
   className,
 }: LoadingProps) {
+  if (image) {
+    return (
+      <LoaderImg
+        className={cls('loading', position, className)}
+        alt="Loading..."
+        src={image}
+        role="status"
+        aria-live="polite"
+        aria-label="Loading"
+        data-test="loading-indicator"
+      />
+    );
+  }
+  const isInline = position === 'inline' || position === 'inline-centered';
   return (
-    <LoaderImg
+    <SpinWrapper
       className={cls('loading', position, className)}
-      alt="Loading..."
-      src={image || Loader}
       role="status"
       aria-live="polite"
       aria-label="Loading"
       data-test="loading-indicator"
-    />
+    >
+      <Spin size={isInline ? 'small' : 'default'} />
+    </SpinWrapper>
   );
 }
 
