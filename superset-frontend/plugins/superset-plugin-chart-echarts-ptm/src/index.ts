@@ -28,6 +28,10 @@ export { default as PtmBigNumberWithTrendlineChartPlugin } from './plugin/bignum
 
 export { default as PtmTableChartPlugin } from './plugin/table';
 
+export { default as PtmMixedTimeseriesChartPlugin } from './plugin/mixedTimeseries';
+
+export { default as PtmPivotTableChartPlugin } from './plugin/pivotTable';
+
 export {
   createPtmPlugin,
   wrapTransformProps,
