@@ -81,9 +81,18 @@ export const useDatasetDrillInfo = (
       });
       return;
     }
+    const numericDatasetId = getDatasetId(datasetId);
+    if (!Number.isFinite(numericDatasetId)) {
+      // avoid requesting /api/v1/dataset/NaN/drill_info/
+      setResource({
+        status: ResourceStatus.Complete,
+        result: {} as Dataset,
+        error: null,
+      });
+      return;
+    }
     const fetchDataset = async () => {
       try {
-        const numericDatasetId = getDatasetId(datasetId);
         const loadDrillByOptionsExtension = getExtensionsRegistry().get(
           'load.drillby.options',
         );

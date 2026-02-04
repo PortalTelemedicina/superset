@@ -41,8 +41,6 @@ import {
   TimePivotChartPlugin,
 } from '@superset-ui/legacy-preset-chart-nvd3';
 import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
-import { DeckGLChartPresetPTM } from '@superset-ui/legacy-preset-chart-deckgl-maplibre-ptm';
-import MapLibreChartPluginPTM from '@superset-ui/legacy-plugin-chart-maplibre-ptm';
 import { CartodiagramPlugin } from '@superset-ui/plugin-chart-cartodiagram';
 import {
   BigNumberChartPlugin,
@@ -85,14 +83,6 @@ import { FilterPlugins } from 'src/constants';
 import AgGridTableChartPlugin from '@superset-ui/plugin-chart-ag-grid-table';
 import TimeTableChartPlugin from '../TimeTable';
 
-// PTM (Portal Telemedicina) Chart Plugins
-import {
-  PtmTimeseriesChartPlugin,
-  PtmPieChartPlugin,
-  PtmBigNumberTotalChartPlugin,
-  PtmBigNumberWithTrendlineChartPlugin,
-  PtmTableChartPlugin,
-} from '@superset-ui/superset-plugin-chart-echarts-ptm';
 export default class MainPreset extends Preset {
   constructor() {
     const experimentalPlugins = isFeatureEnabled(
@@ -111,7 +101,7 @@ export default class MainPreset extends Preset {
 
     super({
       name: 'Legacy charts',
-      presets: [new DeckGLChartPreset(), new DeckGLChartPresetPTM()],
+      presets: [new DeckGLChartPreset()],
       plugins: [
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
@@ -136,7 +126,6 @@ export default class MainPreset extends Preset {
         }),
         new HorizonChartPlugin().configure({ key: VizType.Horizon }),
         new MapBoxChartPlugin().configure({ key: VizType.MapBox }),
-        new MapLibreChartPluginPTM().configure({ key: 'maplibre_ptm' }),
         new PairedTTestChartPlugin().configure({ key: VizType.PairedTTest }),
         new ParallelCoordinatesChartPlugin().configure({
           key: VizType.ParallelCoordinates,
@@ -204,25 +193,6 @@ export default class MainPreset extends Preset {
         }).configure({ key: VizType.Cartodiagram }),
         ...experimentalPlugins,
         ...agGridTablePlugin,
-
-        // ==========================================================
-        // PTM (Portal Telemedicina) Chart Plugins
-        // ==========================================================
-        new PtmTimeseriesChartPlugin().configure({
-          key: 'ptm_echarts_timeseries',
-        }),
-        new PtmPieChartPlugin().configure({
-          key: 'ptm_pie',
-        }),
-        new PtmBigNumberTotalChartPlugin().configure({
-          key: 'ptm_big_number_total',
-        }),
-        new PtmBigNumberWithTrendlineChartPlugin().configure({
-          key: 'ptm_big_number_trendline',
-        }),
-        new PtmTableChartPlugin().configure({
-          key: 'ptm_table',
-        }),
       ],
     });
   }
