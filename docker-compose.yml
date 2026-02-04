@@ -266,6 +266,7 @@ volumes:
   superset_home:
     external: false
   db_home:
-    external: false
+    external: true
+    name: superset_db_home
   redis:
     external: false

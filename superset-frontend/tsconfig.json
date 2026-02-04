@@ -19,6 +19,9 @@
       "@superset-ui/superset-plugin-chart-echarts-ptm": [
         "./plugins/superset-plugin-chart-echarts-ptm/src"
       ],
+      "@superset-ui/superset-extension-portal": [
+        "./packages/superset-extension-portal/src"
+      ],
       "@superset-ui/switchboard": ["./packages/superset-ui-switchboard/src"]
     },
     "typeRoots": ["src/types", "node_modules/@types"]
