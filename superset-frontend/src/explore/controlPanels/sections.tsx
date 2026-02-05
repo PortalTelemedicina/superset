@@ -91,6 +91,17 @@ export const annotations: ControlPanelSectionConfig = {
   ],
 };
 
+export const dataReliabilitySection: ControlPanelSectionConfig = {
+  label: t('Data Reliability'),
+  expanded: false,
+  controlSetRows: [
+    ['show_data_reliability'],
+    ['data_reliability_icon'],
+    ['data_reliability_position'],
+    ['data_reliability_message'],
+  ],
+};
+
 export const NVD3TimeSeries: ControlPanelSectionConfig[] = [
   {
     label: t('Query'),

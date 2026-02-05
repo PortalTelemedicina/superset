@@ -27,6 +27,8 @@ export interface TransformConfig {
   userOverrides?: boolean;
   /** Apply PTM text casing to axis/legend labels (ECharts). */
   textCasing?: boolean;
+  /** Enable Data Reliability indicator in chart header. */
+  dataReliability?: boolean;
 }
 
 export const DEFAULT_TRANSFORMS: TransformConfig = {
@@ -37,6 +39,7 @@ export const DEFAULT_TRANSFORMS: TransformConfig = {
   pillFormat: false,
   userOverrides: true,
   textCasing: false,
+  dataReliability: true,
 };
 
 

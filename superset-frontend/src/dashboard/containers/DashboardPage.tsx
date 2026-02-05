@@ -244,6 +244,9 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
       dashboardCssInjectorComponent: registry.get(
         'dashboard.css.injector',
       ) as DashboardExtensionsValue['dashboardCssInjectorComponent'],
+      chartDataReliabilityOverlayComponent: registry.get(
+        'dashboard.chart.dataReliabilityOverlay',
+      ),
     };
   }, []);
 

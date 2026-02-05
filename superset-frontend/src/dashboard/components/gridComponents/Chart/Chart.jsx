@@ -41,6 +41,8 @@ import exportPivotExcel from 'src/utils/downloadAsPivotExcel';
 
 import SliceHeader from '../../SliceHeader';
 import MissingChart from '../../MissingChart';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
+import { DefaultChartDataReliabilityOverlay } from './DefaultChartDataReliabilityOverlay';
 import {
   addDangerToast,
   addSuccessToast,
@@ -109,6 +111,9 @@ const Chart = props => {
   const dispatch = useDispatch();
   const descriptionRef = useRef(null);
   const headerRef = useRef(null);
+  const { chartDataReliabilityOverlayComponent } = useDashboardExtensions();
+  const DataReliabilityOverlayComponent =
+    chartDataReliabilityOverlayComponent ?? DefaultChartDataReliabilityOverlay;
 
   const boundActionCreators = useMemo(
     () =>
@@ -515,6 +520,14 @@ const Chart = props => {
             }}
           />
         )}
+
+        {formData?.show_data_reliability &&
+          formData?.data_reliability_message && (
+            <DataReliabilityOverlayComponent
+              formData={formData}
+              context="dashboard"
+            />
+          )}
 
         <ChartContainer
           width={width}

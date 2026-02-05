@@ -136,7 +136,6 @@ export const ptmJsonOverrideControl: ControlSetRow = [
   },
 ];
 
-
 export function createPtmControlSection(
   transforms: TransformConfig,
   pluginControls: ControlSetRow[] = [],
@@ -145,6 +144,15 @@ export function createPtmControlSection(
 
   if (transforms.colorPalette !== false) {
     controlSetRows.push(ptmColorPaletteControl);
+  }
+
+  if (transforms.dataReliability !== false) {
+    controlSetRows.push(
+      ['show_data_reliability'],
+      ['data_reliability_icon'],
+      ['data_reliability_position'],
+      ['data_reliability_message'],
+    );
   }
 
   if (pluginControls.length > 0) {

@@ -19,7 +19,10 @@
 
 import type { ComponentType, ReactNode } from 'react';
 import { createContext, useContext } from 'react';
-import type { DashboardHeaderExtensionProps } from '@superset-ui/core';
+import type {
+  ChartDataReliabilityOverlayProps,
+  DashboardHeaderExtensionProps,
+} from '@superset-ui/core';
 import type { HorizontalBarProps } from 'src/dashboard/components/nativeFilters/FilterBar/types';
 
 /** Props for the dashboard CSS injector component (injected at root). */
@@ -62,6 +65,7 @@ export interface DashboardExtensionsValue {
     args: SliceHeaderControlsExtensionArgs,
   ) => ReactNode;
   dashboardCssInjectorComponent?: ComponentType<DashboardCssInjectorProps>;
+  chartDataReliabilityOverlayComponent?: ComponentType<ChartDataReliabilityOverlayProps>;
 }
 
 const defaultValue: DashboardExtensionsValue = {};

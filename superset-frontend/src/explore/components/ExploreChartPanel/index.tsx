@@ -46,12 +46,16 @@ import { buildV1ChartDataPayload } from 'src/explore/exploreUtils';
 import { getChartRequiredFieldsMissingMessage } from 'src/utils/getChartRequiredFieldsMissingMessage';
 import type { ChartState, Datasource } from 'src/explore/types';
 import type { Slice } from 'src/types/Chart';
+import { DefaultChartDataReliabilityOverlay } from 'src/dashboard/components/gridComponents/Chart/DefaultChartDataReliabilityOverlay';
 import { DataTablesPane } from '../DataTablesPane';
 import { ChartPills } from '../ChartPills';
 import { ExploreAlert } from '../ExploreAlert';
 import useResizeDetectorByObserver from './useResizeDetectorByObserver';
 
 const extensionsRegistry = getExtensionsRegistry();
+const ChartDataReliabilityOverlayExtension =
+  extensionsRegistry.get('explore.chart.dataReliabilityOverlay') ??
+  DefaultChartDataReliabilityOverlay;
 const DefaultHeader: React.FC = ({ children }) => <>{children}</>;
 
 export interface ExploreChartPanelProps {
@@ -252,35 +256,45 @@ const ExploreChartPanel = ({
           min-height: 0;
           flex: 1;
           overflow: auto;
+          position: relative;
         `}
         ref={chartPanelRef}
       >
         {chartPanelWidth && chartPanelHeight && (
-          <ChartContainer
-            width={Math.floor(chartPanelWidth)}
-            height={chartPanelHeight}
-            ownState={ownState}
-            annotationData={chart.annotationData}
-            chartId={chart.id}
-            triggerRender={triggerRender}
-            force={force}
-            datasource={datasource}
-            errorMessage={errorMessage}
-            formData={formData}
-            latestQueryFormData={chart.latestQueryFormData}
-            onQuery={onQuery}
-            queriesResponse={chart.queriesResponse}
-            chartIsStale={chartIsStale}
-            setControlValue={actions.setControlValue}
-            timeout={timeout}
-            triggerQuery={chart.triggerQuery}
-            vizType={vizType}
-            {...(chart.chartAlert && { chartAlert: chart.chartAlert })}
-            {...(chart.chartStackTrace && {
-              chartStackTrace: chart.chartStackTrace,
-            })}
-            {...(chart.chartStatus && { chartStatus: chart.chartStatus })}
-          />
+          <>
+            <ChartContainer
+              width={Math.floor(chartPanelWidth)}
+              height={chartPanelHeight}
+              ownState={ownState}
+              annotationData={chart.annotationData}
+              chartId={chart.id}
+              triggerRender={triggerRender}
+              force={force}
+              datasource={datasource}
+              errorMessage={errorMessage}
+              formData={formData}
+              latestQueryFormData={chart.latestQueryFormData}
+              onQuery={onQuery}
+              queriesResponse={chart.queriesResponse}
+              chartIsStale={chartIsStale}
+              setControlValue={actions.setControlValue}
+              timeout={timeout}
+              triggerQuery={chart.triggerQuery}
+              vizType={vizType}
+              {...(chart.chartAlert && { chartAlert: chart.chartAlert })}
+              {...(chart.chartStackTrace && {
+                chartStackTrace: chart.chartStackTrace,
+              })}
+              {...(chart.chartStatus && { chartStatus: chart.chartStatus })}
+            />
+            {formData?.show_data_reliability &&
+              formData?.data_reliability_message && (
+                <ChartDataReliabilityOverlayExtension
+                  formData={formData}
+                  context="explore"
+                />
+              )}
+          </>
         )}
       </div>
     ),
@@ -412,6 +426,7 @@ const ExploreChartPanel = ({
       refreshCachedQuery,
       formData?.row_limit,
       renderChart,
+      theme.sizeUnit,
     ],
   );
 

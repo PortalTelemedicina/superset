@@ -278,6 +278,11 @@ export interface SliceHeaderControlsClassNamesResult {
   controls?: string;
 }
 
+export interface ChartDataReliabilityOverlayProps {
+  formData: QueryFormData;
+  context: 'dashboard' | 'explore';
+}
+
 export type Extensions = Partial<{
   'alertsreports.header.icon': ComponentType;
   'load.drillby.options': LoadDrillByOptions;
@@ -324,4 +329,6 @@ export type Extensions = Partial<{
     args: SliceHeaderControlsTriggerArgs,
   ) => ReactNode;
   'dashboard.sliceHeaderControls.decorator': ComponentType;
+  'dashboard.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
+  'explore.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
 }>;

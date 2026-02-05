@@ -31,11 +31,13 @@ import {
   isPtmFilterBarCollapseEnabled,
   isPtmChartPluginsEnabled,
   isPtmSliceHeaderControlsEnabled,
+  isPtmDataReliabilityIndicatorEnabled,
 } from './config/featureFlags';
 import { registerPtmHeaderExtension } from './extensions/headerRegistry';
 import { registerPtmDashboardCssExtension } from './extensions/dashboardCssRegistry';
 import { registerPtmFilterBarExtension } from './extensions/filterBarRegistry';
 import { registerPtmSliceHeaderControlsExtension } from './extensions/sliceHeaderControlsRegistry';
+import { registerPtmDataReliabilityExtension } from './extensions/dataReliabilityRegistry';
 import { registerPtmPlugins } from './plugins/registerPtmPlugins';
 
 let applied = false;
@@ -65,6 +67,9 @@ export function applyPTMExtensions(): void {
   }
   if (isPtmSliceHeaderControlsEnabled()) {
     registerPtmSliceHeaderControlsExtension();
+  }
+  if (isPtmDataReliabilityIndicatorEnabled()) {
+    registerPtmDataReliabilityExtension();
   }
   if (isPtmChartPluginsEnabled()) {
     registerPtmPlugins();

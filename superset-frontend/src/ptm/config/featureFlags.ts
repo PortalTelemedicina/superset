@@ -27,6 +27,8 @@ export const PTM_ENABLE_HEADER_CUSTOM = 'PTM_ENABLE_HEADER_CUSTOM';
 export const PTM_ENABLE_PTM_CHART_PLUGINS = 'PTM_ENABLE_PTM_CHART_PLUGINS';
 export const PTM_ENABLE_FILTERBAR_COLLAPSE = 'PTM_ENABLE_FILTERBAR_COLLAPSE';
 export const PTM_ENABLE_SLICE_HEADER_CONTROLS = 'PTM_ENABLE_SLICE_HEADER_CONTROLS';
+export const PTM_ENABLE_DATA_RELIABILITY_INDICATOR =
+  'PTM_ENABLE_DATA_RELIABILITY_INDICATOR';
 
 type FeatureFlags = Record<string, boolean>;
 
@@ -105,4 +107,8 @@ export function isPtmFilterBarCollapseEnabled(): boolean {
 
 export function isPtmSliceHeaderControlsEnabled(): boolean {
   return isPtmFlagOn(PTM_ENABLE_SLICE_HEADER_CONTROLS, true);
+}
+
+export function isPtmDataReliabilityIndicatorEnabled(): boolean {
+  return isPtmFlagOn(PTM_ENABLE_DATA_RELIABILITY_INDICATOR, true);
 }

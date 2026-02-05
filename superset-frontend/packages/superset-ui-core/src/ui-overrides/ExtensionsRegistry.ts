@@ -170,6 +170,10 @@ const validators: Partial<
     validateSliceHeaderControlsClassNames as (value: unknown) => unknown | null,
   'dashboard.sliceHeaderControls.decorator': (value: unknown) =>
     validateComponent(value, 'dashboard.sliceHeaderControls.decorator'),
+  'dashboard.chart.dataReliabilityOverlay': (value: unknown) =>
+    validateComponent(value, 'dashboard.chart.dataReliabilityOverlay'),
+  'explore.chart.dataReliabilityOverlay': (value: unknown) =>
+    validateComponent(value, 'explore.chart.dataReliabilityOverlay'),
 };
 
 function guardExtensionOverride<K extends keyof Extensions>(

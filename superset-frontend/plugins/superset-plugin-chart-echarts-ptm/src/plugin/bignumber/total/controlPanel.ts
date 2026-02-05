@@ -23,6 +23,7 @@ import {
   D3_TIME_FORMAT_OPTIONS,
   Dataset,
   getStandardizedControls,
+  sections,
 } from '@superset-ui/chart-controls';
 import {
   headerFontSize,
@@ -160,6 +161,7 @@ export default {
         [additionalTextFontSize],
       ],
     },
+    sections.dataReliabilitySection,
   ],
   controlOverrides: {
     y_axis_format: {

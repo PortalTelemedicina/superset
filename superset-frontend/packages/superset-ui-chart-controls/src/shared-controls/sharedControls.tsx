@@ -427,6 +427,62 @@ const order_by_cols: SharedControlConfig<'SelectControl'> = {
   resetOnHide: false,
 };
 
+const show_data_reliability: SharedControlConfig<'CheckboxControl'> = {
+  type: 'CheckboxControl',
+  label: t('Show Data Reliability'),
+  description: t(
+    'Display an info icon with data reliability information in the chart header',
+  ),
+  default: false,
+  renderTrigger: true,
+};
+
+const data_reliability_message: SharedControlConfig<'TextAreaControl'> = {
+  type: 'TextAreaControl',
+  label: t('Data Reliability Details'),
+  description: t(
+    'Describe the data source, refresh cadence, completeness, and any limitations.',
+  ),
+  default: '',
+  language: 'markdown',
+  renderTrigger: true,
+  visibility: ({ controls }) =>
+    Boolean(controls?.show_data_reliability?.value),
+};
+
+const data_reliability_icon: SharedControlConfig<'SelectControl'> = {
+  type: 'SelectControl',
+  label: t('Data Reliability Icon'),
+  description: t('Choose the icon style for the data reliability indicator.'),
+  default: 'info',
+  choices: [
+    ['info', t('Info')],
+    ['warning', t('Warning')],
+    ['alert', t('Alert')],
+  ],
+  clearable: false,
+  renderTrigger: true,
+  visibility: ({ controls }) =>
+    Boolean(controls?.show_data_reliability?.value),
+};
+
+const data_reliability_position: SharedControlConfig<'SelectControl'> = {
+  type: 'SelectControl',
+  label: t('Data Reliability Icon Position'),
+  description: t('Position of the data reliability icon overlay in the chart area.'),
+  default: 'top_right',
+  choices: [
+    ['top_left', t('Top Left')],
+    ['top_right', t('Top Right')],
+    ['bottom_left', t('Bottom Left')],
+    ['bottom_right', t('Bottom Right')],
+  ],
+  clearable: false,
+  renderTrigger: true,
+  visibility: ({ controls }) =>
+    Boolean(controls?.show_data_reliability?.value),
+};
+
 export default {
   metrics: dndAdhocMetricsControl,
   metric: dndAdhocMetricControl,
@@ -472,4 +528,8 @@ export default {
   currency_format,
   sort_by_metric,
   order_by_cols,
+  show_data_reliability,
+  data_reliability_icon,
+  data_reliability_position,
+  data_reliability_message,
 };
