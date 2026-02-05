@@ -125,7 +125,11 @@ const plugins = [
   }),
 
   new CopyPlugin({
-    patterns: ['package.json', { from: 'src/assets/images', to: 'images' }],
+    patterns: [
+      'package.json',
+      { from: 'src/assets/images', to: 'images' },
+      { from: 'src/assets/stylesheets', to: 'stylesheets' },
+    ],
   }),
 
   // static pages
