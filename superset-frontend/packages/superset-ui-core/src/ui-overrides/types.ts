@@ -331,4 +331,6 @@ export type Extensions = Partial<{
   'dashboard.sliceHeaderControls.decorator': ComponentType;
   'dashboard.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
   'explore.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
+  'dashboard.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
+  'explore.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
 }>;

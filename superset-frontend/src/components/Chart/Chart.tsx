@@ -28,6 +28,7 @@ import {
   SqlaFormData,
   ClientErrorObject,
   type JsonObject,
+  getExtensionsRegistry,
 } from '@superset-ui/core';
 import type { ChartState, Datasource, ChartStatus } from 'src/explore/types';
 import { PLACEHOLDER_DATASOURCE } from 'src/dashboard/constants';
@@ -312,10 +313,11 @@ class Chart extends PureComponent<ChartProps, {}> {
       chartIsStale,
       queriesResponse = [],
       width,
+      chartId,
+      dashboardId,
     } = this.props;
 
     const databaseName = datasource?.database?.name as string | undefined;
-
     const isLoading = chartStatus === 'loading';
 
     if (chartStatus === 'failed') {
@@ -374,7 +376,23 @@ class Chart extends PureComponent<ChartProps, {}> {
           width={width}
         >
           {isLoading
-            ? this.renderSpinner(databaseName)
+            ? (() => {
+                const registry = getExtensionsRegistry();
+                const LoadingComponent = (dashboardId
+                  ? registry.get('dashboard.chart.loading')
+                  : registry.get('explore.chart.loading')) as
+                  | React.ComponentType<{ chartId: number; chartStatus?: string }>
+                  | undefined;
+                if (LoadingComponent) {
+                  return (
+                    <LoadingComponent
+                      chartId={chartId}
+                      chartStatus={chartStatus}
+                    />
+                  );
+                }
+                return this.renderSpinner(databaseName);
+              })()
             : this.renderChartContainer()}
         </Styles>
       </ErrorBoundary>
