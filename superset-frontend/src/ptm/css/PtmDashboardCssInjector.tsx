@@ -39,7 +39,7 @@ function isPtmDashboardFromTags(
  * the dashboard has the PTM tag, then injects the combined CSS.
  */
 export default function PtmDashboardCssInjector({
-  css,
+  dashboardCss,
   dashboard,
 }: DashboardCssInjectorProps) {
   const removeStyleRef = useRef<(() => void) | null>(null);
@@ -50,13 +50,14 @@ export default function PtmDashboardCssInjector({
   useEffect(() => {
     const dashboardId = dashboard?.id ?? null;
     const sameDashboard = dashboardId === lastDashboardIdRef.current;
-    const dashboardCss = typeof css === 'string' ? css : '';
+    const rawDashboardCss =
+      typeof dashboardCss === 'string' ? dashboardCss : '';
     const enablePtmTheme = isPtmDashboardFromTags(dashboard);
     const ptmImport =
-      enablePtmTheme && dashboardCss.indexOf(PTM_CSS_URL) === -1
+      enablePtmTheme && rawDashboardCss.indexOf(PTM_CSS_URL) === -1
         ? `@import url("${PTM_CSS_URL}");\n`
         : '';
-    const finalCss = `${ptmImport}${dashboardCss}`.trim();
+    const finalCss = `${ptmImport}${rawDashboardCss}`.trim();
     const cssChanged = finalCss !== lastCssRef.current;
     if (finalCss) {
       if (cssChanged) {
@@ -72,7 +73,7 @@ export default function PtmDashboardCssInjector({
     }
     lastDashboardIdRef.current = dashboardId;
     // Intentionally no cleanup: avoid remove/re-add on filter apply (prevents flash/reflow)
-  }, [css, dashboard]);
+  }, [dashboardCss, dashboard]);
 
   // Remove style only on unmount
   useEffect(

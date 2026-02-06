@@ -23,6 +23,23 @@ import rison from 'rison';
 import { isPtmDashboard, getPtmChartMapping } from '../utils/ptmChartMapping';
 import type { DashboardSaveHookArgs } from '@superset-ui/core';
 
+type PtmFormData = Record<string, unknown> & {
+  viz_type?: string;
+  subheader?: string;
+  ptm_series_type?: string;
+};
+
+const getVizType = (
+  formData?: Record<string, unknown>,
+  fallback?: string,
+): string | undefined => {
+  const fromForm =
+    formData && typeof formData.viz_type === 'string'
+      ? formData.viz_type
+      : undefined;
+  return fromForm || fallback;
+};
+
 /**
  * PTM dashboard save hook handler.
  * Converts charts to PTM equivalents when PTM autoconvert is enabled.
@@ -59,8 +76,11 @@ async function ptmDashboardSaveHook(
         const conversionPromises = [];
 
         for (const slice of fetchedSlices) {
-          const formData = JSON.parse(slice.params || '{}');
-          const currentVizType = formData.viz_type || slice.viz_type;
+          const formData = JSON.parse(slice.params || '{}') as Record<
+            string,
+            unknown
+          >;
+          const currentVizType = getVizType(formData, slice.viz_type);
 
           if (!currentVizType) continue;
 
@@ -70,8 +90,8 @@ async function ptmDashboardSaveHook(
           // Skip if already converted
           if (currentVizType === mapping.ptmVizType) continue;
 
-          const updatedFormData = {
-            ...formData,
+          const updatedFormData: PtmFormData = {
+            ...(formData ?? {}),
             viz_type: mapping.ptmVizType,
           };
 
@@ -127,7 +147,7 @@ async function ptmDashboardSaveHook(
 
   for (const sliceId in slices) {
     const slice = slices[sliceId];
-    const currentVizType = slice.form_data?.viz_type;
+    const currentVizType = getVizType(slice.form_data);
 
     if (!currentVizType) continue;
 
@@ -138,8 +158,8 @@ async function ptmDashboardSaveHook(
     if (currentVizType === mapping.ptmVizType) continue;
 
     // Prepare updated form_data
-    const updatedFormData = {
-      ...slice.form_data,
+    const updatedFormData: PtmFormData = {
+      ...(slice.form_data ?? {}),
       viz_type: mapping.ptmVizType,
     };
 
