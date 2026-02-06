@@ -151,7 +151,7 @@ ENV SUPERSET_HOME="/app/superset_home" \
     FLASK_APP="superset.app:create_app()" \
     PYTHONPATH="/app/pythonpath" \
     SUPERSET_PORT="8088"
-    PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
+    PLAYWRIGHT_BROWSERS_PATH="/usr/local/share/playwright-browsers"
 
 # Copy the entrypoints, make them executable in userspace
 COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
