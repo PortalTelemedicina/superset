@@ -52,17 +52,20 @@ export default styled.div`
       max-width: none !important;
     }
 
-    /* Sticky table: force presentation divs (header/body/footer) to full width */
+    /* Sticky table: add side padding and avoid forcing full width */
     & div[role="table"] > div[role="presentation"] {
-      width: 100% !important;
-      max-width: none !important;
+      width: auto !important;
+      max-width: 100% !important;
+      padding: 0 16px !important;
+      box-sizing: border-box !important;
     }
 
     /* ========================================
        TABLE BASE STYLES
        ======================================== */
     table.table {
-      width: 100% !important;
+      width: auto !important;
+      max-width: 100% !important;
       margin: 0 !important;
       border-collapse: collapse !important;
       border-spacing: 0 !important;
@@ -146,6 +149,14 @@ export default styled.div`
     }
 
     /* ========================================
+       FOOTER / SUMMARY ROW
+       ======================================== */
+    table.table > tfoot > tr > th,
+    table.table > tfoot > tr > td {
+      padding-top: 16px !important;
+    }
+
+    /* ========================================
        NUMERIC CELLS & BARS
        ======================================== */
     .dt-metric {
@@ -205,7 +216,7 @@ export default styled.div`
       align-items: center !important;
       justify-content: space-between !important;
       gap: 12px !important;
-      padding: 0 0 12px 16px !important;
+      padding: 0 16px 12px 16px !important;
       flex-wrap: wrap !important;
     }
 
