@@ -150,7 +150,7 @@ ENV SUPERSET_HOME="/app/superset_home" \
     SUPERSET_ENV="production" \
     FLASK_APP="superset.app:create_app()" \
     PYTHONPATH="/app/pythonpath" \
-    SUPERSET_PORT="8088"
+    SUPERSET_PORT="8088" \
     PLAYWRIGHT_BROWSERS_PATH="/usr/local/share/playwright-browsers"
 
 # Copy the entrypoints, make them executable in userspace
