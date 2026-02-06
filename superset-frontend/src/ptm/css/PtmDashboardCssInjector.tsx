@@ -23,6 +23,7 @@ import injectCustomCss from 'src/dashboard/util/injectCustomCss';
 
 const PTM_TAG_NAME = 'PTM';
 const PTM_CSS_URL = '/static/assets/stylesheets/ptm-dashboard.css';
+const PTM_LINK_ID = 'ptm-dashboard-css-link';
 
 function isPtmDashboardFromTags(
   dashboard: DashboardCssInjectorProps['dashboard'],
@@ -35,14 +36,41 @@ function isPtmDashboardFromTags(
 }
 
 /**
- * PTM dashboard CSS injector: prepends @import for ptm-dashboard.css when
- * the dashboard has the PTM tag, then injects the combined CSS.
+ * Ensures PTM CSS link is loaded synchronously in the document head.
+ * Returns a function to remove the link.
+ */
+function ensurePtmCssLink(): () => void {
+  const head = document.head || document.getElementsByTagName('head')[0];
+  let link = document.getElementById(PTM_LINK_ID) as HTMLLinkElement | null;
+
+  if (!link) {
+    link = document.createElement('link');
+    link.id = PTM_LINK_ID;
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = PTM_CSS_URL;
+    // Insert at the beginning to ensure PTM CSS loads before custom CSS
+    head.insertBefore(link, head.firstChild);
+  }
+
+  return () => {
+    const existingLink = document.getElementById(PTM_LINK_ID);
+    if (existingLink) {
+      existingLink.remove();
+    }
+  };
+}
+
+/**
+ * PTM dashboard CSS injector: loads ptm-dashboard.css synchronously via <link>
+ * when the dashboard has the PTM tag, then injects the dashboard custom CSS.
  */
 export default function PtmDashboardCssInjector({
   dashboardCss,
   dashboard,
 }: DashboardCssInjectorProps) {
   const removeStyleRef = useRef<(() => void) | null>(null);
+  const removeLinkRef = useRef<(() => void) | null>(null);
   const lastDashboardIdRef = useRef<number | null>(null);
   const lastCssRef = useRef<string>('');
 
@@ -53,12 +81,24 @@ export default function PtmDashboardCssInjector({
     const rawDashboardCss =
       typeof dashboardCss === 'string' ? dashboardCss : '';
     const enablePtmTheme = isPtmDashboardFromTags(dashboard);
-    const ptmImport =
-      enablePtmTheme && rawDashboardCss.indexOf(PTM_CSS_URL) === -1
-        ? `@import url("${PTM_CSS_URL}");\n`
-        : '';
-    const finalCss = `${ptmImport}${rawDashboardCss}`.trim();
+
+    if (enablePtmTheme) {
+      // Ensure PTM CSS link is loaded synchronously
+      if (!removeLinkRef.current) {
+        removeLinkRef.current = ensurePtmCssLink();
+      }
+    } else {
+      // Remove PTM CSS link if dashboard doesn't have PTM tag
+      if (removeLinkRef.current) {
+        removeLinkRef.current();
+        removeLinkRef.current = null;
+      }
+    }
+
+    // Inject dashboard custom CSS (without @import, PTM CSS is already loaded via link)
+    const finalCss = rawDashboardCss.trim();
     const cssChanged = finalCss !== lastCssRef.current;
+    
     if (finalCss) {
       if (cssChanged) {
         removeStyleRef.current = injectCustomCss(finalCss);
@@ -71,15 +111,18 @@ export default function PtmDashboardCssInjector({
         lastCssRef.current = '';
       }
     }
+    
     lastDashboardIdRef.current = dashboardId;
     // Intentionally no cleanup: avoid remove/re-add on filter apply (prevents flash/reflow)
   }, [dashboardCss, dashboard]);
 
-  // Remove style only on unmount
+  // Remove style and link only on unmount
   useEffect(
     () => () => {
       removeStyleRef.current?.();
       removeStyleRef.current = null;
+      removeLinkRef.current?.();
+      removeLinkRef.current = null;
     },
     [],
   );
