@@ -283,6 +283,27 @@ export interface ChartDataReliabilityOverlayProps {
   context: 'dashboard' | 'explore';
 }
 
+export interface DashboardSaveHookArgs {
+  dashboard: {
+    tags?: Array<{ name?: string }>;
+    metadata?: Record<string, unknown>;
+  };
+  slices: Record<
+    string,
+    {
+      form_data?: Record<string, unknown>;
+      slice_name?: string;
+      datasource?: string | number;
+    }
+  >;
+  mode: 'update' | 'copy';
+  newDashboardId?: number; // Only present in copy mode
+}
+
+export type DashboardSaveHook = (
+  args: DashboardSaveHookArgs,
+) => Promise<void>;
+
 export type Extensions = Partial<{
   'alertsreports.header.icon': ComponentType;
   'load.drillby.options': LoadDrillByOptions;
@@ -333,4 +354,5 @@ export type Extensions = Partial<{
   'explore.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
   'dashboard.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
   'explore.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
+  'dashboard.save.before': DashboardSaveHook;
 }>;

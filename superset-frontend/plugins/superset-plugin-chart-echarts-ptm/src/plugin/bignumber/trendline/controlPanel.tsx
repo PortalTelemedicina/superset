@@ -37,6 +37,7 @@ import {
   iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
+  autofit,
 } from '../sharedControls';
 
 const config: ControlPanelConfig = {
@@ -138,11 +139,10 @@ const config: ControlPanelConfig = {
       ],
     },
     {
-      label: t('Chart Options'),
+      label: t('Display settings'),
       expanded: true,
+      tabOverride: 'data',
       controlSetRows: [
-        [layoutMode],
-        ['color_picker', null],
         [
           {
             name: 'subheader',
@@ -156,6 +156,15 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+      ],
+    },
+    {
+      label: t('Chart Options'),
+      expanded: true,
+      controlSetRows: [
+        [layoutMode],
+        [autofit],
+        ['color_picker', null],
         [titleFontSize],
         [headerFontSize],
         [subheaderFontSize],

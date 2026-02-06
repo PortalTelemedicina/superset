@@ -27,7 +27,7 @@ import type { HorizontalBarProps } from 'src/dashboard/components/nativeFilters/
 
 /** Props for the dashboard CSS injector component (injected at root). */
 export interface DashboardCssInjectorProps {
-  css: string;
+  dashboardCss: string;
   dashboard: {
     id?: number;
     tags?: Array<{ name?: string | null }>;

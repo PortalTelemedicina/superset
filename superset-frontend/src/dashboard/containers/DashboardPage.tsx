@@ -66,6 +66,7 @@ import {
 import SyncDashboardState, {
   getDashboardContextLocalStorage,
 } from '../components/SyncDashboardState';
+import OverwriteConfirm from '../components/OverwriteConfirm';
 
 export const DashboardPageIdContext = createContext('');
 
@@ -290,9 +291,13 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
       {readyToRender && hasDashboardInfoInitiated ? (
         <>
           <SyncDashboardState dashboardPageId={dashboardPageId} />
+          <OverwriteConfirm />
           <DashboardPageIdContext.Provider value={dashboardPageId}>
             <DashboardExtensionsContext.Provider value={dashboardExtensions}>
-              <DashboardCssInjector css={dashboardCss} dashboard={dashboard} />
+              <DashboardCssInjector
+                dashboardCss={dashboardCss}
+                dashboard={dashboard}
+              />
               <CrudThemeProvider
                 themeId={
                   dashboardTheme !== undefined

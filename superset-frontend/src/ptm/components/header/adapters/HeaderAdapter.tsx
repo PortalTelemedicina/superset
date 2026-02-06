@@ -30,6 +30,7 @@ import { HeaderSlotEditor } from '../components/HeaderSlotEditor';
 import { useStandaloneMode } from '../hooks/useStandaloneMode';
 import { useHeaderPreview } from '../hooks/useHeaderPreview';
 import { HeaderLayout, getDefaultHeaderLayout } from '../types';
+import OverwriteConfirm from 'src/dashboard/components/OverwriteConfirm';
 import {
   setDashboardMetadata,
   setUnsavedChanges,
@@ -226,20 +227,24 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
   // Now we can do conditional returns after all hooks are called
   if (shouldShowCustomHeader) {
     return (
-      <div className="dashboard-header-container">
-        {PreviewBanner}
-        <CustomizableHeader
-          headerLayout={headerLayout}
-          dashboardTitle={dashboardInfo?.dashboard_title}
-          dashboardId={dashboardInfo?.id}
-        />
-      </div>
+      <>
+        <OverwriteConfirm />
+        <div className="dashboard-header-container">
+          {PreviewBanner}
+          <CustomizableHeader
+            headerLayout={headerLayout}
+            dashboardTitle={dashboardInfo?.dashboard_title}
+            dashboardId={dashboardInfo?.id}
+          />
+        </div>
+      </>
     );
   }
 
   // Fallback to original header (with optional "Customize header" button and inline editor)
   return (
     <>
+      <OverwriteConfirm />
       <PageHeaderWithActions
         {...pageHeaderProps}
         titlePanelAdditionalItems={enhancedTitlePanelItems}

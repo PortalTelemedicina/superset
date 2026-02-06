@@ -26,14 +26,14 @@ import injectCustomCss from 'src/dashboard/util/injectCustomCss';
  * Used when no extension provides dashboardCssInjectorComponent.
  */
 export default function DefaultDashboardCssInjector({
-  css,
+  dashboardCss,
 }: DashboardCssInjectorProps) {
   useEffect(() => {
-    const finalCss = (typeof css === 'string' ? css : '').trim();
+    const finalCss = (typeof dashboardCss === 'string' ? dashboardCss : '').trim();
     if (finalCss) {
       return injectCustomCss(finalCss);
     }
     return () => {};
-  }, [css]);
+  }, [dashboardCss]);
   return null;
 }

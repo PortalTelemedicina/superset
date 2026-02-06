@@ -23,86 +23,39 @@ import { CustomControlItem } from '@superset-ui/chart-controls';
 export const titleFontSize: CustomControlItem = {
   name: 'title_font_size',
   config: {
-    type: 'SelectControl',
-    label: t('Title Font Size'),
+    type: 'TextControl',
+    label: t('Title Font Size (px)'),
     renderTrigger: true,
-    clearable: false,
+    isInt: true,
     default: 14,
     description: t('Font size for the title above the number (in pixels)'),
-    options: [
-      { label: t('Small (12px)'), value: 12 },
-      { label: t('Normal (14px)'), value: 14 },
-      { label: t('Medium (16px)'), value: 16 },
-      { label: t('Large (18px)'), value: 18 },
-      { label: t('XLarge (20px)'), value: 20 },
-    ],
+    placeholder: '14',
   },
 };
 
 export const headerFontSize: CustomControlItem = {
   name: 'header_font_size',
   config: {
-    type: 'SelectControl',
-    label: t('Big Number Font Size'),
+    type: 'TextControl',
+    label: t('Big Number Font Size (ratio)'),
     renderTrigger: true,
-    clearable: false,
+    isFloat: true,
     default: 0.4,
-    options: [
-      {
-        label: t('Tiny'),
-        value: 0.2,
-      },
-      {
-        label: t('Small'),
-        value: 0.3,
-      },
-      {
-        label: t('Normal'),
-        value: 0.4,
-      },
-      {
-        label: t('Large'),
-        value: 0.5,
-      },
-      {
-        label: t('Huge'),
-        value: 0.6,
-      },
-    ],
+    description: t('Font size ratio for the big number (0.0-1.0, proportion of available height)'),
+    placeholder: '0.4',
   },
 };
 
 export const subheaderFontSize: CustomControlItem = {
   name: 'subheader_font_size',
   config: {
-    type: 'SelectControl',
-    label: t('Percentage Font Size'),
+    type: 'TextControl',
+    label: t('Percentage Font Size (ratio)'),
     renderTrigger: true,
-    clearable: false,
+    isFloat: true,
     default: 0.15,
-    description: t('Font size for the percentage/comparison text'),
-    options: [
-      {
-        label: t('Tiny'),
-        value: 0.125,
-      },
-      {
-        label: t('Small'),
-        value: 0.15,
-      },
-      {
-        label: t('Normal'),
-        value: 0.2,
-      },
-      {
-        label: t('Large'),
-        value: 0.3,
-      },
-      {
-        label: t('Huge'),
-        value: 0.4,
-      },
-    ],
+    description: t('Font size ratio for the percentage/comparison text (0.0-1.0)'),
+    placeholder: '0.15',
   },
 };
 
@@ -113,7 +66,7 @@ export const layoutMode: CustomControlItem = {
     label: t('Layout Mode'),
     renderTrigger: true,
     clearable: false,
-    default: 'classic',
+    default: 'ptm',
     description: t('Choose between classic or PTM custom layout'),
     options: [
       { label: t('Classic'), value: 'classic' },
@@ -202,19 +155,27 @@ export const additionalText: CustomControlItem = {
 export const additionalTextFontSize: CustomControlItem = {
   name: 'additional_text_font_size',
   config: {
-    type: 'SelectControl',
-    label: t('Additional Text Font Size'),
+    type: 'TextControl',
+    label: t('Additional Text Font Size (px)'),
     renderTrigger: true,
-    clearable: false,
+    isInt: true,
     default: 12,
-    description: t('Font size for additional text'),
-    options: [
-      { label: t('Tiny (10px)'), value: 10 },
-      { label: t('Small (12px)'), value: 12 },
-      { label: t('Normal (14px)'), value: 14 },
-      { label: t('Large (16px)'), value: 16 },
-    ],
+    description: t('Font size for additional text (in pixels)'),
+    placeholder: '12',
     visibility: ({ controls }: any) => Boolean(controls?.additional_text?.value),
+  },
+};
+
+export const autofit: CustomControlItem = {
+  name: 'autofit',
+  config: {
+    type: 'CheckboxControl',
+    label: t('Autofit Font Sizes'),
+    renderTrigger: true,
+    default: true,
+    description: t(
+      'When enabled, font sizes will scale proportionally to fit all content in the card. When disabled, configured sizes are used strictly (may clip if card is too small).',
+    ),
   },
 };
 

@@ -29,6 +29,7 @@ import {
   getClientErrorObject,
   getCategoricalSchemeRegistry,
   promiseTimeout,
+  getExtensionsRegistry,
 } from '@superset-ui/core';
 import {
   addChart,
@@ -362,11 +363,56 @@ export function saveDashboardRequest(data, id, saveType) {
       );
     };
 
-    const onCopySuccess = response => {
+    // Call dashboard save extension hooks (e.g., PTM auto-convert)
+    const callDashboardSaveHooks = async (mode = 'update') => {
+      const registry = getExtensionsRegistry();
+      const hook = registry.get('dashboard.save.before');
+      if (hook) {
+        const state = getState();
+        const { sliceEntities } = state;
+        try {
+          await hook({
+            dashboard: {
+              tags: data.tags || [],
+              metadata: data.metadata || {},
+            },
+            slices: sliceEntities?.slices || {},
+            mode,
+          });
+        } catch (error) {
+          console.warn('Dashboard save hook failed:', error);
+          // Don't throw - allow save to continue
+        }
+      }
+    };
+
+    const onCopySuccess = async response => {
       const lastModifiedTime = response.json.result.last_modified_time;
+      const newDashboardId = response.json.result.id;
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
       }
+      
+      // Call dashboard save extension hooks (e.g., PTM auto-convert) for copy mode
+      const registry = getExtensionsRegistry();
+      const hook = registry.get('dashboard.save.before');
+      if (hook) {
+        try {
+          await hook({
+            dashboard: {
+              tags: data.tags || [],
+              metadata: data.metadata || {},
+            },
+            slices: {}, // Empty for copy mode - hook will fetch slices itself
+            mode: 'copy',
+            newDashboardId,
+          });
+        } catch (error) {
+          console.warn('Dashboard save hook failed during copy:', error);
+          // Continue anyway - don't block dashboard creation
+        }
+      }
+      
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
       dispatch(
@@ -376,7 +422,7 @@ export function saveDashboardRequest(data, id, saveType) {
         }),
       );
       dispatch(saveDashboardFinished());
-      navigateTo(`/superset/dashboard/${response.json.result.id}/`);
+      navigateTo(`/superset/dashboard/${newDashboardId}/`);
       dispatch(addSuccessToast(t('This dashboard was saved successfully.')));
       return response;
     };
@@ -409,15 +455,38 @@ export function saveDashboardRequest(data, id, saveType) {
         }
 
         // fetch datasets to make sure they are up to date
-        SupersetClient.get({
-          endpoint: `/api/v1/dashboard/${id}/datasets`,
-          headers: { 'Content-Type': 'application/json' },
-        }).then(({ json }) => {
-          const datasources = json?.result ?? [];
-          if (datasources.length) {
-            dispatch(setDatasources(datasources));
-          }
-        });
+        // Wrap in try-catch and handle promise rejection to prevent uncaught errors
+        try {
+          SupersetClient.get({
+            endpoint: `/api/v1/dashboard/${id}/datasets`,
+            headers: { 'Content-Type': 'application/json' },
+          })
+            .then(({ json }) => {
+              const datasources = json?.result ?? [];
+              if (datasources.length) {
+                dispatch(setDatasources(datasources));
+              }
+            })
+            .catch(error => {
+              // Silently fail - datasets endpoint may not exist, return 404, or dashboard may not have datasets
+              // This is not critical for dashboard save functionality
+              // Handle Response objects (which SupersetClient throws) and error objects
+              const status = error instanceof Response 
+                ? error.status 
+                : error?.status || error?.response?.status || error?.statusCode;
+              
+              // Only log non-404 errors (404 is expected if dashboard has no datasets)
+              if (status !== 404 && status !== undefined) {
+                console.debug('Could not fetch dashboard datasets:', error);
+              }
+              
+              // Return a resolved promise to prevent unhandled rejection
+              return Promise.resolve();
+            });
+        } catch (error) {
+          // Handle any synchronous errors
+          console.debug('Error setting up datasets fetch:', error);
+        }
       }
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
@@ -476,14 +545,18 @@ export function saveDashboardRequest(data, id, saveType) {
               }),
             };
 
-      const updateDashboard = () =>
-        SupersetClient.put({
+      const updateDashboard = async () => {
+        // Call dashboard save extension hooks (e.g., PTM auto-convert)
+        await callDashboardSaveHooks('update');
+        
+        return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${id}`,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedDashboard),
         })
           .then(response => onUpdateSuccess(response))
           .catch(response => onError(response));
+      };
       return new Promise((resolve, reject) => {
         if (
           !isFeatureEnabled(FeatureFlag.ConfirmDashboardDiff) ||

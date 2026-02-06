@@ -39,6 +39,7 @@ import { registerPtmFilterBarExtension } from './extensions/filterBarRegistry';
 import { registerPtmSliceHeaderControlsExtension } from './extensions/sliceHeaderControlsRegistry';
 import { registerPtmDataReliabilityExtension } from './extensions/dataReliabilityRegistry';
 import { registerPtmChartLoadingExtension } from './extensions/chartLoadingRegistry';
+import { registerPtmDashboardSaveExtension } from './extensions/dashboardSaveRegistry';
 import { registerPtmPlugins } from './plugins/registerPtmPlugins';
 
 let applied = false;
@@ -73,6 +74,7 @@ export function applyPTMExtensions(): void {
     registerPtmDataReliabilityExtension();
   }
   registerPtmChartLoadingExtension();
+  registerPtmDashboardSaveExtension();
   if (isPtmChartPluginsEnabled()) {
     registerPtmPlugins();
   }

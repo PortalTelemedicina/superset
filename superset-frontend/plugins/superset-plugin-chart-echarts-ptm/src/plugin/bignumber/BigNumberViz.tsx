@@ -345,16 +345,16 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     }
   }
 
-  renderAdditionalText() {
+  renderAdditionalText(scaledFontSize?: number) {
     const { additionalText, additionalTextFontSize } = this.props;
-    
-    if (!additionalText) return null;
+
+    if (!additionalText || additionalText.trim() === '') return null;
 
     return (
       <div
         className="additional-text"
         style={{
-          fontSize: additionalTextFontSize || 12,
+          fontSize: scaledFontSize ?? additionalTextFontSize ?? 12,
         }}
       >
         {additionalText}
@@ -390,36 +390,160 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       showTrendLine,
       title,
       titleFontSize,
+      showIcon,
+      additionalText,
+      autofit = true,
     } = this.props;
     const className = this.getClassName();
 
-    // Calculate badge font size from subheaderFontSize control
-    // Use a smaller multiplier for the badge to keep it compact
+    // Calculate responsive padding and gap based on card height
+    const sizeUnit = 8;
+    // Responsive padding: scales between 12px (min) and 24px (max) based on height
+    const responsivePad = Math.max(
+      sizeUnit * 1.5,
+      Math.min(sizeUnit * 3, (height / 151) * sizeUnit * 2.5)
+    );
+    // Responsive gap: scales between 8px (min) and 16px (max) based on height
+    const responsiveGap = Math.max(
+      sizeUnit * 1,
+      Math.min(sizeUnit * 2, (height / 151) * sizeUnit * 1.5)
+    );
+
+    // Base configured font sizes
+    const baseTitleFontSize = titleFontSize || 14;
+    const baseHeaderFontSize = headerFontSize || 0.4;
+    const baseSubheaderFontSize = subheaderFontSize || 0.15;
+    const baseAdditionalTextFontSize = this.props.additionalTextFontSize || 12;
+
+    // Calculate fixed element heights (not scaled)
+    const padding = responsivePad * 2;
+    const headerRowHeight = (showIcon || this.props.subheader) ? 40 + responsiveGap : 0;
+    const trendlineHeight = showTrendLine ? 60 + responsiveGap : 0;
+    const totalGaps =
+      (title ? 1 : 0) +
+      (additionalText ? 1 : 0) +
+      (showTrendLine ? 1 : 0) +
+      (headerRowHeight > 0 ? 1 : 0);
+
+    // Calculate target layout heights with configured sizes
+    // First, estimate available height for header assuming configured sizes for title/additional text
+    const targetTitleHeight = title ? baseTitleFontSize * 1.3 + responsiveGap : 0;
+    const targetAdditionalTextHeight = additionalText 
+      ? baseAdditionalTextFontSize * 1.4 * 2 + responsiveGap 
+      : 0;
+    
+    // Calculate available height for the header (big number) with configured sizes
+    const availableHeightForHeader = Math.max(
+      height -
+        padding -
+        headerRowHeight -
+        targetTitleHeight -
+        targetAdditionalTextHeight -
+        trendlineHeight -
+        totalGaps * responsiveGap,
+      30
+    );
+
+    // Calculate target header height based on configured ratio
+    const targetHeaderHeight = availableHeightForHeader * baseHeaderFontSize;
+
+    // Calculate total target height with configured sizes
+    const totalTargetHeight = 
+      padding +
+      headerRowHeight +
+      targetTitleHeight +
+      targetHeaderHeight +
+      targetAdditionalTextHeight +
+      trendlineHeight +
+      totalGaps * responsiveGap;
+
+    // Calculate scale factor if autofit is enabled and content exceeds available space
+    let scaleFactor = 1;
+    if (autofit && totalTargetHeight > height) {
+      // Calculate fixed height (doesn't scale)
+      const fixedHeight = padding + headerRowHeight + trendlineHeight + totalGaps * responsiveGap;
+      const availableForVariable = height - fixedHeight;
+      
+      // Approximate scale factor: scale variable elements proportionally
+      // Account for the fact that header height depends on available height, which increases
+      // as we scale down title/additionalText. Use a conservative estimate.
+      const variableHeight = targetTitleHeight + targetHeaderHeight + targetAdditionalTextHeight;
+      if (variableHeight > 0) {
+        // Use a slightly more aggressive scale factor to account for the feedback effect
+        // where scaling down title/additionalText frees up space for header
+        const baseScale = availableForVariable / variableHeight;
+        // Apply a small adjustment to account for header height dependency
+        scaleFactor = Math.max(
+          0.5, // Minimum scale factor to prevent too small text
+          baseScale * 0.95 // Slight reduction to ensure it fits
+        );
+      }
+    }
+
+    // Apply scale factor to font sizes
+    const scaledTitleFontSize = autofit 
+      ? Math.max(10, baseTitleFontSize * scaleFactor) // Min 10px for readability
+      : baseTitleFontSize;
+    const scaledHeaderFontSize = autofit
+      ? baseHeaderFontSize * scaleFactor
+      : baseHeaderFontSize;
+    const scaledSubheaderFontSize = autofit
+      ? baseSubheaderFontSize * scaleFactor
+      : baseSubheaderFontSize;
+    const scaledAdditionalTextFontSize = autofit
+      ? Math.max(10, baseAdditionalTextFontSize * scaleFactor) // Min 10px for readability
+      : baseAdditionalTextFontSize;
+
+    // Recalculate heights with scaled sizes
+    const scaledTitleHeight = title ? scaledTitleFontSize * 1.3 + responsiveGap : 0;
+    const scaledAdditionalTextHeight = additionalText
+      ? scaledAdditionalTextFontSize * 1.4 * 2 + responsiveGap
+      : 0;
+    
+    const availableHeight = Math.max(
+      height -
+        padding -
+        headerRowHeight -
+        scaledTitleHeight -
+        scaledAdditionalTextHeight -
+        trendlineHeight -
+        totalGaps * responsiveGap,
+      30
+    );
+    const headerMaxHeight = Math.max(availableHeight * scaledHeaderFontSize, 30);
+
+    // Calculate badge font size from scaled subheaderFontSize
     const badgeFontSize = Math.max(
-      Math.ceil(subheaderFontSize * height * 0.08),
+      Math.ceil(scaledSubheaderFontSize * height * 0.08),
       12 // Minimum 12px for readability
     );
 
     return (
-      <div className={`${className} ptm-layout`} style={{ height }}>
+      <div
+        className={`${className} ptm-layout`}
+        style={{
+          height: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          '--pad': `${responsivePad}px`,
+          '--gap': `${responsiveGap}px`,
+        } as React.CSSProperties}
+      >
         <div className="ptm-header-row">
           {this.renderIcon()}
           {this.renderTrendBadge(badgeFontSize)}
         </div>
-        
+
         {title && (
-          <div 
-            className="ptm-title"
-            style={{ fontSize: titleFontSize || 14 }}
-          >
+          <div className="ptm-title" style={{ fontSize: scaledTitleFontSize }}>
             {title}
           </div>
         )}
-        
+
         {this.renderFallbackWarning()}
-        {this.renderHeader(Math.ceil(headerFontSize * height))}
-        {this.renderAdditionalText()}
-        
+        {this.renderHeader(headerMaxHeight)}
+        {this.renderAdditionalText(scaledAdditionalTextFontSize)}
+
         {showTrendLine && (
           <div className="ptm-bottom-trendline">
             {this.renderTrendline(60)}
@@ -436,30 +560,36 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       kickerFontSize,
       headerFontSize,
       subheaderFontSize,
+      title,
     } = this.props;
     const className = this.getClassName();
+    const sizeUnit = 8;
+    const padding = sizeUnit * 2 * 2;
+    const titleHeight = title ? (this.props.titleFontSize || 14) * 1.4 + sizeUnit * 2 : 0;
 
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
-      const allTextHeight = height - chartHeight;
+      const allTextHeight = height - chartHeight - padding - titleHeight;
 
       return (
-        <div className={className}>
+        <div
+          className={className}
+          style={{ height: '100%', boxSizing: 'border-box', overflow: 'hidden' }}
+        >
           {this.renderTitle()}
-          <div className="text-container" style={{ height: allTextHeight }}>
+          <div className="text-container" style={{ height: allTextHeight, minHeight: 0 }}>
             {this.renderFallbackWarning()}
             {this.renderKicker(
-              Math.ceil(
-                (kickerFontSize || 0) * (1 - PROPORTION.TRENDLINE) * height,
-              ),
+              Math.ceil((kickerFontSize || 0) * (1 - PROPORTION.TRENDLINE) * allTextHeight),
             )}
             {this.renderHeader(
-              Math.ceil(headerFontSize * (1 - PROPORTION.TRENDLINE) * height),
+              Math.max(
+                Math.ceil(headerFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight),
+                30
+              ),
             )}
             {this.renderSubheader(
-              Math.ceil(
-                subheaderFontSize * (1 - PROPORTION.TRENDLINE) * height,
-              ),
+              Math.ceil(subheaderFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight),
             )}
           </div>
           {this.renderTrendline(chartHeight)}
@@ -467,13 +597,21 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       );
     }
 
+    const availableHeight = height - padding - titleHeight;
+    const kickerHeight = (kickerFontSize || 0) * availableHeight;
+    const subheaderHeight = subheaderFontSize * availableHeight;
+    const headerAvailableHeight = availableHeight - kickerHeight - subheaderHeight - sizeUnit * 2;
+
     return (
-      <div className={className} style={{ height }}>
+      <div
+        className={className}
+        style={{ height: '100%', boxSizing: 'border-box', overflow: 'hidden' }}
+      >
         {this.renderTitle()}
         {this.renderFallbackWarning()}
-        {this.renderKicker((kickerFontSize || 0) * height)}
-        {this.renderHeader(Math.ceil(headerFontSize * height))}
-        {this.renderSubheader(Math.ceil(subheaderFontSize * height))}
+        {this.renderKicker(kickerHeight)}
+        {this.renderHeader(Math.max(Math.ceil(headerFontSize * headerAvailableHeight), 30))}
+        {this.renderSubheader(Math.ceil(subheaderHeight))}
       </div>
     );
   }
@@ -498,9 +636,15 @@ export default styled(BigNumberVis)`
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     padding: ${tok.sizeUnit * 2}px ${tok.sizeUnit * 3}px;
+    box-sizing: border-box;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
 
     &.no-trendline .subheader-line {
       padding-bottom: 0.3em;
@@ -549,10 +693,14 @@ export default styled(BigNumberVis)`
       font-family: 'Montserrat', ${tok.fontFamily};
       font-weight: 700;
       position: relative;
-      line-height: 1em;
+      line-height: 1.1;
       white-space: nowrap;
       color: ${tok.colorTextHeading};
       margin-bottom: ${tok.sizeUnit}px;
+      display: flex;
+      align-items: center;
+      min-height: 0;
+      overflow: visible;
       span {
         position: absolute;
         bottom: 0;
@@ -598,15 +746,27 @@ export default styled(BigNumberVis)`
 
     /* PTM Layout Specific Styles */
     &.ptm-layout {
-      padding: ${tok.sizeUnit * 3}px;
-      gap: ${tok.sizeUnit * 2}px;
+      /* Responsive padding and gap using CSS custom properties with clamp() */
+      --pad: clamp(${tok.sizeUnit * 1.5}px, ${tok.sizeUnit * 2.5}px, ${tok.sizeUnit * 3}px);
+      --gap: clamp(${tok.sizeUnit * 1}px, ${tok.sizeUnit * 1.5}px, ${tok.sizeUnit * 2}px);
+      padding: var(--pad);
+      row-gap: var(--gap);
+      box-sizing: border-box;
+      overflow: hidden;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
 
       .ptm-header-row {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         width: 100%;
-        margin-bottom: ${tok.sizeUnit * 2}px;
+        margin-bottom: 0;
+        flex-shrink: 0;
+        min-width: 0;
       }
 
       .ptm-icon-container {
@@ -654,27 +814,49 @@ export default styled(BigNumberVis)`
         font-family: 'Montserrat', ${tok.fontFamily};
         font-weight: 400;
         color: ${tok.colorTextSecondary};
-        margin-bottom: ${tok.sizeUnit}px;
-        line-height: 1.3;
+        margin-bottom: 0;
+        line-height: clamp(1.2, 1.3, 1.4);
+        flex-shrink: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
       }
 
       .header-line {
-        margin-bottom: ${tok.sizeUnit}px;
+        margin-bottom: 0;
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+        overflow: visible;
+        width: 100%;
+        line-height: clamp(1.0, 1.1, 1.2);
+        display: flex;
+        align-items: center;
       }
 
       .additional-text {
         font-family: 'Montserrat', ${tok.fontFamily};
         font-weight: 400;
         color: ${tok.colorTextSecondary};
-        line-height: 1.5;
-        margin-top: ${tok.sizeUnit}px;
+        line-height: clamp(1.3, 1.4, 1.5);
+        margin-top: 0;
+        flex-shrink: 0;
+        width: 100%;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 1em;
       }
 
       .ptm-bottom-trendline {
-        margin-top: ${tok.sizeUnit * 2}px;
+        margin-top: 0;
         width: 100%;
         height: 60px;
         overflow: hidden;
+        flex-shrink: 0;
       }
     }
   `;

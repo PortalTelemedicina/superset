@@ -115,7 +115,7 @@ def validate_json_metadata(value: Union[bytes, bytearray, str]) -> None:
         raise ValidationError(errors)
 
 
-EXTENSION_METADATA_KEYS = ("headerLayout", "portal_header_layout", "portalHeaderLayout")
+EXTENSION_METADATA_KEYS = ("headerLayout", "portal_header_layout", "portalHeaderLayout", "ptm_autoconvert")
 
 
 def normalize_dashboard_metadata(
@@ -202,6 +202,7 @@ class DashboardJSONMetadataSchema(Schema):
     native_filter_migration = fields.Dict()
     # Extension-owned dashboard metadata (kept for backward compatibility)
     headerLayout = fields.Dict(allow_none=True)
+    ptm_autoconvert = fields.Boolean(allow_none=True)
 
     @pre_load
     def normalize_extension_metadata(  # pylint: disable=unused-argument

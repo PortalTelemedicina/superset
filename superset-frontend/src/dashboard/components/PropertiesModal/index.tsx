@@ -22,6 +22,7 @@ import jsonStringify from 'json-stringify-pretty-compact';
 import {
   AsyncSelect,
   Button,
+  Checkbox,
   Col,
   Form,
   FormItem,
@@ -129,6 +130,7 @@ const PropertiesModal = ({
   const [roles, setRoles] = useState<Roles>([]);
   const saveLabel = onlyApply ? t('Apply') : t('Save');
   const [tags, setTags] = useState<TagType[]>([]);
+  const [ptmAutoconvert, setPtmAutoconvert] = useState(false);
   const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
   const originalDashboardMetadata = useRef<Record<string, any>>({});
 
@@ -222,6 +224,7 @@ const PropertiesModal = ({
 
       setJsonMetadata(metaDataCopy ? jsonStringify(metaDataCopy) : '');
       originalDashboardMetadata.current = metadata;
+      setPtmAutoconvert(metadata?.ptm_autoconvert === true);
     },
     [form],
   );
@@ -396,6 +399,8 @@ const PropertiesModal = ({
       // Ensure color-related fields from updatedDashboardMetadata are preserved
       label_colors: customLabelColors,
       color_scheme: updatedColorScheme,
+      // Include PTM autoconvert flag
+      ptm_autoconvert: ptmAutoconvert,
     };
     
     currentJsonMetadata = jsonStringify(completeMetadata);
@@ -756,6 +761,32 @@ const PropertiesModal = ({
             </Col>
           </Row>
         ) : null}
+        <Row>
+          <Col xs={24} md={24}>
+            <Typography.Title level={4} style={{ marginTop: '1em' }}>
+              {t('PTM Settings')}
+            </Typography.Title>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col xs={24} md={24}>
+            <FormItem
+              name="ptmAutoconvert"
+              valuePropName="checked"
+              extra={t(
+                'When enabled, all charts on this dashboard will be automatically converted to their PTM equivalents when saving. This affects all charts globally (not just this dashboard).',
+              )}
+            >
+              <Checkbox
+                checked={ptmAutoconvert}
+                onChange={e => setPtmAutoconvert(e.target.checked)}
+                disabled={isLoading}
+              >
+                {t('Auto-convert charts to PTM versions')}
+              </Checkbox>
+            </FormItem>
+          </Col>
+        </Row>
         <Row>
           <Col xs={24} md={24}>
             <Typography.Title level={4} style={{ marginTop: '1em' }}>

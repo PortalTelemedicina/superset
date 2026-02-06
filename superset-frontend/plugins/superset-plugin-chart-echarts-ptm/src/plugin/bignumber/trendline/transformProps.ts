@@ -51,7 +51,6 @@ export default function transformProps(
     queriesData,
     formData,
     rawFormData,
-    theme,
     hooks,
     inContextMenu,
     datasource: { currencyFormats = {}, columnFormats = {} },
@@ -73,7 +72,7 @@ export default function transformProps(
     yAxisFormat,
     currencyFormat,
     timeRangeFixed,
-    layoutMode = 'classic',
+    layoutMode = 'ptm',
     showIcon = false,
     iconName = 'Activity',
     iconSize = 24,
@@ -81,6 +80,7 @@ export default function transformProps(
     iconBackgroundColor = '#F5F5F5',
     additionalText = '',
     additionalTextFontSize = 12,
+    autofit = true,
   } = formData;
   const granularity = extractTimegrain(rawFormData);
   const {
@@ -232,7 +232,8 @@ export default function transformProps(
                 },
                 {
                   offset: 1,
-                  color: theme.colors.grayscale.light5,
+                  // Fade to transparent white, matching PTM area gradient pattern
+                  color: 'rgba(255, 255, 255, 0)',
                 },
               ]),
             },
@@ -300,6 +301,7 @@ export default function transformProps(
     iconBackgroundColor,
     additionalText,
     additionalTextFontSize,
+    autofit,
   };
 }
 

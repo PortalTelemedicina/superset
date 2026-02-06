@@ -37,6 +37,7 @@ import {
   iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
+  autofit,
 } from '../sharedControls';
 
 export default {
@@ -71,6 +72,7 @@ export default {
       expanded: true,
       controlSetRows: [
         [layoutMode],
+        [autofit],
         [titleFontSize],
         [headerFontSize],
         [subheaderFontSize],

@@ -207,6 +207,16 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   justify-content: normal !important;
 }
 
+/* PTM BigNumber: ensure card and chart fill available height */
+[data-test-viz-type^="ptm_big_number"] .dashboard-component-chart-holder,
+[data-test-viz-type^="ptm_big_number"] .dashboard-chart,
+[data-test-viz-type^="ptm_big_number"] .chart-container,
+[data-test-viz-type^="ptm_big_number"] .slice_container,
+[data-test-viz-type^="ptm_big_number"] .superset-legacy-chart-big-number {
+  height: 100% !important;
+  max-height: none !important;
+}
+
 /* === HIDE UI ELEMENTS === */
 .filter-counts {
   display: none !important;
