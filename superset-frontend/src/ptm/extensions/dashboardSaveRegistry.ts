@@ -20,7 +20,12 @@
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { SupersetClient } from '@superset-ui/core';
 import rison from 'rison';
-import { isPtmDashboard, getPtmChartMapping } from '../utils/ptmChartMapping';
+import {
+  getPtmChartMapping,
+  getLegacyChartMapping,
+  isPtmAutoconvertEnabled,
+  isPtmVizType,
+} from '../utils/ptmChartMapping';
 import type { DashboardSaveHookArgs } from '@superset-ui/core';
 
 type PtmFormData = Record<string, unknown> & {
@@ -41,17 +46,105 @@ const getVizType = (
 };
 
 /**
+ * Revert PTM charts to legacy equivalents (when auto-convert is turned off).
+ */
+async function revertPtmCharts(
+  slices: Record<
+    string,
+    {
+      form_data?: Record<string, unknown>;
+      slice_name?: string;
+      datasource?: string | number;
+    }
+  >,
+): Promise<void> {
+  const revertPromises: Promise<unknown>[] = [];
+
+  for (const sliceId in slices) {
+    const slice = slices[sliceId];
+    const formData = slice.form_data ?? {};
+    const currentVizType = getVizType(formData);
+
+    if (!currentVizType || !isPtmVizType(currentVizType)) continue;
+
+    const ptmSeriesType =
+      typeof formData.ptm_series_type === 'string'
+        ? formData.ptm_series_type
+        : undefined;
+    const legacyVizType = getLegacyChartMapping(currentVizType, ptmSeriesType);
+    if (!legacyVizType) continue;
+
+    const updatedFormData: Record<string, unknown> = {
+      ...formData,
+      viz_type: legacyVizType,
+    };
+    delete updatedFormData.ptm_series_type;
+
+    let datasourceId = formData.datasource_id;
+    let datasourceType = formData.datasource_type || 'table';
+    if (!datasourceId && slice.datasource) {
+      const parts = String(slice.datasource).split('__');
+      if (parts.length === 2) {
+        datasourceId = parseInt(parts[0], 10);
+        datasourceType = parts[1].toLowerCase();
+      }
+    }
+
+    revertPromises.push(
+      SupersetClient.put({
+        endpoint: `/api/v1/chart/${sliceId}`,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          params: JSON.stringify(updatedFormData),
+          viz_type: legacyVizType,
+          slice_name: slice.slice_name,
+          datasource_id: datasourceId,
+          datasource_type: datasourceType,
+        }),
+      }).catch(error => {
+        console.warn(
+          `Failed to revert chart ${sliceId} (${slice.slice_name}) to legacy:`,
+          error,
+        );
+      }),
+    );
+  }
+
+  if (revertPromises.length > 0) {
+    await Promise.allSettled(revertPromises);
+  }
+}
+
+/**
  * PTM dashboard save hook handler.
- * Converts charts to PTM equivalents when PTM autoconvert is enabled.
+ * Toggle between new (PTM) and original (legacy) chart versions:
+ * - When "Use PTM" is on: convert charts to PTM equivalents on save.
+ * - When "Use PTM" is off or unset: revert any PTM charts to legacy on save.
+ * Tag PTM does not affect this; only the dashboard metadata flag does.
  */
 async function ptmDashboardSaveHook(
   args: DashboardSaveHookArgs,
 ): Promise<void> {
   const { dashboard, slices, mode, newDashboardId } = args;
+  const metadata = dashboard?.metadata ?? {};
+  const usePtmVersions = metadata.ptm_autoconvert === true;
 
-  // Check if this is a PTM dashboard
-  if (!isPtmDashboard(dashboard)) {
-    return; // Not a PTM dashboard, skip conversion
+  // Use legacy: revert any PTM charts to original versions (update mode only).
+  // Skip entirely when there are no PTM charts (e.g. already reverted) to avoid unnecessary API calls.
+  if (!usePtmVersions && mode === 'update' && Object.keys(slices).length > 0) {
+    const hasAnyPtmChart = Object.values(slices).some(slice => {
+      const vizType = getVizType(slice.form_data);
+      return !!vizType && isPtmVizType(vizType);
+    });
+    if (hasAnyPtmChart) {
+      await revertPtmCharts(slices);
+    }
+    return;
+  }
+
+  // Use PTM: convert only when ptm_autoconvert is explicitly true
+  if (!isPtmAutoconvertEnabled(dashboard)) {
+    return;
   }
 
   // For copy mode, we need to fetch slices from the new dashboard
@@ -214,6 +307,58 @@ async function ptmDashboardSaveHook(
   // Wait for all conversions to complete (or fail gracefully)
   if (conversionPromises.length > 0) {
     await Promise.allSettled(conversionPromises);
+  }
+}
+
+/**
+ * Revert all PTM charts on a dashboard to legacy equivalents.
+ * Used when saving from the Properties modal with auto-convert turned off.
+ */
+export async function revertPtmChartsForDashboard(
+  dashboardId: number,
+): Promise<void> {
+  try {
+    const dashResponse = await SupersetClient.get({
+      endpoint: `/api/v1/dashboard/${dashboardId}`,
+    });
+    const dashboardData = dashResponse.json.result;
+    const sliceList = dashboardData.slices ?? [];
+    if (sliceList.length === 0) return;
+
+    const sliceIds = sliceList.map((s: { id: number }) => s.id);
+    const chartsResponse = await SupersetClient.get({
+      endpoint: `/api/v1/chart/?q=${rison.encode({
+        filters: [{ col: 'id', opr: 'in', value: sliceIds }],
+      })}`,
+    });
+    const charts = chartsResponse.json.result ?? [];
+
+    const slices: Record<
+      string,
+      {
+        form_data?: Record<string, unknown>;
+        slice_name?: string;
+        datasource?: string | number;
+      }
+    > = {};
+    charts.forEach((chart: { id: number; params?: string; slice_name?: string; datasource_id?: number; datasource_type?: string }) => {
+      const formData = (chart.params ? JSON.parse(chart.params) : {}) as Record<string, unknown>;
+      slices[String(chart.id)] = {
+        form_data: { ...formData, datasource_id: chart.datasource_id, datasource_type: chart.datasource_type },
+        slice_name: chart.slice_name,
+        datasource: chart.datasource_id,
+      };
+    });
+
+    const hasAnyPtmChart = Object.values(slices).some(s => {
+      const vizType = getVizType(s.form_data);
+      return !!vizType && isPtmVizType(vizType);
+    });
+    if (hasAnyPtmChart) {
+      await revertPtmCharts(slices);
+    }
+  } catch (error) {
+    console.warn('Failed to revert PTM charts for dashboard:', error);
   }
 }
 

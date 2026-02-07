@@ -22,7 +22,6 @@ import jsonStringify from 'json-stringify-pretty-compact';
 import {
   AsyncSelect,
   Button,
-  Checkbox,
   Col,
   Form,
   FormItem,
@@ -31,6 +30,7 @@ import {
   JsonEditor,
   Modal,
   Row,
+  Switch,
   Typography,
 } from '@superset-ui/core/components';
 import { useJsonValidation } from '@superset-ui/core/components/AsyncAceEditor';
@@ -67,6 +67,7 @@ import {
 } from 'src/dashboard/actions/dashboardState';
 import { areObjectsEqual } from 'src/reduxUtils';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
+import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
 
 const StyledJsonEditor = styled(JsonEditor)`
   /* Border is already applied by AceEditor itself */
@@ -435,20 +436,26 @@ const PropertiesModal = ({
       onHide();
       addSuccessToast(t('Dashboard properties updated'));
     } else {
-      SupersetClient.put({
-        endpoint: `/api/v1/dashboard/${dashboardId}`,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dashboard_title: title,
-          slug: slug || null,
-          json_metadata: currentJsonMetadata || null,
-          owners: (owners || []).map(o => o.id),
-          certified_by: certifiedBy || null,
-          certification_details:
-            certifiedBy && certificationDetails ? certificationDetails : null,
-          ...morePutProps,
-        }),
-      }).then(() => {
+      const saveDashboard = async () => {
+        if (!ptmAutoconvert) {
+          await revertPtmChartsForDashboard(dashboardId);
+        }
+        return SupersetClient.put({
+          endpoint: `/api/v1/dashboard/${dashboardId}`,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dashboard_title: title,
+            slug: slug || null,
+            json_metadata: currentJsonMetadata || null,
+            owners: (owners || []).map(o => o.id),
+            certified_by: certifiedBy || null,
+            certification_details:
+              certifiedBy && certificationDetails ? certificationDetails : null,
+            ...morePutProps,
+          }),
+        });
+      };
+      saveDashboard().then(() => {
         onSubmit(onSubmitProps);
         onHide();
         addSuccessToast(t('The dashboard has been saved'));
@@ -773,17 +780,16 @@ const PropertiesModal = ({
             <FormItem
               name="ptmAutoconvert"
               valuePropName="checked"
+              label={t('Use PTM chart versions (new UI)')}
               extra={t(
-                'When enabled, all charts on this dashboard will be automatically converted to their PTM equivalents when saving. This affects all charts globally (not just this dashboard).',
+                'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted when you save. You can switch between new and original at any time.',
               )}
             >
-              <Checkbox
+              <Switch
                 checked={ptmAutoconvert}
-                onChange={e => setPtmAutoconvert(e.target.checked)}
+                onChange={checked => setPtmAutoconvert(checked)}
                 disabled={isLoading}
-              >
-                {t('Auto-convert charts to PTM versions')}
-              </Checkbox>
+              />
             </FormItem>
           </Col>
         </Row>

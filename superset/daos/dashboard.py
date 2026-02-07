@@ -24,6 +24,7 @@ from flask import g
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 
 from superset import is_feature_enabled, security_manager
+from superset.dashboards.schemas import EXTENSION_METADATA_KEYS
 from superset.commands.dashboard.exceptions import (
     DashboardAccessDeniedError,
     DashboardForbiddenError,
@@ -264,6 +265,17 @@ class DashboardDAO(BaseDAO[Dashboard]):
         md["map_label_colors"] = data.get("map_label_colors", {})
         md["color_scheme_domain"] = data.get("color_scheme_domain", [])
         md["cross_filters_enabled"] = data.get("cross_filters_enabled", True)
+
+        # Preserve extension-owned metadata (e.g. ptm_autoconvert, headerLayout)
+        # so the frontend toggle and other extension state are persisted.
+        if is_feature_enabled("PTM_EXTENSION_ENABLED"):
+            for key in EXTENSION_METADATA_KEYS:
+                if key in data:
+                    md[key] = data[key]
+        else:
+            for key in EXTENSION_METADATA_KEYS:
+                md.pop(key, None)
+
         dashboard.json_metadata = json.dumps(md)
 
     @staticmethod

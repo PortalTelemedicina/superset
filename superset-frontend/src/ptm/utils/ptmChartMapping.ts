@@ -27,18 +27,19 @@
 const PTM_TAG_NAME = 'PTM';
 
 /**
- * Check if a dashboard is a PTM dashboard based on tags or metadata flag
+ * Check if a dashboard is a PTM dashboard based on tags or metadata flag.
+ * Used for theme/CSS (e.g. tag PTM). For save-hook conversion, use isPtmAutoconvertEnabled instead.
  */
 export function isPtmDashboard(
   dashboard: { tags?: Array<{ name?: string }>; metadata?: { ptm_autoconvert?: boolean } } | null | undefined,
 ): boolean {
   if (!dashboard) return false;
-  
+
   // Check metadata flag
   if (dashboard.metadata?.ptm_autoconvert === true) {
     return true;
   }
-  
+
   // Check PTM tag
   const tags = dashboard.tags;
   if (Array.isArray(tags)) {
@@ -46,8 +47,19 @@ export function isPtmDashboard(
       t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME,
     );
   }
-  
+
   return false;
+}
+
+/**
+ * Whether PTM auto-convert is explicitly enabled for this dashboard.
+ * Only the metadata flag is used; the PTM tag does not trigger conversion.
+ * Use this in the save hook to decide convert vs revert.
+ */
+export function isPtmAutoconvertEnabled(
+  dashboard: { metadata?: { ptm_autoconvert?: boolean } } | null | undefined,
+): boolean {
+  return dashboard?.metadata?.ptm_autoconvert === true;
 }
 
 /**
@@ -105,4 +117,51 @@ export function getPtmChartMapping(vizType: string): PtmChartMapping | null {
  */
 export function hasPtmEquivalent(vizType: string): boolean {
   return vizType in PTM_CHART_TYPE_MAP;
+}
+
+/**
+ * Reverse mapping: PTM viz_type (and optional ptm_series_type) -> legacy viz_type.
+ * Used when reverting auto-converted charts.
+ */
+const PTM_TO_LEGACY_MAP: Record<
+  string,
+  string | ((ptmSeriesType?: string) => string)
+> = {
+  ptm_big_number_total: 'big_number_total',
+  ptm_big_number_trendline: 'big_number_with_trendline',
+  ptm_pie: 'pie',
+  ptm_table: 'table',
+  ptm_mixed_timeseries: 'mixed_timeseries',
+  ptm_pivot_table: 'pivot_table_v2',
+  ptm_echarts_timeseries: (ptmSeriesType?: string) => {
+    const map: Record<string, string> = {
+      bar: 'echarts_timeseries_bar',
+      line: 'echarts_timeseries_line',
+      smooth: 'echarts_timeseries_smooth',
+      step: 'echarts_timeseries_step',
+      auto: 'echarts_timeseries',
+    };
+    return map[ptmSeriesType ?? 'auto'] ?? 'echarts_timeseries';
+  },
+};
+
+/**
+ * Get legacy chart viz_type for a PTM chart (for revert).
+ * Returns null if the viz_type is not a known PTM type.
+ */
+export function getLegacyChartMapping(
+  ptmVizType: string,
+  ptmSeriesType?: string,
+): string | null {
+  const entry = PTM_TO_LEGACY_MAP[ptmVizType];
+  if (entry == null) return null;
+  if (typeof entry === 'function') return entry(ptmSeriesType);
+  return entry;
+}
+
+/**
+ * Check if a viz_type is a PTM chart type (can be reverted to legacy).
+ */
+export function isPtmVizType(vizType: string): boolean {
+  return vizType in PTM_TO_LEGACY_MAP;
 }
