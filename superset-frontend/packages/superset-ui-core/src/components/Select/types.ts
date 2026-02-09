@@ -167,6 +167,12 @@ export interface BaseSelectProps extends AntdExposedProps {
   ref: Ref<RefSelectProps>;
 
   dropdownStyle?: React.CSSProperties;
+
+  /**
+   * Ant Design Select styles (e.g. styles.popup.root).
+   * Prefer this over deprecated dropdownStyle when possible.
+   */
+  styles?: AntdProps['styles'];
 }
 
 export interface SelectProps extends BaseSelectProps {

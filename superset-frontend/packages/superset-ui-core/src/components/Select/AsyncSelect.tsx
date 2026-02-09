@@ -144,6 +144,7 @@ const AsyncSelect = forwardRef(
       getPopupContainer,
       oneLine,
       maxTagCount: propsMaxTagCount,
+      dropdownStyle,
       ...props
     }: AsyncSelectProps,
     ref: RefObject<AsyncSelectRef>,
@@ -641,6 +642,27 @@ const AsyncSelect = forwardRef(
           }
           oneLine={oneLine}
           {...props}
+          styles={
+            dropdownStyle
+              ? {
+                  ...props.styles,
+                  popup: {
+                    ...(typeof props.styles?.popup === 'object' &&
+                    props.styles?.popup !== null
+                      ? props.styles.popup
+                      : {}),
+                    root: {
+                      ...(typeof props.styles?.popup === 'object' &&
+                      props.styles?.popup !== null &&
+                      props.styles?.popup?.root != null
+                        ? props.styles.popup.root
+                        : {}),
+                      ...dropdownStyle,
+                    },
+                  },
+                }
+              : props.styles
+          }
           ref={ref}
         />
       </StyledContainer>
