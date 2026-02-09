@@ -36,8 +36,14 @@ BABEL_DEFAULT_LOCALE = 'pt_BR'
 
 
 def override_bootstrap_locale(data):
-    if data.get("locale") == "pt":
+    from flask import current_app
+
+    locale = data.get("locale")
+    if locale == "pt":
         data["locale"] = "pt_BR"
+    elif locale == "en":
+        # Use default locale when server sent "en" (e.g. get_locale() was None)
+        data["locale"] = current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
     return data
 
 
@@ -118,15 +124,24 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
+    "ALLOW_FULL_CSV_EXPORT": True,  # Show "Export to full .CSV" and "Export to full Excel" in chart menus
     "TAGGING_SYSTEM": True,
     "PTM_EXTENSION_ENABLED": True,
+    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,  # Enable Playwright for full-page screenshots
 }
+
+# Tiled screenshot configuration for large dashboards
+# These settings enable capturing full-height dashboards by taking multiple screenshots
+# and stitching them together, preventing PDF reports from being cut off
+SCREENSHOT_TILED_ENABLED = True  # Enable tiled screenshots for large dashboards
+SCREENSHOT_TILED_CHART_THRESHOLD = 20  # Minimum charts to trigger tiled screenshots
+SCREENSHOT_TILED_HEIGHT_THRESHOLD = 5000  # Minimum height (px) to trigger tiled screenshots
+SCREENSHOT_TILED_VIEWPORT_HEIGHT = 2000  # Height of each tile in pixels
+
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = f"http://superset_app{os.environ.get('SUPERSET_APP_ROOT', '/')}/"  # When using docker compose baseurl should be http://superset_nginx{ENV{BASEPATH}}/  # noqa: E501
+WEBDRIVER_BASEURL = "http://superset:8088/"  # docker-compose service name
 # The base URL for the email report hyperlinks.
-WEBDRIVER_BASEURL_USER_FRIENDLY = (
-    f"http://localhost:8888/{os.environ.get('SUPERSET_APP_ROOT', '/')}/"
-)
+WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 SQLLAB_CTAS_NO_LIMIT = True
 
 log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
