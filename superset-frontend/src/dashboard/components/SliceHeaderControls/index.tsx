@@ -323,6 +323,7 @@ const SliceHeaderControls = (
     isCached = [],
   } = props;
   const isTable = slice.viz_type === VizType.Table;
+  const isPtmTable = slice.viz_type === 'ptm_table';
   const isPivotTable = slice.viz_type === VizType.PivotTable;
   const cachedWhen = (cachedDttm || []).map(itemCachedDttm =>
     extendedDayjs.utc(itemCachedDttm).fromNow(),
@@ -530,7 +531,7 @@ const SliceHeaderControls = (
         },
         ...(isFeatureEnabled(FeatureFlag.AllowFullCsvExport) &&
         props.supersetCanCSV &&
-        isTable
+        (isTable || isPtmTable)
           ? [
               {
                 key: MenuKeys.ExportFullCsv,
