@@ -36,7 +36,7 @@ interface DashboardInfo {
 
 export interface HeaderDropdownProps {
   addSuccessToast: (msg: string) => void;
-  addDangerToast: () => void;
+  addDangerToast: (msg: string) => void;
   customCss: string;
   colorNamespace?: string;
   colorScheme?: string;

@@ -144,6 +144,8 @@ export type DashboardInfo = {
     shared_label_colors: string[];
     map_label_colors: JsonObject;
     cross_filters_enabled: boolean;
+    ptm_locked?: boolean;
+    ptm_autoconvert?: boolean;
   };
   crossFiltersEnabled: boolean;
   filterBarOrientation: FilterBarOrientation;

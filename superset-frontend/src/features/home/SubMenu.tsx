@@ -25,10 +25,10 @@ import {
 } from 'react';
 
 import { Link, useHistory } from 'react-router-dom';
-import { styled, SupersetTheme, css, t, useTheme } from '@superset-ui/core';
+import { styled, css, t, useTheme } from '@superset-ui/core';
 import cx from 'classnames';
 import { debounce } from 'lodash';
-import { Menu, MenuMode, MainNav } from '@superset-ui/core/components/Menu';
+import { Menu, MenuMode } from '@superset-ui/core/components/Menu';
 import {
   Button,
   Tooltip,
@@ -116,19 +116,6 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
       position: relative;
       margin-left: ${({ theme }) => theme.sizeUnit * 2}px;
     }
-  }
-`;
-
-const styledDisabled = (theme: SupersetTheme) => css`
-  color: ${theme.colorTextDisabled};
-  cursor: not-allowed;
-
-  &:hover {
-    color: ${theme.colorTextDisabled};
-  }
-
-  .ant-menu-item-selected {
-    background-color: ${theme.colorBgContainerDisabled};
   }
 `;
 
