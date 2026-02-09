@@ -37,6 +37,10 @@ import { getUrlParam } from 'src/utils/urlUtils';
 import { MenuKeys, RootState } from 'src/dashboard/types';
 import { HeaderDropdownProps } from 'src/dashboard/components/Header/types';
 import { updateDashboardTheme } from 'src/dashboard/actions/dashboardInfo';
+import { setDashboardMetadata } from 'src/dashboard/actions/dashboardState';
+import { SupersetClient } from '@superset-ui/core';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
+import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
 
 export const useHeaderActionsMenu = ({
   customCss,
@@ -78,6 +82,10 @@ export const useHeaderActionsMenu = ({
   const directPathToChild = useSelector(
     (state: RootState) => state.dashboardState.directPathToChild,
   );
+  const currentMetadata = useSelector(
+    (state: RootState) => state.dashboardInfo?.metadata ?? {},
+  );
+  const ptmLocked = currentMetadata.ptm_locked === true;
 
   useEffect(() => {
     if (customCss !== css) {
@@ -120,6 +128,57 @@ export const useHeaderActionsMenu = ({
         case MenuKeys.ManageEmbedded:
           manageEmbedded();
           break;
+        case MenuKeys.PtmLock:
+        case MenuKeys.PtmUnlock: {
+          const locked = key === MenuKeys.PtmLock;
+          const metadata = { ...currentMetadata, ptm_locked: locked };
+          SupersetClient.get({
+            endpoint: `/api/v1/dashboard/${dashboardId}`,
+          })
+            .then(({ json }) => {
+              const dash = json.result;
+              const existing = dash.json_metadata
+                ? JSON.parse(dash.json_metadata)
+                : {};
+              const merged = { ...existing, ptm_locked: locked };
+              return SupersetClient.put({
+                endpoint: `/api/v1/dashboard/${dashboardId}`,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  dashboard_title: dash.dashboard_title,
+                  slug: dash.slug,
+                  json_metadata: JSON.stringify(merged),
+                  owners: (dash.owners ?? []).map((o: { id: number }) => o.id),
+                  certified_by: dash.certified_by,
+                  certification_details: dash.certification_details,
+                }),
+              });
+            })
+            .then(() => {
+              dispatch(setDashboardMetadata(metadata));
+              addSuccessToast(
+                locked
+                  ? t('PTM changes locked for this dashboard')
+                  : t('PTM changes unlocked'),
+              );
+            })
+            .catch(err => {
+              addDangerToast(
+                err?.message || t('Failed to update dashboard'),
+              );
+            });
+          break;
+        }
+        case MenuKeys.PtmRevertToLegacy: {
+          revertPtmChartsForDashboard(dashboardId)
+            .then(() => {
+              addSuccessToast(t('Charts reverted to legacy versions'));
+            })
+            .catch(() => {
+              addDangerToast(t('Failed to revert charts'));
+            });
+          break;
+        }
         default:
           break;
       }
@@ -128,8 +187,12 @@ export const useHeaderActionsMenu = ({
     [
       forceRefreshAllCharts,
       addSuccessToast,
+      addDangerToast,
       showPropertiesModal,
       manageEmbedded,
+      dashboardId,
+      currentMetadata,
+      dispatch,
     ],
   );
 
@@ -328,6 +391,21 @@ export const useHeaderActionsMenu = ({
       );
     }
 
+    // PTM Lock / Unlock and Revert (when extension enabled and user can edit)
+    if (isPtmExtensionEnabled() && userCanEdit) {
+      menuItems.push({
+        key: ptmLocked ? MenuKeys.PtmUnlock : MenuKeys.PtmLock,
+        label: ptmLocked
+          ? t('Unlock PTM changes')
+          : t('Lock PTM changes'),
+      });
+      menuItems.push({ type: 'divider', key: 'ptm_divider' });
+      menuItems.push({
+        key: MenuKeys.PtmRevertToLegacy,
+        label: t('Revert charts to Legacy'),
+      });
+    }
+
     // Auto-refresh interval
     menuItems.push(
       createModalMenuItem(
@@ -373,6 +451,7 @@ export const useHeaderActionsMenu = ({
     lastModifiedTime,
     layout,
     onSave,
+    ptmLocked,
     refreshFrequency,
     refreshLimit,
     refreshWarning,

@@ -229,6 +229,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "tags.name",
         "tags.type",
         "uuid",
+        "json_metadata",
     ]
 
     list_select_columns = list_columns + ["changed_on", "created_on", "changed_by_fk"]

@@ -524,6 +524,19 @@ export function saveDashboardRequest(data, id, saveType) {
     ) {
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
+      const metadataToSend = {
+        ...(cleanedData?.metadata || {}),
+        default_filters: safeStringify(serializedFilters),
+        filter_scopes: serializedFilterScopes,
+        chart_configuration: chartConfiguration,
+        global_chart_configuration: globalChartConfiguration,
+      };
+      // Do not persist PTM keys when extension is disabled (e.g. production).
+      // Prevents ptm_autoconvert/ptm_locked from being written when using same build against prod DB.
+      if (getState().common?.feature_flags?.PTM_EXTENSION_ENABLED !== true) {
+        delete metadataToSend.ptm_autoconvert;
+        delete metadataToSend.ptm_locked;
+      }
       const updatedDashboard =
         saveType === SAVE_TYPE_OVERWRITE_CONFIRMED
           ? data
@@ -536,13 +549,7 @@ export function saveDashboardRequest(data, id, saveType) {
               owners: cleanedData.owners,
               roles: cleanedData.roles,
               tags: cleanedData.tags || [],
-              json_metadata: safeStringify({
-                ...(cleanedData?.metadata || {}),
-                default_filters: safeStringify(serializedFilters),
-                filter_scopes: serializedFilterScopes,
-                chart_configuration: chartConfiguration,
-                global_chart_configuration: globalChartConfiguration,
-              }),
+              json_metadata: safeStringify(metadataToSend),
             };
 
       const updateDashboard = async () => {
@@ -609,11 +616,16 @@ export function saveDashboardRequest(data, id, saveType) {
     }
     cleanedData.metadata.default_filters = safeStringify(serializedFilters);
     cleanedData.metadata.filter_scopes = serializedFilterScopes;
+    const copyMetadata = { ...cleanedData.metadata };
+    if (getState().common?.feature_flags?.PTM_EXTENSION_ENABLED !== true) {
+      delete copyMetadata.ptm_autoconvert;
+      delete copyMetadata.ptm_locked;
+    }
     const copyPayload = {
       dashboard_title: cleanedData.dashboard_title,
       css: cleanedData.css,
       duplicate_slices: cleanedData.duplicate_slices,
-      json_metadata: JSON.stringify(cleanedData.metadata),
+      json_metadata: JSON.stringify(copyMetadata),
     };
 
     return SupersetClient.post({

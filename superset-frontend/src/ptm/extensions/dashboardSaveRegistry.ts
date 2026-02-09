@@ -20,10 +20,10 @@
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { SupersetClient } from '@superset-ui/core';
 import rison from 'rison';
+import { isPtmExtensionEnabled } from '../config/featureFlags';
 import {
   getPtmChartMapping,
   getLegacyChartMapping,
-  isPtmAutoconvertEnabled,
   isPtmVizType,
 } from '../utils/ptmChartMapping';
 import type { DashboardSaveHookArgs } from '@superset-ui/core';
@@ -125,8 +125,18 @@ async function revertPtmCharts(
 async function ptmDashboardSaveHook(
   args: DashboardSaveHookArgs,
 ): Promise<void> {
+  // Do not run PTM conversion when the extension is disabled (e.g. production).
+  if (!isPtmExtensionEnabled()) {
+    return;
+  }
   const { dashboard, slices, mode, newDashboardId } = args;
   const metadata = dashboard?.metadata ?? {};
+
+  if (metadata.ptm_locked === true) {
+    return;
+  }
+
+  // Only strict true means "use PTM". false, undefined, or any other value must never trigger conversion.
   const usePtmVersions = metadata.ptm_autoconvert === true;
 
   // Use legacy: revert any PTM charts to original versions (update mode only).
@@ -142,8 +152,9 @@ async function ptmDashboardSaveHook(
     return;
   }
 
-  // Use PTM: convert only when ptm_autoconvert is explicitly true
-  if (!isPtmAutoconvertEnabled(dashboard)) {
+  // Never convert unless ptm_autoconvert is explicitly true. Presence of the key with value false
+  // (e.g. after adding it to metadata) must not trigger conversion.
+  if (metadata.ptm_autoconvert !== true) {
     return;
   }
 

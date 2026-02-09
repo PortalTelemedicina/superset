@@ -67,6 +67,7 @@ import {
 } from 'src/dashboard/actions/dashboardState';
 import { areObjectsEqual } from 'src/reduxUtils';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
 
 const StyledJsonEditor = styled(JsonEditor)`
@@ -132,6 +133,7 @@ const PropertiesModal = ({
   const saveLabel = onlyApply ? t('Apply') : t('Save');
   const [tags, setTags] = useState<TagType[]>([]);
   const [ptmAutoconvert, setPtmAutoconvert] = useState(false);
+  const [ptmLocked, setPtmLocked] = useState(false);
   const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
   const originalDashboardMetadata = useRef<Record<string, any>>({});
 
@@ -210,7 +212,11 @@ const PropertiesModal = ({
         metadata,
       };
 
-      form.setFieldsValue(dashboardInfo);
+      const ptmAutoconvertValue = metadata?.ptm_autoconvert === true;
+      form.setFieldsValue({
+        ...dashboardInfo,
+        ptmAutoconvert: ptmAutoconvertValue,
+      });
       setDashboardInfo(dashboardInfo);
       setOwners(owners);
       setRoles(roles);
@@ -225,7 +231,8 @@ const PropertiesModal = ({
 
       setJsonMetadata(metaDataCopy ? jsonStringify(metaDataCopy) : '');
       originalDashboardMetadata.current = metadata;
-      setPtmAutoconvert(metadata?.ptm_autoconvert === true);
+      setPtmAutoconvert(ptmAutoconvertValue);
+      setPtmLocked(metadata?.ptm_locked === true);
     },
     [form],
   );
@@ -394,16 +401,20 @@ const PropertiesModal = ({
     // CRITICAL FIX: Merge the edited metadata with the complete dashboard metadata
     // This preserves native_filters, positions, and other properties that are
     // intentionally hidden from the JSON editor
-    const completeMetadata = {
-      ...originalDashboardMetadata.current,  // Start with complete metadata
-      ...metadata,                             // Override with user edits from JSON editor
+    const completeMetadata: Record<string, unknown> = {
+      ...originalDashboardMetadata.current, // Start with complete metadata
+      ...metadata, // Override with user edits from JSON editor
       // Ensure color-related fields from updatedDashboardMetadata are preserved
       label_colors: customLabelColors,
       color_scheme: updatedColorScheme,
-      // Include PTM autoconvert flag
-      ptm_autoconvert: ptmAutoconvert,
     };
-    
+    // Only include PTM flags when the extension is enabled (avoid persisting in production)
+    if (isPtmExtensionEnabled()) {
+      completeMetadata.ptm_autoconvert = ptmAutoconvert;
+      completeMetadata.ptm_locked =
+        originalDashboardMetadata.current?.ptm_locked ?? ptmLocked;
+    }
+
     currentJsonMetadata = jsonStringify(completeMetadata);
 
     const moreOnSubmitProps: { roles?: Roles; tags?: TagType[] } = {};
@@ -437,7 +448,7 @@ const PropertiesModal = ({
       addSuccessToast(t('Dashboard properties updated'));
     } else {
       const saveDashboard = async () => {
-        if (!ptmAutoconvert) {
+        if (isPtmExtensionEnabled() && !ptmAutoconvert) {
           await revertPtmChartsForDashboard(dashboardId);
         }
         return SupersetClient.put({
@@ -623,10 +634,15 @@ const PropertiesModal = ({
   }, [dashboardId]);
 
   const handleChangeTags = (tags: { label: string; value: number }[]) => {
-    const parsedTags: TagType[] = ensureIsArray(tags).map(r => ({
+    let parsedTags: TagType[] = ensureIsArray(tags).map(r => ({
       id: r.value,
       name: r.label,
     }));
+    if (ptmLocked) {
+      parsedTags = parsedTags.filter(
+        tag => String(tag.name || '').toUpperCase() !== 'PTM',
+      );
+    }
     setTags(parsedTags);
   };
 
@@ -768,31 +784,50 @@ const PropertiesModal = ({
             </Col>
           </Row>
         ) : null}
-        <Row>
-          <Col xs={24} md={24}>
-            <Typography.Title level={4} style={{ marginTop: '1em' }}>
-              {t('PTM Settings')}
-            </Typography.Title>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col xs={24} md={24}>
-            <FormItem
-              name="ptmAutoconvert"
-              valuePropName="checked"
-              label={t('Use PTM chart versions (new UI)')}
-              extra={t(
-                'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted when you save. You can switch between new and original at any time.',
-              )}
-            >
-              <Switch
-                checked={ptmAutoconvert}
-                onChange={checked => setPtmAutoconvert(checked)}
-                disabled={isLoading}
-              />
-            </FormItem>
-          </Col>
-        </Row>
+        {isPtmExtensionEnabled() && (
+          <>
+            <Row>
+              <Col xs={24} md={24}>
+                <Typography.Title level={4} style={{ marginTop: '1em' }}>
+                  {t('PTM Settings')}
+                </Typography.Title>
+              </Col>
+            </Row>
+            {ptmLocked ? (
+              <Row gutter={16}>
+                <Col xs={24} md={24}>
+                  <Typography.Text type="secondary">
+                    {t(
+                      'PTM changes are locked for this dashboard. Unlock from the dashboard Actions menu to change.',
+                    )}
+                  </Typography.Text>
+                </Col>
+              </Row>
+            ) : (
+              <Row gutter={16}>
+                <Col xs={24} md={24}>
+                  <FormItem
+                    name="ptmAutoconvert"
+                    valuePropName="checked"
+                    label={t('Use PTM chart versions (new UI)')}
+                    extra={t(
+                      'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted when you save. You can switch between new and original at any time.',
+                    )}
+                  >
+                    <Switch
+                      checked={ptmAutoconvert}
+                      onChange={checked => {
+                        setPtmAutoconvert(checked);
+                        form.setFieldsValue({ ptmAutoconvert: checked });
+                      }}
+                      disabled={isLoading}
+                    />
+                  </FormItem>
+                </Col>
+              </Row>
+            )}
+          </>
+        )}
         <Row>
           <Col xs={24} md={24}>
             <Typography.Title level={4} style={{ marginTop: '1em' }}>
