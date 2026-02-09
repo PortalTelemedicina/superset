@@ -16,7 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ReactNode, useState, useEffect, FunctionComponent } from 'react';
+import {
+  ReactNode,
+  useState,
+  useEffect,
+  useMemo,
+  FunctionComponent,
+} from 'react';
 
 import { Link, useHistory } from 'react-router-dom';
 import { styled, SupersetTheme, css, t, useTheme } from '@superset-ui/core';
@@ -160,8 +166,6 @@ export interface SubMenuProps {
   backgroundColor?: string;
 }
 
-const { SubMenu } = MainNav;
-
 const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
   const [showMenu, setMenu] = useState<MenuMode>('horizontal');
   const [navRightStyle, setNavRightStyle] = useState('nav-right');
@@ -201,6 +205,47 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
   }, [props.buttons]);
+
+  const dropDownMenuItems = useMemo(
+    () =>
+      props.dropDownLinks?.map((link, i) => ({
+        key: `dropdown-${i}`,
+        label: link.label,
+        icon: <Icons.CaretDownOutlined />,
+        popupOffset: [10, 20] as [number, number],
+        popupClassName: 'dropdown-menu-links',
+        children: link.childs
+          ?.map(item => {
+            if (typeof item !== 'object') return null;
+            if (item.disable) {
+              return {
+                key: item.label,
+                label: (
+                  <Tooltip
+                    placement="top"
+                    title={t(
+                      "Enable 'Allow file uploads to database' in any database's settings",
+                    )}
+                  >
+                    <span>{item.label}</span>
+                  </Tooltip>
+                ),
+                disabled: true,
+              };
+            }
+            return {
+              key: item.label,
+              label: (
+                <Typography.Link href={item.url} onClick={item.onClick}>
+                  {item.label}
+                </Typography.Link>
+              ),
+            };
+          })
+          .filter(Boolean),
+      })),
+    [props.dropDownLinks],
+  );
 
   return (
     <StyledHeader backgroundColor={props.backgroundColor}>
@@ -248,52 +293,19 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
           })}
         />
         <div className={navRightStyle}>
-          <Menu mode="horizontal" triggerSubMenuAction="click" disabledOverflow>
-            {props.dropDownLinks?.map((link, i) => (
-              <SubMenu
-                css={css`
-                  [data-icon='caret-down'] {
-                    color: ${theme.colorIcon};
-                    font-size: ${theme.fontSizeXS}px;
-                    margin-left: ${theme.sizeUnit}px;
-                  }
-                `}
-                key={i}
-                title={link.label}
-                icon={<Icons.CaretDownOutlined />}
-                popupOffset={[10, 20]}
-                className="dropdown-menu-links"
-              >
-                {link.childs?.map(item => {
-                  if (typeof item === 'object') {
-                    return item.disable ? (
-                      <MainNav.Item
-                        key={item.label}
-                        css={styledDisabled}
-                        disabled
-                      >
-                        <Tooltip
-                          placement="top"
-                          title={t(
-                            "Enable 'Allow file uploads to database' in any database's settings",
-                          )}
-                        >
-                          {item.label}
-                        </Tooltip>
-                      </MainNav.Item>
-                    ) : (
-                      <MainNav.Item key={item.label}>
-                        <Typography.Link href={item.url} onClick={item.onClick}>
-                          {item.label}
-                        </Typography.Link>
-                      </MainNav.Item>
-                    );
-                  }
-                  return null;
-                })}
-              </SubMenu>
-            ))}
-          </Menu>
+          <Menu
+            mode="horizontal"
+            triggerSubMenuAction="click"
+            disabledOverflow
+            items={dropDownMenuItems}
+            css={css`
+              [data-icon='caret-down'] {
+                color: ${theme.colorIcon};
+                font-size: ${theme.fontSizeXS}px;
+                margin-left: ${theme.sizeUnit}px;
+              }
+            `}
+          />
           {props.buttons?.map((btn, i) => (
             <Button
               key={i}

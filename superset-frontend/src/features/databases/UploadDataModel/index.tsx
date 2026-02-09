@@ -626,9 +626,7 @@ const UploadDataModal: FunctionComponent<UploadDataModalProps> = ({
                   <Row>
                     <Col span={24}>
                       <StyledFormItem
-                        label={t('%(label)s file', {
-                          label: extensionsToLabel[type],
-                        })}
+                        label={`${extensionsToLabel[type]} ${t('file')}`}
                         name="file"
                         required
                         rules={[{ validator: validateUpload }]}
