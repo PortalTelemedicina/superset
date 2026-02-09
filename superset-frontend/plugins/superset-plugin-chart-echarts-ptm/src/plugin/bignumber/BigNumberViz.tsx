@@ -33,18 +33,6 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import Echart from './EchartWrapper';
 import { BigNumberVizProps } from './types';
 
-const MONTSERRAT_FONT_ID = 'ptm-montserrat-font';
-const loadMontserratFont = () => {
-  if (typeof document !== 'undefined' && !document.getElementById(MONTSERRAT_FONT_ID)) {
-    const link = document.createElement('link');
-    link.id = MONTSERRAT_FONT_ID;
-    link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap';
-    document.head.appendChild(link);
-  }
-};
-loadMontserratFont();
-
 const defaultNumberFormatter = getNumberFormatter();
 
 const PROPORTION = {
@@ -632,7 +620,7 @@ export default styled(BigNumberVis)`
   ${({ theme }) => {
     const tok = getThemeTokens(theme);
     return `
-    font-family: 'Montserrat', ${tok.fontFamily};
+    font-family: 'Inter', ${tok.fontFamily};
     position: relative;
     display: flex;
     flex-direction: column;
@@ -667,7 +655,7 @@ export default styled(BigNumberVis)`
 
     /* PTM: Card title above the number */
     .card-title {
-      font-family: 'Montserrat', ${tok.fontFamily};
+      font-family: 'Inter', ${tok.fontFamily};
       font-weight: 500;
       font-size: 14px;
       color: ${tok.colorTextSecondary};
@@ -678,7 +666,7 @@ export default styled(BigNumberVis)`
 
     /* PTM: Kicker/Headline - shows timestamp */
     .kicker {
-      font-family: 'Montserrat', ${tok.fontFamily};
+      font-family: 'Inter', ${tok.fontFamily};
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -690,7 +678,7 @@ export default styled(BigNumberVis)`
 
     /* PTM: Main big number */
     .header-line {
-      font-family: 'Montserrat', ${tok.fontFamily};
+      font-family: 'Inter', ${tok.fontFamily};
       font-weight: 700;
       position: relative;
       line-height: 1.1;
@@ -709,7 +697,7 @@ export default styled(BigNumberVis)`
 
     /* PTM: Subheader below the number - description/percentage */
     .subheader-line {
-      font-family: 'Montserrat', ${tok.fontFamily};
+      font-family: 'Inter', ${tok.fontFamily};
       font-weight: 500;
       line-height: 1.4em;
       color: ${tok.colorTextSecondary};
@@ -804,14 +792,14 @@ export default styled(BigNumberVis)`
         }
 
         .trend-badge-text {
-          font-family: 'Montserrat', ${tok.fontFamily};
+          font-family: 'Inter', ${tok.fontFamily};
           font-weight: 500;
           line-height: 1;
         }
       }
 
       .ptm-title {
-        font-family: 'Montserrat', ${tok.fontFamily};
+        font-family: 'Inter', ${tok.fontFamily};
         font-weight: 400;
         color: ${tok.colorTextSecondary};
         margin-bottom: 0;
@@ -836,7 +824,7 @@ export default styled(BigNumberVis)`
       }
 
       .additional-text {
-        font-family: 'Montserrat', ${tok.fontFamily};
+        font-family: 'Inter', ${tok.fontFamily};
         font-weight: 400;
         color: ${tok.colorTextSecondary};
         line-height: clamp(1.3, 1.4, 1.5);

@@ -19,16 +19,6 @@
 import { css, styled } from '@superset-ui/core';
 import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
-// PTM: Load Inter font for pivot tables
-const PTM_INTER_FONT_ID = 'ptm-inter-font-pivot';
-if (typeof document !== 'undefined' && !document.getElementById(PTM_INTER_FONT_ID)) {
-  const link = document.createElement('link');
-  link.id = PTM_INTER_FONT_ID;
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap';
-  document.head.appendChild(link);
-}
-
 export default styled.div`
   ${({ theme }) => {
     const tok = getThemeTokens(theme);

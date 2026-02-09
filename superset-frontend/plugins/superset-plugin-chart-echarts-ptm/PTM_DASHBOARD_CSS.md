@@ -6,7 +6,7 @@ Copy and paste this CSS into **Dashboard > Edit > CSS** to apply the Portal Tele
 
 ## ⚠️ Important: Loading Custom Fonts
 
-Superset's CSS editor **does not allow `@import`** statements. To use the custom fonts (Montserrat and Inter), you have two options:
+Superset's CSS editor **does not allow `@import`** statements. To use the custom font (Inter), you have two options:
 
 ### Option 1: Add a Markdown Component (Recommended)
 
@@ -15,13 +15,12 @@ Superset's CSS editor **does not allow `@import`** statements. To use the custom
 3. Paste this HTML in the Markdown content:
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 ```
 
 ### Option 2: Use System Font Fallbacks
 
 If you can't add the Markdown component, the CSS below will automatically fall back to system fonts that look similar:
-- Montserrat → system-ui, -apple-system, BlinkMacSystemFont
 - Inter → system-ui, -apple-system, BlinkMacSystemFont
 
 ---
@@ -58,7 +57,7 @@ If you can't add the Markdown component, the CSS below will automatically fall b
   --ptm-neutral-600: #222222;
   
   /* Fonts with system fallbacks */
-  --ptm-font-title: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ptm-font-title: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
   --ptm-radius-sm: 8px;
@@ -342,14 +341,14 @@ If you want a lighter version:
 /* PTM Dashboard - Minimal Theme */
 
 /* NOTE: To load fonts, add a Markdown component with:
-   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 */
 
 :root {
   --ptm-primary: #2C9FE5;
   --ptm-neutral-100: #F7F7F6;
   --ptm-neutral-white: #FFFFFF;
-  --ptm-font-title: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --ptm-font-title: 'Inter', system-ui, -apple-system, sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 

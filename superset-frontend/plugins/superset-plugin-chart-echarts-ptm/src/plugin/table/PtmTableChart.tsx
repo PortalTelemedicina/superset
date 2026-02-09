@@ -668,7 +668,7 @@ import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/form
             th {
               border-right: 2px solid ${tok.colorBorder};
             }
-            th:first-child {
+            th:first-of-type {
               border-left: none;
             }
             th:last-child {

@@ -132,7 +132,7 @@ export const PTM_CHART_COLORS = PTM_COLOR_PALETTES.mixed.colors;
 
 export const PTM_TYPOGRAPHY = {
   fontFamily: {
-    title: "'Montserrat', sans-serif",
+    title: "'Inter', sans-serif",
     body: "'Inter', sans-serif",
   },
   fontSize: {
