@@ -19,7 +19,7 @@
 import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
-import { getExtensionsRegistry, t, useTheme } from '@superset-ui/core';
+import { getExtensionsRegistry, SupersetClient, t, useTheme } from '@superset-ui/core';
 import {
   DashboardExtensionsContext,
   type DashboardExtensionsValue,
@@ -67,6 +67,7 @@ import SyncDashboardState, {
   getDashboardContextLocalStorage,
 } from '../components/SyncDashboardState';
 import OverwriteConfirm from '../components/OverwriteConfirm';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 
 export const DashboardPageIdContext = createContext('');
 
@@ -193,14 +194,32 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
         dataMask = isOldRison;
       }
 
-      if (readyToRender) {
+      if (readyToRender && dashboard) {
         if (!isDashboardHydrated.current) {
           isDashboardHydrated.current = true;
+        }
+        let dashboardToHydrate = dashboard;
+        if (isPtmExtensionEnabled()) {
+          try {
+            const { json } = await SupersetClient.get({
+              endpoint: `/api/v1/dashboard/${idOrSlug}/has_shared_charts`,
+            });
+            const hasSharedCharts = (json as { result?: boolean })?.result === true;
+            dashboardToHydrate = {
+              ...dashboard,
+              metadata: {
+                ...dashboard.metadata,
+                has_shared_charts: hasSharedCharts,
+              },
+            };
+          } catch {
+            // Non-fatal: proceed without has_shared_charts
+          }
         }
         dispatch(
           hydrateDashboard({
             history,
-            dashboard,
+            dashboard: dashboardToHydrate,
             charts,
             activeTabs,
             dataMask,

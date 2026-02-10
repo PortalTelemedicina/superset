@@ -134,6 +134,7 @@ const PropertiesModal = ({
   const [tags, setTags] = useState<TagType[]>([]);
   const [ptmAutoconvert, setPtmAutoconvert] = useState(false);
   const [ptmLocked, setPtmLocked] = useState(false);
+  const [hasSharedCharts, setHasSharedCharts] = useState(false);
   const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
   const originalDashboardMetadata = useRef<Record<string, any>>({});
 
@@ -233,6 +234,10 @@ const PropertiesModal = ({
       originalDashboardMetadata.current = metadata;
       setPtmAutoconvert(ptmAutoconvertValue);
       setPtmLocked(metadata?.ptm_locked === true);
+      setHasSharedCharts(
+        metadata?.has_shared_charts === true ||
+          metadata?.ptm_locked_reason === 'shared_charts',
+      );
     },
     [form],
   );
@@ -243,17 +248,27 @@ const PropertiesModal = ({
     // that renders this component have all the values we need.
     // At some point when we have a more consistent frontend
     // datamodel, the dashboard could probably just be passed as a prop.
-    SupersetClient.get({
-      endpoint: `/api/v1/dashboard/${dashboardId}`,
-    }).then(response => {
-      const dashboard = response.json.result;
+    Promise.all([
+      SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboardId}`,
+      }),
+      SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboardId}/has_shared_charts`,
+      }).catch(() => ({ json: { result: false } })),
+    ]).then(([dashboardResponse, hasSharedResponse]) => {
+      const dashboard = dashboardResponse.json.result;
       const jsonMetadataObj = dashboard.json_metadata?.length
         ? JSON.parse(dashboard.json_metadata)
         : {};
+      const hasSharedChartsResult =
+        (hasSharedResponse.json as { result?: boolean })?.result === true;
 
       handleDashboardData({
         ...dashboard,
-        metadata: jsonMetadataObj,
+        metadata: {
+          ...jsonMetadataObj,
+          has_shared_charts: hasSharedChartsResult,
+        },
       });
 
       setIsLoading(false);
@@ -410,9 +425,13 @@ const PropertiesModal = ({
     };
     // Only include PTM flags when the extension is enabled (avoid persisting in production)
     if (isPtmExtensionEnabled()) {
-      completeMetadata.ptm_autoconvert = ptmAutoconvert;
-      completeMetadata.ptm_locked =
-        originalDashboardMetadata.current?.ptm_locked ?? ptmLocked;
+      completeMetadata.ptm_autoconvert = hasSharedCharts ? false : ptmAutoconvert;
+      completeMetadata.ptm_locked = hasSharedCharts
+        ? true
+        : (originalDashboardMetadata.current?.ptm_locked ?? ptmLocked);
+      if (hasSharedCharts) {
+        completeMetadata.ptm_locked_reason = 'shared_charts';
+      }
     }
 
     currentJsonMetadata = jsonStringify(completeMetadata);
@@ -793,7 +812,17 @@ const PropertiesModal = ({
                 </Typography.Title>
               </Col>
             </Row>
-            {ptmLocked ? (
+            {hasSharedCharts ? (
+              <Row gutter={16}>
+                <Col xs={24} md={24}>
+                  <Typography.Text type="secondary">
+                    {t(
+                      'This dashboard has charts shared with other dashboards. PTM is locked and cannot be unlocked. To use PTM, create charts exclusive to this dashboard or copy the dashboard with "Duplicate charts" selected.',
+                    )}
+                  </Typography.Text>
+                </Col>
+              </Row>
+            ) : ptmLocked ? (
               <Row gutter={16}>
                 <Col xs={24} md={24}>
                   <Typography.Text type="secondary">

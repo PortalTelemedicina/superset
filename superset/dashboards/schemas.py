@@ -121,6 +121,7 @@ EXTENSION_METADATA_KEYS = (
     "portalHeaderLayout",
     "ptm_autoconvert",
     "ptm_locked",
+    "ptm_locked_reason",
 )
 
 
@@ -210,6 +211,7 @@ class DashboardJSONMetadataSchema(Schema):
     headerLayout = fields.Dict(allow_none=True)
     ptm_autoconvert = fields.Boolean(allow_none=True)
     ptm_locked = fields.Boolean(allow_none=True)
+    ptm_locked_reason = fields.Str(allow_none=True)
 
     @pre_load
     def normalize_extension_metadata(  # pylint: disable=unused-argument

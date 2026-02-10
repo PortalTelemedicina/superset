@@ -36,7 +36,10 @@ from superset.dashboards.filters import DashboardAccessFilter, is_uuid
 from superset.exceptions import SupersetSecurityException
 from superset.extensions import db
 from superset.models.core import FavStar, FavStarClassName
-from superset.models.dashboard import Dashboard, id_or_slug_filter
+from sqlalchemy import select
+from sqlalchemy.sql import func
+
+from superset.models.dashboard import Dashboard, dashboard_slices, id_or_slug_filter
 from superset.models.embedded_dashboard import EmbeddedDashboard
 from superset.models.slice import Slice
 from superset.utils import json
@@ -90,6 +93,33 @@ class DashboardDAO(BaseDAO[Dashboard]):
     @staticmethod
     def get_charts_for_dashboard(id_or_slug: str) -> list[Slice]:
         return DashboardDAO.get_by_id_or_slug(id_or_slug).slices
+
+    @staticmethod
+    def get_has_shared_charts_by_slice_ids(slice_ids: list[int]) -> bool:
+        """
+        Return True if any of the given slice IDs appears on more than one
+        dashboard (shared chart). Used to enforce PTM lock when charts are shared.
+        """
+        if not slice_ids:
+            return False
+        subq = (
+            select(dashboard_slices.c.slice_id)
+            .where(dashboard_slices.c.slice_id.in_(slice_ids))
+            .group_by(dashboard_slices.c.slice_id)
+            .having(func.count(func.distinct(dashboard_slices.c.dashboard_id)) > 1)
+            .limit(1)
+        )
+        return db.session.execute(subq).first() is not None
+
+    @classmethod
+    def get_has_shared_charts(cls, id_or_slug: int | str) -> bool:
+        """
+        Return True if the dashboard has any chart that is also on another
+        dashboard. Used to block PTM autoconvert and force lock.
+        """
+        dashboard = cls.get_by_id_or_slug(id_or_slug)
+        slice_ids = [s.id for s in dashboard.slices]
+        return cls.get_has_shared_charts_by_slice_ids(slice_ids)
 
     @staticmethod
     def get_dashboard_changed_on(id_or_slug_or_dashboard: str | Dashboard) -> datetime:
@@ -184,6 +214,7 @@ class DashboardDAO(BaseDAO[Dashboard]):
     ) -> None:
         new_filter_scopes = {}
         md = dashboard.params_dict
+        slice_ids_from_positions: list[int] | None = None
 
         if (positions := data.get("positions")) is not None:
             # find slices in the position data
@@ -192,6 +223,8 @@ class DashboardDAO(BaseDAO[Dashboard]):
                 for value in positions.values()
                 if isinstance(value, dict)
             ]
+
+            slice_ids_from_positions = [sid for sid in slice_ids if sid is not None]
 
             current_slices = (
                 db.session.query(Slice).filter(Slice.id.in_(slice_ids)).all()
@@ -272,6 +305,19 @@ class DashboardDAO(BaseDAO[Dashboard]):
             for key in EXTENSION_METADATA_KEYS:
                 if key in data:
                     md[key] = data[key]
+            # If any chart on this dashboard is shared with another dashboard,
+            # force PTM locked with no way to unlock (user must duplicate charts
+            # or copy dashboard with duplicate charts).
+            slice_ids_for_check = (
+                slice_ids_from_positions
+                if slice_ids_from_positions is not None
+                else [s.id for s in dashboard.slices]
+            )
+            if slice_ids_for_check and DashboardDAO.get_has_shared_charts_by_slice_ids(
+                slice_ids_for_check
+            ):
+                md["ptm_locked"] = True
+                md["ptm_locked_reason"] = "shared_charts"
         else:
             for key in EXTENSION_METADATA_KEYS:
                 md.pop(key, None)

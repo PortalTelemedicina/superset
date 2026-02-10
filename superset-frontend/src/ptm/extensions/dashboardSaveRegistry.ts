@@ -135,6 +135,22 @@ async function ptmDashboardSaveHook(
     return;
   }
 
+  // Block convert/revert when dashboard has charts shared with other dashboards.
+  // Backend also forces ptm_locked in that case; this avoids any convert/revert in the same save.
+  const idToCheck = mode === 'update' ? dashboardId : mode === 'copy' ? newDashboardId : null;
+  if (idToCheck != null) {
+    try {
+      const { json } = await SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${idToCheck}/has_shared_charts`,
+      });
+      if ((json as { result?: boolean })?.result === true) {
+        return;
+      }
+    } catch {
+      // Non-fatal: proceed with hook
+    }
+  }
+
   // In update mode, Redux sliceEntities contains all charts ever loaded (e.g. from "add chart" picker),
   // not only the charts on this dashboard. Restrict to this dashboard's charts via the API.
   let slicesForDashboard = slices;

@@ -78,7 +78,6 @@ import { findPermission } from 'src/utils/findPermission';
 import { navigateTo } from 'src/utils/navigationUtils';
 import { WIDER_DROPDOWN_WIDTH } from 'src/components/ListView/utils';
 import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
-import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
 
 const PAGE_SIZE = 25;
 const PASSWORDS_NEEDED_MESSAGE = t(
@@ -189,6 +188,9 @@ function DashboardList(props: DashboardListProps) {
   );
   const [dashboardToDelete, setDashboardToDelete] =
     useState<CRUDDashboard | null>(null);
+  const [ptmDropdownOpenId, setPtmDropdownOpenId] = useState<number | null>(
+    null,
+  );
 
   const [importingDashboard, showImportModal] = useState<boolean>(false);
   const [passwordFields, setPasswordFields] = useState<string[]>([]);
@@ -457,7 +459,10 @@ function DashboardList(props: DashboardListProps) {
 
           const handlePtmAction = (key: string) => {
             const id = original.id;
+            const isLockedBySharedCharts =
+              ptmMetadata?.ptm_locked_reason === 'shared_charts';
             if (key === 'ptm_lock' || key === 'ptm_unlock') {
+              if (key === 'ptm_unlock' && isLockedBySharedCharts) return;
               const locked = key === 'ptm_lock';
               SupersetClient.get({
                 endpoint: `/api/v1/dashboard/${id}`,
@@ -492,13 +497,6 @@ function DashboardList(props: DashboardListProps) {
                 .catch(err =>
                   addDangerToast(err?.message || t('Failed to update dashboard')),
                 );
-            } else if (key === 'ptm_revert') {
-              revertPtmChartsForDashboard(id)
-                .then(() => {
-                  refreshData();
-                  addSuccessToast(t('Charts reverted to legacy versions'));
-                })
-                .catch(() => addDangerToast(t('Failed to revert charts')));
             }
           };
 
@@ -513,25 +511,92 @@ function DashboardList(props: DashboardListProps) {
                 })()
               : original.json_metadata || {};
           const ptmLocked = ptmMetadata?.ptm_locked === true;
-          const ptmMenuItems = [
-            {
-              key: 'ptm_status',
-              label: ptmLocked ? t('Status: Locked') : t('Status: Unlocked'),
-              disabled: true,
-            },
-            {
-              key: 'ptm_lock',
-              label: t('Lock PTM changes'),
-              disabled: ptmLocked,
-            },
-            {
-              key: 'ptm_unlock',
-              label: t('Unlock PTM changes'),
-              disabled: !ptmLocked,
-            },
-            { type: 'divider' as const, key: 'ptm_divider' },
-            { key: 'ptm_revert', label: t('Revert charts to Legacy') },
-          ];
+          const isLockedBySharedCharts =
+            ptmMetadata?.ptm_locked_reason === 'shared_charts';
+
+          const ptmOverlay = (
+            <div
+              role="menu"
+              className="ant-dropdown-menu ptm-actions-overlay"
+              css={{
+                minWidth: 160,
+                padding: '4px 0',
+              }}
+            >
+              <div
+                className="ant-dropdown-menu-item-disabled"
+                css={{
+                  padding: '5px 12px',
+                  color: 'var(--ant-color-text-quaternary)',
+                  fontSize: 12,
+                  cursor: 'default',
+                }}
+              >
+                {isLockedBySharedCharts
+                  ? t('Status: Locked (shared charts)')
+                  : ptmLocked
+                    ? t('Status: Locked')
+                    : t('Status: Unlocked')}
+              </div>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  handlePtmAction('ptm_lock');
+                  setPtmDropdownOpenId(null);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handlePtmAction('ptm_lock');
+                    setPtmDropdownOpenId(null);
+                  }
+                }}
+                css={{
+                  padding: '5px 12px',
+                  cursor: ptmLocked ? 'not-allowed' : 'pointer',
+                  opacity: ptmLocked ? 0.5 : 1,
+                  '&:hover': ptmLocked ? {} : { background: 'var(--ant-color-item-hover-bg)' },
+                }}
+              >
+                {t('Lock PTM changes')}
+              </div>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  if (!isLockedBySharedCharts) {
+                    handlePtmAction('ptm_unlock');
+                    setPtmDropdownOpenId(null);
+                  }
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (!isLockedBySharedCharts) {
+                      handlePtmAction('ptm_unlock');
+                      setPtmDropdownOpenId(null);
+                    }
+                  }
+                }}
+                css={{
+                  padding: '5px 12px',
+                  cursor:
+                    !ptmLocked || isLockedBySharedCharts
+                      ? 'not-allowed'
+                      : 'pointer',
+                  opacity:
+                    !ptmLocked || isLockedBySharedCharts ? 0.5 : 1,
+                  '&:hover':
+                    !ptmLocked || isLockedBySharedCharts
+                      ? {}
+                      : { background: 'var(--ant-color-item-hover-bg)' },
+                }}
+              >
+                {t('Unlock PTM changes')}
+              </div>
+            </div>
+          );
 
           return (
             <Actions className="actions">
@@ -601,11 +666,11 @@ function DashboardList(props: DashboardListProps) {
               )}
               {canEdit && isPtmExtensionEnabled() && (
                 <Dropdown
-                  menu={{
-                    items: ptmMenuItems,
-                    onClick: ({ key }) =>
-                      key !== 'ptm_status' && handlePtmAction(String(key)),
-                  }}
+                  open={ptmDropdownOpenId === original.id}
+                  onOpenChange={open =>
+                    setPtmDropdownOpenId(open ? original.id : null)
+                  }
+                  dropdownRender={() => ptmOverlay}
                   trigger={['click']}
                 >
                   <Tooltip
@@ -667,6 +732,8 @@ function DashboardList(props: DashboardListProps) {
       refreshData,
       addSuccessToast,
       addDangerToast,
+      ptmDropdownOpenId,
+      setPtmDropdownOpenId,
     ],
   );
 

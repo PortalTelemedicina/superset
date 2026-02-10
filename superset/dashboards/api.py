@@ -178,6 +178,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "add_favorite",
         "remove_favorite",
         "get_charts",
+        "get_has_shared_charts",
         "get_datasets",
         "get_tabs",
         "get_freshness",
@@ -599,6 +600,52 @@ class DashboardRestApi(BaseSupersetModelRestApi):
             charts = DashboardDAO.get_charts_for_dashboard(id_or_slug)
             result = [self.chart_entity_response_schema.dump(chart) for chart in charts]
             return self.response(200, result=result)
+        except DashboardAccessDeniedError:
+            return self.response_403()
+        except DashboardNotFoundError:
+            return self.response_404()
+
+    @expose("/<id_or_slug>/has_shared_charts", methods=("GET",))
+    @protect()
+    @safe
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get_has_shared_charts",
+        log_to_statsd=False,
+    )
+    def get_has_shared_charts(self, id_or_slug: str) -> Response:
+        """Whether the dashboard has any chart shared with another dashboard.
+        ---
+        get:
+          summary: Check if dashboard has shared charts
+          description: >-
+            Returns true if any chart on this dashboard is also on another
+            dashboard. When true, PTM autoconvert is blocked and the dashboard
+            is locked (cannot be unlocked) until charts are duplicated or
+            the dashboard is copied with duplicate charts.
+          parameters:
+          - in: path
+            schema:
+              type: string
+            name: id_or_slug
+          responses:
+            200:
+              description: Has shared charts
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      result:
+                        type: boolean
+            403:
+              $ref: '#/components/responses/403'
+            404:
+              $ref: '#/components/responses/404'
+        """
+        try:
+            has_shared = DashboardDAO.get_has_shared_charts(id_or_slug)
+            return self.response(200, result=has_shared)
         except DashboardAccessDeniedError:
             return self.response_403()
         except DashboardNotFoundError:

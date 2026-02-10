@@ -40,7 +40,6 @@ import { updateDashboardTheme } from 'src/dashboard/actions/dashboardInfo';
 import { setDashboardMetadata } from 'src/dashboard/actions/dashboardState';
 import { SupersetClient } from '@superset-ui/core';
 import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
-import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
 
 export const useHeaderActionsMenu = ({
   customCss,
@@ -86,6 +85,9 @@ export const useHeaderActionsMenu = ({
     (state: RootState) => state.dashboardInfo?.metadata ?? {},
   );
   const ptmLocked = currentMetadata.ptm_locked === true;
+  const isLockedBySharedCharts =
+    currentMetadata.has_shared_charts === true ||
+    currentMetadata.ptm_locked_reason === 'shared_charts';
 
   useEffect(() => {
     if (customCss !== css) {
@@ -104,7 +106,8 @@ export const useHeaderActionsMenu = ({
   );
 
   const handleMenuClick = useCallback(
-    ({ key }: { key: string }) => {
+    (info: { key: string; keyPath?: string[] }) => {
+      const key = info.keyPath?.[0] ?? info.key;
       switch (key) {
         case MenuKeys.RefreshDashboard:
           forceRefreshAllCharts();
@@ -130,6 +133,7 @@ export const useHeaderActionsMenu = ({
           break;
         case MenuKeys.PtmLock:
         case MenuKeys.PtmUnlock: {
+          if (isLockedBySharedCharts) break;
           const locked = key === MenuKeys.PtmLock;
           const metadata = { ...currentMetadata, ptm_locked: locked };
           SupersetClient.get({
@@ -169,20 +173,10 @@ export const useHeaderActionsMenu = ({
             });
           break;
         }
-        case MenuKeys.PtmRevertToLegacy: {
-          revertPtmChartsForDashboard(dashboardId)
-            .then(() => {
-              addSuccessToast(t('Charts reverted to legacy versions'));
-            })
-            .catch(() => {
-              addDangerToast(t('Failed to revert charts'));
-            });
-          break;
-        }
         default:
           break;
       }
-      setIsDropdownVisible(false);
+      setTimeout(() => setIsDropdownVisible(false), 0);
     },
     [
       forceRefreshAllCharts,
@@ -391,19 +385,24 @@ export const useHeaderActionsMenu = ({
       );
     }
 
-    // PTM Lock / Unlock and Revert (when extension enabled and user can edit)
+    // PTM Lock / Unlock (when extension enabled and user can edit)
     if (isPtmExtensionEnabled() && userCanEdit) {
-      menuItems.push({
-        key: ptmLocked ? MenuKeys.PtmUnlock : MenuKeys.PtmLock,
-        label: ptmLocked
-          ? t('Unlock PTM changes')
-          : t('Lock PTM changes'),
-      });
-      menuItems.push({ type: 'divider', key: 'ptm_divider' });
-      menuItems.push({
-        key: MenuKeys.PtmRevertToLegacy,
-        label: t('Revert charts to Legacy'),
-      });
+      if (isLockedBySharedCharts) {
+        menuItems.push({
+          key: 'ptm_locked_shared_charts',
+          label: t(
+            'PTM locked (dashboard has charts shared with other dashboards)',
+          ),
+          disabled: true,
+        });
+      } else {
+        menuItems.push({
+          key: ptmLocked ? MenuKeys.PtmUnlock : MenuKeys.PtmLock,
+          label: ptmLocked
+            ? t('Unlock PTM changes')
+            : t('Lock PTM changes'),
+        });
+      }
     }
 
     // Auto-refresh interval
@@ -442,6 +441,7 @@ export const useHeaderActionsMenu = ({
     customCss,
     dashboardId,
     dashboardInfo,
+    forceRefreshAllCharts,
     dashboardTitle,
     downloadMenuItem,
     editMode,
@@ -452,6 +452,7 @@ export const useHeaderActionsMenu = ({
     layout,
     onSave,
     ptmLocked,
+    isLockedBySharedCharts,
     refreshFrequency,
     refreshLimit,
     refreshWarning,

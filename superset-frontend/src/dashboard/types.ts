@@ -301,5 +301,4 @@ export enum MenuKeys {
   ExportPivotXlsx = 'export_pivot_xlsx',
   PtmLock = 'ptm_lock',
   PtmUnlock = 'ptm_unlock',
-  PtmRevertToLegacy = 'ptm_revert_to_legacy',
 }
