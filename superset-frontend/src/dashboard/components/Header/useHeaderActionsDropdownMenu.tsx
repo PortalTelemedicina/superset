@@ -34,7 +34,7 @@ import FilterScopeModal from 'src/dashboard/components/filterscope/FilterScopeMo
 import getDashboardUrl from 'src/dashboard/util/getDashboardUrl';
 import { getActiveFilters } from 'src/dashboard/util/activeDashboardFilters';
 import { getUrlParam } from 'src/utils/urlUtils';
-import { MenuKeys, RootState } from 'src/dashboard/types';
+import { DashboardInfo, MenuKeys, RootState } from 'src/dashboard/types';
 import { HeaderDropdownProps } from 'src/dashboard/components/Header/types';
 import { updateDashboardTheme } from 'src/dashboard/actions/dashboardInfo';
 import { setDashboardMetadata } from 'src/dashboard/actions/dashboardState';
@@ -82,7 +82,8 @@ export const useHeaderActionsMenu = ({
     (state: RootState) => state.dashboardState.directPathToChild,
   );
   const currentMetadata = useSelector(
-    (state: RootState) => state.dashboardInfo?.metadata ?? {},
+    (state: RootState) =>
+      state.dashboardInfo?.metadata ?? ({} as DashboardInfo['metadata']),
   );
   const ptmLocked = currentMetadata.ptm_locked === true;
   const isLockedBySharedCharts =
