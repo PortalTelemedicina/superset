@@ -120,13 +120,6 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const dashboardPageId = useMemo(() => nanoid(), []);
-  const hasDashboardInfoInitiated = useSelector<RootState, Boolean>(
-    ({ dashboardInfo }) =>
-      dashboardInfo && Object.keys(dashboardInfo).length > 0,
-  );
-  const dashboardTheme = useSelector(
-    (state: RootState) => state.dashboardInfo.theme,
-  );
   const { addDangerToast } = useToasts();
   const { result: dashboard, error: dashboardApiError } =
     useDashboard(idOrSlug);
@@ -138,6 +131,25 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
     status,
   } = useDashboardDatasets(idOrSlug);
   const isDashboardHydrated = useRef(false);
+
+  const hasDashboardInfoInitiated = useSelector<RootState, Boolean>(
+    ({ dashboardInfo }) => {
+      if (!dashboardInfo || Object.keys(dashboardInfo).length === 0) {
+        return false;
+      }
+      // Ensure Redux has the CURRENT dashboard, not a previous one
+      const dashId = String(dashboardInfo.id);
+      return dashId === idOrSlug || dashId === String(dashboard?.id || '');
+    },
+  );
+  const dashboardTheme = useSelector(
+    (state: RootState) => state.dashboardInfo.theme,
+  );
+
+  // Reset hydration flag when navigating to a different dashboard
+  useEffect(() => {
+    isDashboardHydrated.current = false;
+  }, [idOrSlug]);
 
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);

@@ -32,6 +32,7 @@ cover
 .eggs
 .env
 .envrc
+docker/.env-local
 .idea
 .mypy_cache
 .python-version
