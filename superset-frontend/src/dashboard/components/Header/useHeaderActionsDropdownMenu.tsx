@@ -85,7 +85,8 @@ export const useHeaderActionsMenu = ({
     (state: RootState) => state.dashboardInfo?.metadata ?? {},
   );
   const ptmLocked = currentMetadata.ptm_locked === true;
-\
+  // Use Record cast: these fields are set at runtime by DashboardPage but may
+  // not be present in the static DashboardInfo['metadata'] type yet.
   const md = currentMetadata as Record<string, unknown>;
   const isLockedBySharedCharts =
     md.has_shared_charts === true || md.ptm_locked_reason === 'shared_charts';
