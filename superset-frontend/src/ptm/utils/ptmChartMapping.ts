@@ -72,9 +72,9 @@ export type PtmChartMapping = {
 };
 
 const PTM_CHART_TYPE_MAP: Record<string, PtmChartMapping> = {
-  // Direct mappings
+  // Big Number: legacy viz_type 'big_number_total' = simple KPI, 'big_number' = with trendline (VizType.BigNumber)
   'big_number_total': { ptmVizType: 'ptm_big_number_total' },
-  'big_number': { ptmVizType: 'ptm_big_number_trendline' }, // BigNumber with Trendline
+  'big_number': { ptmVizType: 'ptm_big_number_trendline' },
   'big_number_with_trendline': { ptmVizType: 'ptm_big_number_trendline' }, // Alias for compatibility
   'pie': { ptmVizType: 'ptm_pie' },
   'table': { ptmVizType: 'ptm_table' },
@@ -128,7 +128,7 @@ const PTM_TO_LEGACY_MAP: Record<
   string | ((ptmSeriesType?: string) => string)
 > = {
   ptm_big_number_total: 'big_number_total',
-  ptm_big_number_trendline: 'big_number_with_trendline',
+  ptm_big_number_trendline: 'big_number', // Big Number with Trendline (VizType.BigNumber)
   ptm_pie: 'pie',
   ptm_table: 'table',
   ptm_mixed_timeseries: 'mixed_timeseries',
