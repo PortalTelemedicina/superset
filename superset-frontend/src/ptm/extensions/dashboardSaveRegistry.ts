@@ -19,7 +19,6 @@
 
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { SupersetClient } from '@superset-ui/core';
-import rison from 'rison';
 import { isPtmExtensionEnabled } from '../config/featureFlags';
 import {
   getPtmChartMapping,
@@ -129,11 +128,38 @@ async function ptmDashboardSaveHook(
   if (!isPtmExtensionEnabled()) {
     return;
   }
-  const { dashboard, slices, mode, newDashboardId } = args;
+  const { dashboard, slices, mode, newDashboardId, dashboardId } = args;
   const metadata = dashboard?.metadata ?? {};
 
   if (metadata.ptm_locked === true) {
     return;
+  }
+
+  // In update mode, Redux sliceEntities contains all charts ever loaded (e.g. from "add chart" picker),
+  // not only the charts on this dashboard. Restrict to this dashboard's charts via the API.
+  let slicesForDashboard = slices;
+  if (mode === 'update' && dashboardId != null) {
+    try {
+      const chartsResponse = await SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboardId}/charts`,
+      });
+      const charts = chartsResponse.json?.result ?? [];
+      const allowedIds = new Set(charts.map((c: { id: number }) => String(c.id)));
+      if (allowedIds.size > 0) {
+        slicesForDashboard = {};
+        for (const sliceId of Object.keys(slices)) {
+          if (allowedIds.has(sliceId)) {
+            slicesForDashboard[sliceId] = slices[sliceId];
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'PTM hook: could not fetch dashboard charts, skipping to avoid affecting wrong charts:',
+        error,
+      );
+      return;
+    }
   }
 
   // Only strict true means "use PTM". false, undefined, or any other value must never trigger conversion.
@@ -141,13 +167,13 @@ async function ptmDashboardSaveHook(
 
   // Use legacy: revert any PTM charts to original versions (update mode only).
   // Skip entirely when there are no PTM charts (e.g. already reverted) to avoid unnecessary API calls.
-  if (!usePtmVersions && mode === 'update' && Object.keys(slices).length > 0) {
-    const hasAnyPtmChart = Object.values(slices).some(slice => {
+  if (!usePtmVersions && mode === 'update' && Object.keys(slicesForDashboard).length > 0) {
+    const hasAnyPtmChart = Object.values(slicesForDashboard).some(slice => {
       const vizType = getVizType(slice.form_data);
       return !!vizType && isPtmVizType(vizType);
     });
     if (hasAnyPtmChart) {
-      await revertPtmCharts(slices);
+      await revertPtmCharts(slicesForDashboard);
     }
     return;
   }
@@ -158,33 +184,21 @@ async function ptmDashboardSaveHook(
     return;
   }
 
-  // For copy mode, we need to fetch slices from the new dashboard
+  // For copy mode, fetch charts that belong to the new dashboard only.
+  // Use the dashboard's charts endpoint so we never touch the original dashboard's charts
+  // (GET /dashboard/id returns .charts as names, not .slices; the charts endpoint is the source of truth).
   if (mode === 'copy' && newDashboardId) {
     try {
-      // Fetch the new dashboard to get its slices
-      const dashResponse = await SupersetClient.get({
-        endpoint: `/api/v1/dashboard/${newDashboardId}`,
+      const chartsResponse = await SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${newDashboardId}/charts`,
       });
-      const dashboardData = dashResponse.json.result;
-
-      // Fetch slices for the new dashboard
-      if (dashboardData.slices && dashboardData.slices.length > 0) {
-        const sliceIds = dashboardData.slices.map((s: { id: number }) => s.id);
-        const slicesResponse = await SupersetClient.get({
-          endpoint: `/api/v1/chart/?q=${rison.encode({
-            filters: [{ col: 'id', opr: 'in', value: sliceIds }],
-          })}`,
-        });
-
-        const fetchedSlices = slicesResponse.json.result || [];
+      const fetchedSlices = chartsResponse.json?.result ?? [];
+      if (fetchedSlices.length > 0) {
         const conversionPromises = [];
 
         for (const slice of fetchedSlices) {
-          const formData = JSON.parse(slice.params || '{}') as Record<
-            string,
-            unknown
-          >;
-          const currentVizType = getVizType(formData, slice.viz_type);
+          const formData = (slice.form_data ?? (slice.params ? JSON.parse(slice.params as string) : {})) as Record<string, unknown>;
+          const currentVizType = getVizType(formData, (slice as { viz_type?: string }).viz_type);
 
           if (!currentVizType) continue;
 
@@ -214,6 +228,12 @@ async function ptmDashboardSaveHook(
             updatedFormData.ptm_series_type = mapping.ptmSeriesType;
           }
 
+          const sliceForPayload = slice as {
+            id: number;
+            slice_name?: string;
+            datasource_id?: number;
+            datasource_type?: string;
+          };
           const updatePromise = SupersetClient.put({
             endpoint: `/api/v1/chart/${slice.id}`,
             headers: { 'Content-Type': 'application/json' },
@@ -221,8 +241,8 @@ async function ptmDashboardSaveHook(
               params: JSON.stringify(updatedFormData),
               viz_type: mapping.ptmVizType,
               slice_name: slice.slice_name,
-              datasource_id: slice.datasource_id,
-              datasource_type: slice.datasource_type,
+              datasource_id: sliceForPayload.datasource_id ?? updatedFormData.datasource_id,
+              datasource_type: sliceForPayload.datasource_type ?? updatedFormData.datasource_type ?? 'table',
             }),
           }).catch(error => {
             console.warn(
@@ -246,11 +266,11 @@ async function ptmDashboardSaveHook(
     return;
   }
 
-  // For update mode, use slices from Redux state
+  // For update mode, use only this dashboard's charts (slicesForDashboard already filtered above)
   const conversionPromises = [];
 
-  for (const sliceId in slices) {
-    const slice = slices[sliceId];
+  for (const sliceId in slicesForDashboard) {
+    const slice = slicesForDashboard[sliceId];
     const currentVizType = getVizType(slice.form_data);
 
     if (!currentVizType) continue;
@@ -329,20 +349,11 @@ export async function revertPtmChartsForDashboard(
   dashboardId: number,
 ): Promise<void> {
   try {
-    const dashResponse = await SupersetClient.get({
-      endpoint: `/api/v1/dashboard/${dashboardId}`,
-    });
-    const dashboardData = dashResponse.json.result;
-    const sliceList = dashboardData.slices ?? [];
-    if (sliceList.length === 0) return;
-
-    const sliceIds = sliceList.map((s: { id: number }) => s.id);
     const chartsResponse = await SupersetClient.get({
-      endpoint: `/api/v1/chart/?q=${rison.encode({
-        filters: [{ col: 'id', opr: 'in', value: sliceIds }],
-      })}`,
+      endpoint: `/api/v1/dashboard/${dashboardId}/charts`,
     });
-    const charts = chartsResponse.json.result ?? [];
+    const charts = chartsResponse.json?.result ?? [];
+    if (charts.length === 0) return;
 
     const slices: Record<
       string,
@@ -352,12 +363,12 @@ export async function revertPtmChartsForDashboard(
         datasource?: string | number;
       }
     > = {};
-    charts.forEach((chart: { id: number; params?: string; slice_name?: string; datasource_id?: number; datasource_type?: string }) => {
-      const formData = (chart.params ? JSON.parse(chart.params) : {}) as Record<string, unknown>;
+    charts.forEach((chart: { id: number; form_data?: Record<string, unknown>; params?: string; slice_name?: string; datasource_id?: number; datasource_type?: string }) => {
+      const formData = (chart.form_data ?? (chart.params ? JSON.parse(chart.params) : {})) as Record<string, unknown>;
       slices[String(chart.id)] = {
-        form_data: { ...formData, datasource_id: chart.datasource_id, datasource_type: chart.datasource_type },
+        form_data: { ...formData, datasource_id: chart.datasource_id ?? formData.datasource_id, datasource_type: chart.datasource_type ?? formData.datasource_type },
         slice_name: chart.slice_name,
-        datasource: chart.datasource_id,
+        datasource: chart.datasource_id ?? (formData.datasource_id as number | undefined),
       };
     });
 
@@ -370,6 +381,7 @@ export async function revertPtmChartsForDashboard(
     }
   } catch (error) {
     console.warn('Failed to revert PTM charts for dashboard:', error);
+    throw error;
   }
 }
 

@@ -378,6 +378,7 @@ export function saveDashboardRequest(data, id, saveType) {
             },
             slices: sliceEntities?.slices || {},
             mode,
+            dashboardId: mode === 'update' ? id : undefined,
           });
         } catch (error) {
           console.warn('Dashboard save hook failed:', error);

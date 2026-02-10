@@ -298,6 +298,8 @@ export interface DashboardSaveHookArgs {
   >;
   mode: 'update' | 'copy';
   newDashboardId?: number; // Only present in copy mode
+  /** Dashboard id being saved. Present in update mode so hooks only affect this dashboard's charts. */
+  dashboardId?: number;
 }
 
 export type DashboardSaveHook = (
