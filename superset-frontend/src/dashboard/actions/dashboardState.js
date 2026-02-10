@@ -435,6 +435,7 @@ export function saveDashboardRequest(data, id, saveType) {
       // syncing with the backend transformations of the metadata
       if (updatedDashboard.json_metadata) {
         const metadata = JSON.parse(updatedDashboard.json_metadata);
+        
         // Preserve client headerLayout if server omitted it (e.g. when extension flag is off)
         const clientHeaderLayout =
           getState().dashboardInfo?.metadata?.headerLayout;
@@ -488,45 +489,6 @@ export function saveDashboardRequest(data, id, saveType) {
         } catch (error) {
           // Handle any synchronous errors
           console.debug('Error setting up datasets fetch:', error);
-        }
-
-        // Refetch charts after save hook (convert/revert) to update Redux with new viz_type
-        try {
-          SupersetClient.get({
-            endpoint: `/api/v1/dashboard/${id}/charts`,
-          })
-            .then(({ json }) => {
-              const charts = json?.result ?? [];
-              if (charts.length > 0) {
-                const updatedSlices = charts.reduce((acc, chart) => {
-                  const formData = chart.form_data || {};
-                  acc[chart.id] = {
-                    slice_id: chart.id,
-                    slice_url: chart.slice_url,
-                    slice_name: chart.slice_name,
-                    form_data: {
-                      ...formData,
-                      datasource:
-                        getDatasourceParameter(
-                          formData.datasource_id,
-                          formData.datasource_type,
-                        ) || formData.datasource,
-                    },
-                    viz_type: formData.viz_type,
-                    description: chart.description,
-                    description_markdown: chart.description_markeddown,
-                  };
-                  return acc;
-                }, {});
-                dispatch({ type: ADD_SLICES, payload: { slices: updatedSlices } });
-              }
-            })
-            .catch(error => {
-              // Non-fatal: charts will update on next page load
-              console.debug('Could not refetch charts after save:', error);
-            });
-        } catch (error) {
-          console.debug('Error setting up charts refetch:', error);
         }
       }
       if (lastModifiedTime) {
