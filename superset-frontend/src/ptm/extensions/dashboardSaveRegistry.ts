@@ -182,8 +182,14 @@ async function ptmDashboardSaveHook(
   const usePtmVersions = metadata.ptm_autoconvert === true;
 
   // Use legacy: revert any PTM charts to original versions (update mode only).
-  // Skip entirely when there are no PTM charts (e.g. already reverted) to avoid unnecessary API calls.
-  if (!usePtmVersions && mode === 'update' && Object.keys(slicesForDashboard).length > 0) {
+  // Never revert when dashboard is locked (e.g. user clicked Lock: we must not revert even if
+  // the hook received stale metadata without ptm_locked, or Lock triggered a save).
+  if (
+    !usePtmVersions &&
+    mode === 'update' &&
+    metadata.ptm_locked !== true &&
+    Object.keys(slicesForDashboard).length > 0
+  ) {
     const hasAnyPtmChart = Object.values(slicesForDashboard).some(slice => {
       const vizType = getVizType(slice.form_data);
       return !!vizType && isPtmVizType(vizType);

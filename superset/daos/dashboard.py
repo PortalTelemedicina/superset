@@ -318,6 +318,11 @@ class DashboardDAO(BaseDAO[Dashboard]):
             ):
                 md["ptm_locked"] = True
                 md["ptm_locked_reason"] = "shared_charts"
+            elif md.get("ptm_locked_reason") == "shared_charts":
+                # No shared charts but metadata has shared_charts reason: stale from
+                # copy. Clear so we don't persist locked state from source dashboard.
+                md.pop("ptm_locked", None)
+                md.pop("ptm_locked_reason", None)
         else:
             for key in EXTENSION_METADATA_KEYS:
                 md.pop(key, None)

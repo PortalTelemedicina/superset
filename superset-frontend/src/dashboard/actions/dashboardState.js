@@ -624,6 +624,10 @@ export function saveDashboardRequest(data, id, saveType) {
       delete copyMetadata.ptm_autoconvert;
       delete copyMetadata.ptm_locked;
     }
+    // Never inherit PTM locked state when copying; backend will set it from
+    // has_shared_charts on the new dashboard (which is false when duplicate_slices).
+    delete copyMetadata.ptm_locked;
+    delete copyMetadata.ptm_locked_reason;
     const copyPayload = {
       dashboard_title: cleanedData.dashboard_title,
       css: cleanedData.css,
