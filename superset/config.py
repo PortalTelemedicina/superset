@@ -1692,7 +1692,11 @@ ALERT_REPORTS_DEFAULT_RETENTION = 90
 ALERT_REPORTS_DEFAULT_CRON_VALUE = "0 0 * * *"  # every day
 # If set to true no notification is sent, the worker will just log a message.
 # Useful for debugging
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+# Optional webhook URL to notify on report failure (e.g. Slack incoming webhook).
+# Sends a JSON payload with report name, id, error, and retry instructions.
+# Fires on every failure (not subject to grace period).
+ALERT_REPORTS_FAILURE_WEBHOOK_URL: str | None = None
 # Max tries to run queries to prevent false errors caused by transient errors
 # being returned to users. Set to a value >1 to enable retries.
 ALERT_REPORTS_QUERY_EXECUTION_MAX_TRIES = 1
