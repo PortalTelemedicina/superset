@@ -84,6 +84,68 @@ from superset.utils.urls import get_url_path
 logger = logging.getLogger(__name__)
 
 
+def _send_failure_webhook(
+    report_schedule: ReportSchedule,
+    error_message: str,
+    execution_id: UUID,
+) -> None:
+    """
+    Send a failure notification to the configured webhook URL (e.g. Slack).
+    Fires on every failure, not subject to grace period. Failures are logged
+    but do not affect the main error flow.
+    """
+    webhook_url = app.config.get("ALERT_REPORTS_FAILURE_WEBHOOK_URL")
+
+    if not webhook_url:
+        return
+
+    if not webhook_url.strip().lower().startswith(("http://", "https://")):
+        logger.warning("Failure webhook URL must use http or https scheme, skipping")
+        return
+    try:
+        import urllib.request
+
+        dashboard_title = (
+            report_schedule.dashboard.dashboard_title
+            if report_schedule.dashboard
+            else "N/A"
+        )
+
+        payload = {
+            "text": (
+                f"⚠️ *Report Failed*\n"
+                f"*Report:* {report_schedule.name}\n"
+                f"*Dashboard:* {dashboard_title}\n"
+                f"*Error:* {error_message[:500]}\n"
+                f"*Execution ID:* {execution_id}"
+            ),
+            "report_id": report_schedule.id,
+            "report_name": report_schedule.name,
+            "error": error_message[:1000],
+            "execution_id": str(execution_id),
+        }
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(  # noqa: S310
+            webhook_url,
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:  # noqa: S310
+            if resp.status >= 400:
+                logger.warning(
+                    "Failure webhook returned %s for report %s",
+                    resp.status,
+                    report_schedule.id,
+                )
+    except Exception as ex:  # pylint: disable=broad-except
+        logger.warning(
+            "Failed to send failure webhook for report %s: %s",
+            report_schedule.id,
+            ex,
+        )
+
+
 class BaseReportState:
     current_states: list[ReportState] = []
     initial: bool = False
@@ -765,6 +827,10 @@ class ReportNotTriggeredErrorState(BaseReportState):
                 )
                 # Re-raise the original exception, not the logging failure
                 raise first_ex from logging_ex
+
+            _send_failure_webhook(
+                self._report_schedule, error_message, self._execution_id
+            )
 
             # TODO (dpgaspar) convert this logic to a new state eg: ERROR_ON_GRACE
             if not self.is_in_error_grace_period():
