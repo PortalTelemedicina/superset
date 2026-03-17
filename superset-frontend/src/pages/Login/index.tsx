@@ -258,7 +258,7 @@ export default function Login() {
                   href="/forgot-password/"
                   data-test="forgot-password-link"
                 >
-                  {t('Forgot your password?')}
+                  {t('Esqueceu sua senha?')}
                 </Button>
               </Flex>
             )}
