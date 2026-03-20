@@ -194,7 +194,7 @@ echo ""
 # Show PTM commits that will be replayed
 echo "PTM commits to replay:"
 echo "─────────────────────────────────────────"
-git log --oneline "$MERGE_BASE".."$CURRENT_BRANCH" | head -30
+git log --oneline "$MERGE_BASE".."$CURRENT_BRANCH" | head -30 || true
 if [[ "$PTM_COMMIT_COUNT" -gt 30 ]]; then
     echo "  ... and $((PTM_COMMIT_COUNT - 30)) more"
 fi
