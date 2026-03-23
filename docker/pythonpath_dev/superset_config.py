@@ -26,6 +26,7 @@ import sys
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
+from superset.translations.utils import get_language_pack
 
 LANGUAGES = {
     'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
@@ -36,14 +37,10 @@ BABEL_DEFAULT_LOCALE = 'pt_BR'
 
 
 def override_bootstrap_locale(data):
-    from flask import current_app
-
     locale = data.get("locale")
     if locale == "pt":
         data["locale"] = "pt_BR"
-    elif locale == "en":
-        # Use default locale when server sent "en" (e.g. get_locale() was None)
-        data["locale"] = current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
+        data["language_pack"] = get_language_pack("pt_BR")
     return data
 
 
