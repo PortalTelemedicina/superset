@@ -62,9 +62,9 @@ jobs:
 
       - name: "Set up liccheck"
         run: |
-          # uv rewrites setuptools dist-info in a way that breaks pkg_resources (used by liccheck).
-          # Force-reinstalling setuptools via pip restores pkg_resources to a working state.
-          python -m pip install --force-reinstall --no-cache-dir setuptools
+          # setuptools >=81 removed pkg_resources (pypa/setuptools#5007).
+          # liccheck still imports it, so we force a version that ships it.
+          python -m pip install --force-reinstall "setuptools>=69,<81"
           python -m pip install liccheck
       - name: "Run liccheck"
         run: |
