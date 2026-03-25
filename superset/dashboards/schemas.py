@@ -148,6 +148,9 @@ def normalize_dashboard_metadata(
         )
         if header_layout is None and legacy_layout is not None:
             data["headerLayout"] = legacy_layout
+        # Canonical field is headerLayout; legacy keys are not declared on the schema.
+        data.pop("portal_header_layout", None)
+        data.pop("portalHeaderLayout", None)
         return data
 
     for key in EXTENSION_METADATA_KEYS:
