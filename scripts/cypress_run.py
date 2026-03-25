@@ -45,7 +45,8 @@ def run_cypress_for_test_file(
     os.environ["ELECTRON_DISABLE_GPU"] = "true"
     build_id = generate_build_id()
     browser = os.getenv("CYPRESS_BROWSER", "chrome")
-    chrome_flags = "--disable-dev-shm-usage"
+    # Passed to Chrome after `--`; cypress.config.ts adds more via before:browser:launch.
+    chrome_flags = "--disable-dev-shm-usage --disable-gpu"
 
     for attempt in range(retries):
         # Create Cypress command for a single test file

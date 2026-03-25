@@ -63,7 +63,7 @@ export default eyesPlugin(
               '--no-sandbox',
               '--disable-software-rasterizer',
               '--memory-pressure-off',
-              '--js-flags=--max-old-space-size=4096',
+              '--js-flags=--max-old-space-size=8192',
               '--disable-background-timer-throttling',
               '--disable-backgrounding-occluded-windows',
               '--disable-renderer-backgrounding',
