@@ -397,6 +397,7 @@ authorized_licenses = [
     "apache software",
     "apache software, bsd",
     "bsd",
+    "3-clause bsd",
     "bsd-3-clause",
     "isc license (iscl)",
     "isc license",
@@ -419,6 +420,8 @@ authorized_licenses = [
 polyline = "2"
 # Apache 2.0 https://github.com/hkwi/python-geohash
 python-geohash = "0"
+# Apache 2.0 https://github.com/googleapis/python-crc32c/blob/main/LICENSE
+google-crc32c = "1"
 # --------------------------------------------------------------
 
 # TODO REMOVE THESE DEPS FROM CODEBASE
