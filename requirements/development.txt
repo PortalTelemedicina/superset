@@ -268,8 +268,9 @@ geopy==2.4.1
     #   apache-superset
 gevent==24.2.1
     # via apache-superset
-google-api-core==2.23.0
+google-api-core==2.30.0
     # via
+    #   -c requirements/base.txt
     #   google-cloud-bigquery
     #   google-cloud-bigquery-storage
     #   google-cloud-core
@@ -281,6 +282,7 @@ google-auth==2.40.3
     #   google-api-core
     #   google-auth-oauthlib
     #   google-cloud-bigquery
+    #   google-cloud-bigquery-storage
     #   google-cloud-core
     #   pandas-gbq
     #   pydata-google-auth
@@ -295,16 +297,23 @@ google-cloud-bigquery==3.27.0
     #   apache-superset
     #   pandas-gbq
     #   sqlalchemy-bigquery
-google-cloud-bigquery-storage==2.19.1
+google-cloud-bigquery-storage==2.36.2
     # via pandas-gbq
-google-cloud-core==2.4.1
-    # via google-cloud-bigquery
-google-crc32c==1.6.0
-    # via google-resumable-media
-google-resumable-media==2.7.2
-    # via google-cloud-bigquery
-googleapis-common-protos==1.66.0
+google-cloud-core==2.5.0
     # via
+    #   -c requirements/base.txt
+    #   google-cloud-bigquery
+google-crc32c==1.8.0
+    # via
+    #   -c requirements/base.txt
+    #   google-resumable-media
+google-resumable-media==2.8.0
+    # via
+    #   -c requirements/base.txt
+    #   google-cloud-bigquery
+googleapis-common-protos==1.73.0
+    # via
+    #   -c requirements/base.txt
     #   google-api-core
     #   grpcio-status
 greenlet==3.1.1
@@ -313,11 +322,11 @@ greenlet==3.1.1
     #   apache-superset
     #   gevent
     #   shillelagh
-    #   sqlalchemy
 grpcio==1.71.0
     # via
     #   apache-superset
     #   google-api-core
+    #   google-cloud-bigquery-storage
     #   grpcio-status
 grpcio-status==1.60.1
     # via google-api-core
@@ -572,12 +581,14 @@ prompt-toolkit==3.0.51
     #   click-repl
 prophet==1.2.0
     # via apache-superset
-proto-plus==1.25.0
+proto-plus==1.27.1
     # via
+    #   -c requirements/base.txt
     #   google-api-core
     #   google-cloud-bigquery-storage
-protobuf==4.25.5
+protobuf==6.33.6
     # via
+    #   -c requirements/base.txt
     #   google-api-core
     #   google-cloud-bigquery-storage
     #   googleapis-common-protos
@@ -843,8 +854,6 @@ typing-extensions==4.14.0
     #   apache-superset
     #   cattrs
     #   limits
-    #   pyopenssl
-    #   referencing
     #   selenium
     #   shillelagh
 tzdata==2025.2
