@@ -142,6 +142,31 @@ describe('VizType control', () => {
   });
 });
 
+describe('Test datatable', () => {
+  beforeEach(() => {
+    interceptChart({ legacy: false }).as('tableChartData');
+    interceptChart({ legacy: false }).as('lineChartData');
+    cy.visitChartByName('Daily Totals');
+  });
+  it('Data Pane opens and loads results', () => {
+    cy.contains('Results').click();
+    cy.get('[data-test="row-count-label"]').contains('26 rows');
+    cy.get('.ant-empty-description').should('not.exist');
+  });
+  // Skipped: Chrome renderer crashes when rendering 1k row payload on GHA runners.
+  // Tracked as a Chrome 146 regression — re-enable once stable.
+  it.skip('Datapane loads view samples', () => {
+    cy.intercept(
+      '**/datasource/samples?force=false&datasource_type=table&datasource_id=*',
+    ).as('Samples');
+    cy.contains('Samples').click();
+    cy.wait('@Samples');
+    cy.get('.ant-tabs-tab-active').contains('Samples');
+    cy.get('[data-test="row-count-label"]').contains('1k rows');
+    cy.get('.ant-empty-description').should('not.exist');
+  });
+});
+
 describe('Groupby control', () => {
   it('Set groupby', () => {
     interceptChart({ legacy: false }).as('chartData');
