@@ -62,8 +62,10 @@ jobs:
 
       - name: "Set up liccheck"
         run: |
-          # liccheck imports pkg_resources (setuptools); not guaranteed on slim Python images
-          uv pip install --system liccheck setuptools
+          # liccheck requires pkg_resources (setuptools). uv may skip setuptools as "already
+          # satisfied" while the interpreter still lacks pkg_resources — force via pip + same python.
+          python -m pip install --upgrade "setuptools>=69"
+          python -m pip install liccheck
       - name: "Run liccheck"
         run: |
           # run the checks
