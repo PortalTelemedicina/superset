@@ -878,10 +878,10 @@ UPLOAD_FOLDER = BASE_DIR + "/static/uploads/"
 UPLOAD_CHUNK_SIZE = 4096
 
 # GCP Cloud Storage bucket for dashboard logo uploads (secure rehosting)
-# 
+#
 # If set, dashboard logos will be uploaded to this GCP bucket and the returned
 # GCP public URL will be used directly in HTML for rendering.
-# 
+#
 # If not set (None), logos are stored in local static files (/static/uploads/)
 # and the static file URL is used in HTML.
 #

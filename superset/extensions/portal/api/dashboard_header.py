@@ -8,21 +8,23 @@ using Superset's authentication and permission system.
 
 import os
 from pathlib import Path
-from flask import request, current_app
+
+from flask import current_app, request
+
 from superset.extensions.portal.services.image_rehost import ImageRehostService
 
 
 def upload_header_image_handler():
     """
     Handle header image upload (file uploads only, no URLs).
-    
+
     This function contains the business logic for uploading header images.
     It can be called from core API endpoint or extension endpoint.
-    
+
     The uploaded image is rehosted to the configured storage backend (GCP or
     local static files), and the returned URL is used directly in the dashboard
     header HTML for rendering.
-    
+
     Returns:
         tuple: (status_code, response_dict, message) or Response object
         Response dict contains: {"url": "<url_to_use_in_html>"}
@@ -37,19 +39,27 @@ def upload_header_image_handler():
     allowed_extensions = {".png", ".jpg", ".jpeg", ".svg", ".gif", ".webp"}
     file_ext = Path(file.filename).suffix.lower()
     if file_ext not in allowed_extensions:
-        return 400, None, f"File type not allowed. Allowed types: {', '.join(allowed_extensions)}"
+        return (
+            400,
+            None,
+            f"File type not allowed. Allowed types: {', '.join(allowed_extensions)}",
+        )
 
     file.seek(0, os.SEEK_END)
     file_size = file.tell()
     file.seek(0)
     max_size = 2 * 1024 * 1024  # 2MB
     if file_size > max_size:
-        return 400, None, f"File too large. Maximum size: 2MB. Current size: {file_size / 1024 / 1024:.2f}MB"
+        return (
+            400,
+            None,
+            f"File too large. Maximum size: 2MB. Current size: {file_size / 1024 / 1024:.2f}MB",
+        )
 
     try:
         # Use rehost service to upload image
         url, storage_path = ImageRehostService.upload_image(file)
-        
+
         return 200, {"url": url}, "Image uploaded successfully"
     except (PermissionError, RuntimeError) as err:
         current_app.logger.error(f"Error uploading header image: {str(err)}")

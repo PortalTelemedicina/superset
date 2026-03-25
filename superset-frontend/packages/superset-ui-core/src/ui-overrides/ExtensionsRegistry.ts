@@ -111,10 +111,7 @@ function validateCssTransform(
   }) as Extensions['dashboard.css.transform'];
 }
 
-function validateComponent(
-  value: unknown,
-  key: string,
-): unknown | null {
+function validateComponent(value: unknown, key: string): unknown | null {
   if (value == null) return value;
   if (typeof value !== 'function') {
     console.error(`[ExtensionsRegistry] ${key} must be a component`);
@@ -139,9 +136,7 @@ function validateSliceHeaderControlsClassNames(
     if (
       result &&
       typeof result === 'object' &&
-      Object.values(result).every(
-        v => v === undefined || typeof v === 'string',
-      )
+      Object.values(result).every(v => v === undefined || typeof v === 'string')
     ) {
       return result as SliceHeaderControlsClassNamesResult;
     }
@@ -158,9 +153,8 @@ const validators: Partial<
   'dashboard.header.replacement': validateHeaderReplacement as (
     value: unknown,
   ) => unknown | null,
-  'dashboard.sliceHeaderControls.trigger': validateSliceHeaderControlsTrigger as (
-    value: unknown,
-  ) => unknown | null,
+  'dashboard.sliceHeaderControls.trigger':
+    validateSliceHeaderControlsTrigger as (value: unknown) => unknown | null,
   'dashboard.css.transform': validateCssTransform as (
     value: unknown,
   ) => unknown | null,

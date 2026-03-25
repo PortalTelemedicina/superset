@@ -22,9 +22,10 @@ from typing import Any
 
 from flask import g
 from flask_appbuilder.models.sqla.interface import SQLAInterface
+from sqlalchemy import select
+from sqlalchemy.sql import func
 
 from superset import is_feature_enabled, security_manager
-from superset.dashboards.schemas import EXTENSION_METADATA_KEYS
 from superset.commands.dashboard.exceptions import (
     DashboardAccessDeniedError,
     DashboardForbiddenError,
@@ -33,12 +34,10 @@ from superset.commands.dashboard.exceptions import (
 )
 from superset.daos.base import BaseDAO
 from superset.dashboards.filters import DashboardAccessFilter, is_uuid
+from superset.dashboards.schemas import EXTENSION_METADATA_KEYS
 from superset.exceptions import SupersetSecurityException
 from superset.extensions import db
 from superset.models.core import FavStar, FavStarClassName
-from sqlalchemy import select
-from sqlalchemy.sql import func
-
 from superset.models.dashboard import Dashboard, dashboard_slices, id_or_slug_filter
 from superset.models.embedded_dashboard import EmbeddedDashboard
 from superset.models.slice import Slice

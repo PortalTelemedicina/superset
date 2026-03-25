@@ -20,6 +20,7 @@ import React, { useMemo } from 'react';
 import { styled } from '@superset-ui/core';
 import { Badge, Divider } from 'antd';
 import moment from 'moment';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import {
   HeaderSlot,
   SlotType,
@@ -33,9 +34,8 @@ import {
   DividerSlot,
 } from '../types';
 import DataFreshnessElement from './DataFreshnessElement';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
-const SlotContainer = styled.div<{ 
+const SlotContainer = styled.div<{
   customStyle?: any;
   align?: 'start' | 'center' | 'end';
   flexShrink?: number;
@@ -46,7 +46,9 @@ const SlotContainer = styled.div<{
   flex-shrink: ${({ flexShrink }) => flexShrink ?? 0};
   flex-grow: ${({ flexGrow }) => flexGrow ?? 0};
   min-width: 0;
-  ${({ align }) => align && `
+  ${({ align }) =>
+    align &&
+    `
     align-self: ${align === 'start' ? 'flex-start' : align === 'end' ? 'flex-end' : 'center'};
     margin-left: ${align === 'end' ? 'auto' : align === 'center' ? 'auto' : '0'};
     margin-right: ${align === 'start' ? 'auto' : align === 'center' ? 'auto' : '0'};
@@ -61,7 +63,7 @@ const LogoImage = styled.img<{ size?: any }>`
   ${({ size }) => size?.maxHeight && `max-height: ${size.maxHeight}px`};
   object-fit: contain;
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
-  
+
   &:hover {
     opacity: ${({ onClick }) => (onClick ? 0.8 : 1)};
   }
@@ -125,7 +127,11 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
               logoSlot.link
                 ? () => {
                     if (logoSlot.openInNewTab) {
-                      window.open(logoSlot.link, '_blank', 'noopener,noreferrer');
+                      window.open(
+                        logoSlot.link,
+                        '_blank',
+                        'noopener,noreferrer',
+                      );
                     } else {
                       window.location.href = logoSlot.link!;
                     }
@@ -135,11 +141,7 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
           />
         );
 
-        return (
-          <SlotContainer {...containerProps}>
-            {logo}
-          </SlotContainer>
-        );
+        return <SlotContainer {...containerProps}>{logo}</SlotContainer>;
       }
 
       case SlotType.TITLE: {
@@ -148,16 +150,14 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
 
         return (
           <SlotContainer {...containerProps}>
-            <TitleText fontSize={titleSlot.fontSize}>
-              {title}
-            </TitleText>
+            <TitleText fontSize={titleSlot.fontSize}>{title}</TitleText>
           </SlotContainer>
         );
       }
 
       case SlotType.TEXT: {
         const textSlot = slot as TextSlot;
-        let content = textSlot.content;
+        let { content } = textSlot;
 
         // Process dynamic content
         if (textSlot.supportsDynamicContent) {
@@ -241,7 +241,10 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
             <Divider
               type={dividerSlot.orientation || 'vertical'}
               style={{
-                height: dividerSlot.orientation === 'vertical' ? dividerSlot.height || 32 : undefined,
+                height:
+                  dividerSlot.orientation === 'vertical'
+                    ? dividerSlot.height || 32
+                    : undefined,
                 margin: '0 8px',
               }}
             />
@@ -262,4 +265,3 @@ export const SlotRenderer: React.FC<SlotRendererProps> = ({
 };
 
 export default SlotRenderer;
-

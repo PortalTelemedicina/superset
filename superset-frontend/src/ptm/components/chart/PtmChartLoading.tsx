@@ -36,7 +36,10 @@ interface PtmChartLoadingProps {
  * PTM custom loading spinner component for charts.
  * Provides a centered spinner without the "Waiting on..." message text.
  */
-export function PtmChartLoading({ chartId, chartStatus }: PtmChartLoadingProps) {
+export function PtmChartLoading({
+  chartId,
+  chartStatus,
+}: PtmChartLoadingProps) {
   return (
     <LoadingContainer>
       <Loading position="inline-centered" />

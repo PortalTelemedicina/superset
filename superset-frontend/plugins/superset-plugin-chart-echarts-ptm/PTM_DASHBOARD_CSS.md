@@ -47,7 +47,7 @@ If you can't add the Markdown component, the CSS below will automatically fall b
   --ptm-success: #5AD7A5;
   --ptm-error: #EC4B60;
   --ptm-attention: #F5C451;
-  
+
   --ptm-neutral-white: #FFFFFF;
   --ptm-neutral-100: #F7F7F6;
   --ptm-neutral-200: #F1F1F1;
@@ -55,15 +55,15 @@ If you can't add the Markdown component, the CSS below will automatically fall b
   --ptm-neutral-400: #979797;
   --ptm-neutral-500: #666666;
   --ptm-neutral-600: #222222;
-  
+
   /* Fonts with system fallbacks */
   --ptm-font-title: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
+
   --ptm-radius-sm: 8px;
   --ptm-radius-md: 12px;
   --ptm-radius-lg: 16px;
-  
+
   --ptm-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
   --ptm-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
 }

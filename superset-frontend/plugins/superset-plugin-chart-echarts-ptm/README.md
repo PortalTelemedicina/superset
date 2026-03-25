@@ -230,7 +230,7 @@ export default createPtmPlugin({
 const PIE_DEFAULTS = {
   ...PTM_ECHART_BASE,
   tooltip: { ...PTM_ECHART_TOOLTIP, trigger: 'item' },
-  series: [{ 
+  series: [{
     radius: ['45%', '70%'],
     itemStyle: { borderRadius: 8 },
   }],

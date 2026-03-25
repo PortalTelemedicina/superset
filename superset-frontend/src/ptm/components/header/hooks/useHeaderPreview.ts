@@ -19,10 +19,10 @@ import { useState, useCallback } from 'react';
 
 /**
  * Hook to manage header preview mode state.
- * 
+ *
  * Provides state for previewing custom header
  * in non-standalone mode (normal view).
- * 
+ *
  * @returns Object with preview state and handlers
  */
 export const useHeaderPreview = () => {

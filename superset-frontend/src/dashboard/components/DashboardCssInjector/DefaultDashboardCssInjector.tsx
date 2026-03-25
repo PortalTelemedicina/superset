@@ -29,7 +29,9 @@ export default function DefaultDashboardCssInjector({
   dashboardCss,
 }: DashboardCssInjectorProps) {
   useEffect(() => {
-    const finalCss = (typeof dashboardCss === 'string' ? dashboardCss : '').trim();
+    const finalCss = (
+      typeof dashboardCss === 'string' ? dashboardCss : ''
+    ).trim();
     if (finalCss) {
       return injectCustomCss(finalCss);
     }

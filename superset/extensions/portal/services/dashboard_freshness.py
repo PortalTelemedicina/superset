@@ -4,11 +4,12 @@ Portal dashboard freshness service.
 Computes dashboard data freshness based on physical tables used
 by charts in the dashboard. Currently supports BigQuery only.
 """
+
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from datetime import datetime, timezone
-import logging
 from typing import Any
 
 from sqlalchemy import text
@@ -32,11 +33,7 @@ def _get_dashboard_dataset_ids(dashboard: Dashboard) -> set[int]:
 
 
 def _get_datasets(dataset_ids: set[int]) -> tuple[list[SqlaTable], int]:
-    datasets = (
-        db.session.query(SqlaTable)
-        .filter(SqlaTable.id.in_(dataset_ids))
-        .all()
-    )
+    datasets = db.session.query(SqlaTable).filter(SqlaTable.id.in_(dataset_ids)).all()
     datasets_by_id = {dataset.id: dataset for dataset in datasets}
     missing_count = len(dataset_ids - set(datasets_by_id.keys()))
     return datasets, missing_count
@@ -192,8 +189,7 @@ def _build_result(
 
 def compute_dashboard_freshness(dashboard: Dashboard) -> dict[str, Any]:
     cache_key = f"dashboard_freshness:{dashboard.id}"
-    cached = cache_manager.cache.get(cache_key)
-    if cached:
+    if cached := cache_manager.cache.get(cache_key):
         return cached
 
     skipped = {

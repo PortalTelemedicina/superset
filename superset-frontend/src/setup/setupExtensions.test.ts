@@ -51,4 +51,3 @@ test('applies PTM extensions when PTM_EXTENSION_ENABLED is true', () => {
   setup();
   expect(ptm.applyPTMExtensions).toHaveBeenCalledTimes(1);
 });
-

@@ -78,4 +78,3 @@ export const TIMESERIES_PTM_DEFAULTS = {
 };
 
 export default TIMESERIES_PTM_DEFAULTS;
-

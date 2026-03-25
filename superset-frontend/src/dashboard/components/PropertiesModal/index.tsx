@@ -425,7 +425,9 @@ const PropertiesModal = ({
     };
     // Only include PTM flags when the extension is enabled (avoid persisting in production)
     if (isPtmExtensionEnabled()) {
-      completeMetadata.ptm_autoconvert = hasSharedCharts ? false : ptmAutoconvert;
+      completeMetadata.ptm_autoconvert = hasSharedCharts
+        ? false
+        : ptmAutoconvert;
       completeMetadata.ptm_locked = hasSharedCharts
         ? true
         : (originalDashboardMetadata.current?.ptm_locked ?? ptmLocked);

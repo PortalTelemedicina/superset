@@ -19,7 +19,7 @@
 
 /**
  * PTM Chart Type Mapping Utilities
- * 
+ *
  * Provides functions to detect PTM dashboards and map standard chart types
  * to their PTM equivalents, including special handling for timeseries variants.
  */
@@ -31,7 +31,13 @@ const PTM_TAG_NAME = 'PTM';
  * Used for theme/CSS (e.g. tag PTM). For save-hook conversion, use isPtmAutoconvertEnabled instead.
  */
 export function isPtmDashboard(
-  dashboard: { tags?: Array<{ name?: string }>; metadata?: { ptm_autoconvert?: boolean } } | null | undefined,
+  dashboard:
+    | {
+        tags?: Array<{ name?: string }>;
+        metadata?: { ptm_autoconvert?: boolean };
+      }
+    | null
+    | undefined,
 ): boolean {
   if (!dashboard) return false;
 
@@ -41,11 +47,9 @@ export function isPtmDashboard(
   }
 
   // Check PTM tag
-  const tags = dashboard.tags;
+  const { tags } = dashboard;
   if (Array.isArray(tags)) {
-    return tags.some(
-      t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME,
-    );
+    return tags.some(t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
   }
 
   return false;
@@ -73,32 +77,32 @@ export type PtmChartMapping = {
 
 const PTM_CHART_TYPE_MAP: Record<string, PtmChartMapping> = {
   // Big Number: legacy viz_type 'big_number_total' = simple KPI, 'big_number' = with trendline (VizType.BigNumber)
-  'big_number_total': { ptmVizType: 'ptm_big_number_total' },
-  'big_number': { ptmVizType: 'ptm_big_number_trendline' },
-  'big_number_with_trendline': { ptmVizType: 'ptm_big_number_trendline' }, // Alias for compatibility
-  'pie': { ptmVizType: 'ptm_pie' },
-  'table': { ptmVizType: 'ptm_table' },
-  'mixed_timeseries': { ptmVizType: 'ptm_mixed_timeseries' },
-  'pivot_table_v2': { ptmVizType: 'ptm_pivot_table' },
-  
+  big_number_total: { ptmVizType: 'ptm_big_number_total' },
+  big_number: { ptmVizType: 'ptm_big_number_trendline' },
+  big_number_with_trendline: { ptmVizType: 'ptm_big_number_trendline' }, // Alias for compatibility
+  pie: { ptmVizType: 'ptm_pie' },
+  table: { ptmVizType: 'ptm_table' },
+  mixed_timeseries: { ptmVizType: 'ptm_mixed_timeseries' },
+  pivot_table_v2: { ptmVizType: 'ptm_pivot_table' },
+
   // Timeseries variants -> ptm_echarts_timeseries with series type
-  'echarts_timeseries_bar': { 
+  echarts_timeseries_bar: {
     ptmVizType: 'ptm_echarts_timeseries',
     ptmSeriesType: 'bar',
   },
-  'echarts_timeseries_line': {
+  echarts_timeseries_line: {
     ptmVizType: 'ptm_echarts_timeseries',
     ptmSeriesType: 'line',
   },
-  'echarts_timeseries_smooth': {
+  echarts_timeseries_smooth: {
     ptmVizType: 'ptm_echarts_timeseries',
     ptmSeriesType: 'smooth',
   },
-  'echarts_timeseries_step': {
+  echarts_timeseries_step: {
     ptmVizType: 'ptm_echarts_timeseries',
     ptmSeriesType: 'step',
   },
-  'echarts_timeseries': {
+  echarts_timeseries: {
     ptmVizType: 'ptm_echarts_timeseries',
     ptmSeriesType: 'auto', // Keep original behavior
   },

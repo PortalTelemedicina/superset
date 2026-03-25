@@ -17,11 +17,8 @@
 # pylint: disable=too-many-lines
 import functools
 import logging
-import os
-import uuid
 from datetime import datetime
 from io import BytesIO
-from pathlib import Path
 from typing import Any, Callable, cast
 from zipfile import is_zipfile, ZipFile
 
@@ -610,7 +607,9 @@ class DashboardRestApi(BaseSupersetModelRestApi):
     @safe
     @statsd_metrics
     @event_logger.log_this_with_context(
-        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get_has_shared_charts",
+        action=lambda self,
+        *args,
+        **kwargs: f"{self.__class__.__name__}.get_has_shared_charts",
         log_to_statsd=False,
     )
     def get_has_shared_charts(self, id_or_slug: str) -> Response:
@@ -2027,10 +2026,12 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         # This allows extension logic to be separated from core API
         # See: superset/extensions/portal/api/dashboard_header.py
         try:
-            from superset.extensions.portal.api.dashboard_header import upload_header_image_handler
-            
+            from superset.extensions.portal.api.dashboard_header import (
+                upload_header_image_handler,
+            )
+
             status_code, result, message = upload_header_image_handler()
-            
+
             if status_code == 200:
                 return self.response(status_code, result=result, message=message)
             elif status_code == 400:

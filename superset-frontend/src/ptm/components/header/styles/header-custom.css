@@ -1,6 +1,6 @@
 /**
  * Portal Custom Header Styles
- * 
+ *
  * Scoped CSS for custom header extension.
  * All styles are prefixed with .portal-* to avoid conflicts.
  */
@@ -20,4 +20,3 @@
 .portal-slot-group {
   /* Styles for slot groups (left, center, right) */
 }
-

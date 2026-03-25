@@ -65,7 +65,7 @@ export default function EchartWrapper({
 
   useEffect(() => {
     if (!divRef.current) return;
-    
+
     if (!chartRef.current) {
       chartRef.current = init(divRef.current);
     }
@@ -95,4 +95,3 @@ export default function EchartWrapper({
 
   return <Styles ref={divRef} height={height} width={width} />;
 }
-

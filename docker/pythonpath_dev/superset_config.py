@@ -26,14 +26,15 @@ import sys
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
+
 from superset.translations.utils import get_language_pack
 
 LANGUAGES = {
-    'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
-    'en': {'flag': 'us', 'name': 'English'}
+    "pt_BR": {"flag": "br", "name": "Brazilian Portuguese"},
+    "en": {"flag": "us", "name": "English"},
 }
 
-BABEL_DEFAULT_LOCALE = 'pt_BR'
+BABEL_DEFAULT_LOCALE = "pt_BR"
 
 
 def override_bootstrap_locale(data):
@@ -132,7 +133,9 @@ FEATURE_FLAGS = {
 # and stitching them together, preventing PDF reports from being cut off
 SCREENSHOT_TILED_ENABLED = True  # Enable tiled screenshots for large dashboards
 SCREENSHOT_TILED_CHART_THRESHOLD = 20  # Minimum charts to trigger tiled screenshots
-SCREENSHOT_TILED_HEIGHT_THRESHOLD = 5000  # Minimum height (px) to trigger tiled screenshots
+SCREENSHOT_TILED_HEIGHT_THRESHOLD = (
+    5000  # Minimum height (px) to trigger tiled screenshots
+)
 SCREENSHOT_TILED_VIEWPORT_HEIGHT = 2000  # Height of each tile in pixels
 
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True

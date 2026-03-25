@@ -129,7 +129,6 @@ const ToggleButton = styled.button`
   `}
 `;
 
-
 const getChipColors = (theme: ReturnType<typeof useTheme>) => ({
   bg: theme.colorFillTertiary ?? theme.colorBgLayout,
   fg: theme.colorText,
@@ -213,20 +212,17 @@ export const FilterBarAdapter: FC<HorizontalBarProps> = ({
     [selectedCrossFilters],
   );
 
-  const appliedChips = useMemo(
-    () => {
-      const allChips = [...appliedNativeFilterChips, ...appliedCrossFilterChips];
-      // Deduplicate chips with identical labels
-      const seenLabels = new Set<string>();
-      const chips = allChips.filter(chip => {
-        if (seenLabels.has(chip.label)) return false;
-        seenLabels.add(chip.label);
-        return true;
-      });
-      return chips;
-    },
-    [appliedNativeFilterChips, appliedCrossFilterChips],
-  );
+  const appliedChips = useMemo(() => {
+    const allChips = [...appliedNativeFilterChips, ...appliedCrossFilterChips];
+    // Deduplicate chips with identical labels
+    const seenLabels = new Set<string>();
+    const chips = allChips.filter(chip => {
+      if (seenLabels.has(chip.label)) return false;
+      seenLabels.add(chip.label);
+      return true;
+    });
+    return chips;
+  }, [appliedNativeFilterChips, appliedCrossFilterChips]);
 
   const chipColors = getChipColors(theme);
 
@@ -283,8 +279,7 @@ export const FilterBarAdapter: FC<HorizontalBarProps> = ({
             ) : (
               <span
                 style={{
-                  color:
-                    theme.colorTextTertiary ?? theme.colorTextSecondary,
+                  color: theme.colorTextTertiary ?? theme.colorTextSecondary,
                 }}
               >
                 {t('No applied filters')}

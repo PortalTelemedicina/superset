@@ -60,7 +60,9 @@ test('DataReliabilityIndicator renders with empty message', () => {
 });
 
 test('DataReliabilityIndicator supports warning icon type', () => {
-  render(<DataReliabilityIndicator message={TEST_MESSAGE} iconType="warning" />);
+  render(
+    <DataReliabilityIndicator message={TEST_MESSAGE} iconType="warning" />,
+  );
   const icon = screen.getByLabelText('Data Reliability Information');
   expect(icon).toBeInTheDocument();
 });

@@ -40,10 +40,10 @@ def register_dashboard_extension_fields(app: Flask) -> None:
         return
 
     try:
+        from superset.dashboards.schemas import DashboardJSONMetadataSchema
         from superset.extensions.portal.schemas.dashboard_metadata import (
             PortalDashboardMetadataExtension,
         )
-        from superset.dashboards.schemas import DashboardJSONMetadataSchema
 
         PortalDashboardMetadataExtension.merge_into_base_schema(
             DashboardJSONMetadataSchema
@@ -63,4 +63,3 @@ def register_extensions(app: Optional[Flask] = None) -> None:
         )
         return
     register_dashboard_extension_fields(app)
-

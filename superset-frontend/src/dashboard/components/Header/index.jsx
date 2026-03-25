@@ -63,6 +63,7 @@ import { deleteActiveReport } from 'src/features/reports/ReportModal/actions';
 import { PageHeaderWithActions } from '@superset-ui/core/components/PageHeaderWithActions';
 import { useUnsavedChangesPrompt } from 'src/hooks/useUnsavedChangesPrompt';
 import { PtmLockedBadge } from 'src/dashboard/components/PtmLockedBadge';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 import DashboardEmbedModal from '../EmbeddedModal';
 import OverwriteConfirm from '../OverwriteConfirm';
 import {
@@ -98,7 +99,6 @@ import isDashboardLoading from '../../util/isDashboardLoading';
 import { useChartIds } from '../../util/charts/useChartIds';
 import { useDashboardMetadataBar } from './useDashboardMetadataBar';
 import { useHeaderActionsMenu } from './useHeaderActionsDropdownMenu';
-import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 
 const extensionsRegistry = getExtensionsRegistry();
 
@@ -611,19 +611,16 @@ const Header = () => {
           visible={!editMode}
         />
       ),
-      !editMode &&
-        !isEmbedded &&
-        isPtmExtensionEnabled() &&
-        ptmLocked && (
-          <span css={{ marginLeft: 6 }}>
-            <PtmLockedBadge
-              tooltipId="header-ptm-locked-tooltip"
-              tooltipTitle={t(
-                'Este dashboard está bloqueado para conversão automática de estilo PTM.',
-              )}
-            />
-          </span>
-        ),
+      !editMode && !isEmbedded && isPtmExtensionEnabled() && ptmLocked && (
+        <span css={{ marginLeft: 6 }}>
+          <PtmLockedBadge
+            tooltipId="header-ptm-locked-tooltip"
+            tooltipTitle={t(
+              'Este dashboard está bloqueado para conversão automática de estilo PTM.',
+            )}
+          />
+        </span>
+      ),
       !editMode && !isEmbedded && metadataBar,
     ],
     [

@@ -3,6 +3,7 @@ Portal dashboard freshness API handler.
 
 Isolated endpoint logic for dashboard freshness metadata.
 """
+
 import logging
 
 from superset.extensions.portal.services.dashboard_freshness import (

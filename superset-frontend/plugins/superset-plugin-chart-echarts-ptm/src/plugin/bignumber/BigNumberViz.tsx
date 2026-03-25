@@ -130,14 +130,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderTitle() {
-    const { title, titleFontSize } = this.props as BigNumberVizProps & { title?: string; titleFontSize?: number };
+    const { title, titleFontSize } = this.props as BigNumberVizProps & {
+      title?: string;
+      titleFontSize?: number;
+    };
     if (!title) return null;
 
     return (
-      <div 
-        className="card-title"
-        style={{ fontSize: titleFontSize || 14 }}
-      >
+      <div className="card-title" style={{ fontSize: titleFontSize || 14 }}>
         {title}
       </div>
     );
@@ -147,7 +147,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const { bigNumber, headerFormatter, width, colorThresholdFormatters } =
       this.props;
 
-    const text = bigNumber === null ? t('No data') : headerFormatter(bigNumber as number);
+    const text =
+      bigNumber === null ? t('No data') : headerFormatter(bigNumber as number);
 
     const hasThresholdColorFormatter =
       Array.isArray(colorThresholdFormatters) &&
@@ -203,7 +204,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderSubheader(maxHeight: number) {
-    const { bigNumber, subheader, width, bigNumberFallback, className } = this.props;
+    const { bigNumber, subheader, width, bigNumberFallback, className } =
+      this.props;
     let fontSize = 0;
 
     const NO_DATA_OR_HASNT_LANDED = t(
@@ -296,14 +298,15 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
   }
 
   renderIcon() {
-    const { showIcon, iconName, iconSize, iconColor, iconBackgroundColor } = this.props;
-    
+    const { showIcon, iconName, iconSize, iconColor, iconBackgroundColor } =
+      this.props;
+
     if (!showIcon || !iconName) return null;
 
     try {
       // Get the icon component from lucide-react
       const IconComponent = (LucideIcons as any)[iconName];
-      
+
       if (!IconComponent) {
         console.warn(`Icon "${iconName}" not found in lucide-react`);
         return null;
@@ -313,15 +316,15 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       const padding = size / 2; // Padding is half the icon size
 
       return (
-        <div 
-          className="ptm-icon-container" 
-          style={{ 
+        <div
+          className="ptm-icon-container"
+          style={{
             padding,
             backgroundColor: iconBackgroundColor || '#F5F5F5',
           }}
         >
-          <IconComponent 
-            size={size} 
+          <IconComponent
+            size={size}
             color={iconColor || '#666666'}
             strokeWidth={2}
           />
@@ -352,20 +355,34 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
   renderTrendBadge(fontSize: number) {
     const { subheader, className } = this.props;
-    
+
     // Only show trend badge if there's a positive or negative trend (comparison data)
     const isPositive = className?.includes('positive');
     const isNegative = className?.includes('negative');
-    
+
     // Don't render if no trend data (neither positive nor negative)
     if (!subheader || (!isPositive && !isNegative)) return null;
-    
-    const TrendIcon = isPositive ? TrendingUp : isNegative ? TrendingDown : null;
+
+    const TrendIcon = isPositive
+      ? TrendingUp
+      : isNegative
+        ? TrendingDown
+        : null;
 
     return (
-      <div className={`trend-badge ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}>
-        {TrendIcon && <TrendIcon className="trend-badge-icon" size={fontSize} strokeWidth={2} />}
-        <span className="trend-badge-text" style={{ fontSize }}>{subheader}</span>
+      <div
+        className={`trend-badge ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}
+      >
+        {TrendIcon && (
+          <TrendIcon
+            className="trend-badge-icon"
+            size={fontSize}
+            strokeWidth={2}
+          />
+        )}
+        <span className="trend-badge-text" style={{ fontSize }}>
+          {subheader}
+        </span>
       </div>
     );
   }
@@ -389,12 +406,12 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     // Responsive padding: scales between 12px (min) and 24px (max) based on height
     const responsivePad = Math.max(
       sizeUnit * 1.5,
-      Math.min(sizeUnit * 3, (height / 151) * sizeUnit * 2.5)
+      Math.min(sizeUnit * 3, (height / 151) * sizeUnit * 2.5),
     );
     // Responsive gap: scales between 8px (min) and 16px (max) based on height
     const responsiveGap = Math.max(
       sizeUnit * 1,
-      Math.min(sizeUnit * 2, (height / 151) * sizeUnit * 1.5)
+      Math.min(sizeUnit * 2, (height / 151) * sizeUnit * 1.5),
     );
 
     // Base configured font sizes
@@ -405,7 +422,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
     // Calculate fixed element heights (not scaled)
     const padding = responsivePad * 2;
-    const headerRowHeight = (showIcon || this.props.subheader) ? 40 + responsiveGap : 0;
+    const headerRowHeight =
+      showIcon || this.props.subheader ? 40 + responsiveGap : 0;
     const trendlineHeight = showTrendLine ? 60 + responsiveGap : 0;
     const totalGaps =
       (title ? 1 : 0) +
@@ -415,11 +433,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
     // Calculate target layout heights with configured sizes
     // First, estimate available height for header assuming configured sizes for title/additional text
-    const targetTitleHeight = title ? baseTitleFontSize * 1.3 + responsiveGap : 0;
-    const targetAdditionalTextHeight = additionalText 
-      ? baseAdditionalTextFontSize * 1.4 * 2 + responsiveGap 
+    const targetTitleHeight = title
+      ? baseTitleFontSize * 1.3 + responsiveGap
       : 0;
-    
+    const targetAdditionalTextHeight = additionalText
+      ? baseAdditionalTextFontSize * 1.4 * 2 + responsiveGap
+      : 0;
+
     // Calculate available height for the header (big number) with configured sizes
     const availableHeightForHeader = Math.max(
       height -
@@ -429,14 +449,14 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         targetAdditionalTextHeight -
         trendlineHeight -
         totalGaps * responsiveGap,
-      30
+      30,
     );
 
     // Calculate target header height based on configured ratio
     const targetHeaderHeight = availableHeightForHeader * baseHeaderFontSize;
 
     // Calculate total target height with configured sizes
-    const totalTargetHeight = 
+    const totalTargetHeight =
       padding +
       headerRowHeight +
       targetTitleHeight +
@@ -449,13 +469,15 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     let scaleFactor = 1;
     if (autofit && totalTargetHeight > height) {
       // Calculate fixed height (doesn't scale)
-      const fixedHeight = padding + headerRowHeight + trendlineHeight + totalGaps * responsiveGap;
+      const fixedHeight =
+        padding + headerRowHeight + trendlineHeight + totalGaps * responsiveGap;
       const availableForVariable = height - fixedHeight;
-      
+
       // Approximate scale factor: scale variable elements proportionally
       // Account for the fact that header height depends on available height, which increases
       // as we scale down title/additionalText. Use a conservative estimate.
-      const variableHeight = targetTitleHeight + targetHeaderHeight + targetAdditionalTextHeight;
+      const variableHeight =
+        targetTitleHeight + targetHeaderHeight + targetAdditionalTextHeight;
       if (variableHeight > 0) {
         // Use a slightly more aggressive scale factor to account for the feedback effect
         // where scaling down title/additionalText frees up space for header
@@ -463,13 +485,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         // Apply a small adjustment to account for header height dependency
         scaleFactor = Math.max(
           0.5, // Minimum scale factor to prevent too small text
-          baseScale * 0.95 // Slight reduction to ensure it fits
+          baseScale * 0.95, // Slight reduction to ensure it fits
         );
       }
     }
 
     // Apply scale factor to font sizes
-    const scaledTitleFontSize = autofit 
+    const scaledTitleFontSize = autofit
       ? Math.max(10, baseTitleFontSize * scaleFactor) // Min 10px for readability
       : baseTitleFontSize;
     const scaledHeaderFontSize = autofit
@@ -483,11 +505,13 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       : baseAdditionalTextFontSize;
 
     // Recalculate heights with scaled sizes
-    const scaledTitleHeight = title ? scaledTitleFontSize * 1.3 + responsiveGap : 0;
+    const scaledTitleHeight = title
+      ? scaledTitleFontSize * 1.3 + responsiveGap
+      : 0;
     const scaledAdditionalTextHeight = additionalText
       ? scaledAdditionalTextFontSize * 1.4 * 2 + responsiveGap
       : 0;
-    
+
     const availableHeight = Math.max(
       height -
         padding -
@@ -496,26 +520,31 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         scaledAdditionalTextHeight -
         trendlineHeight -
         totalGaps * responsiveGap,
-      30
+      30,
     );
-    const headerMaxHeight = Math.max(availableHeight * scaledHeaderFontSize, 30);
+    const headerMaxHeight = Math.max(
+      availableHeight * scaledHeaderFontSize,
+      30,
+    );
 
     // Calculate badge font size from scaled subheaderFontSize
     const badgeFontSize = Math.max(
       Math.ceil(scaledSubheaderFontSize * height * 0.08),
-      12 // Minimum 12px for readability
+      12, // Minimum 12px for readability
     );
 
     return (
       <div
         className={`${className} ptm-layout`}
-        style={{
-          height: '100%',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          '--pad': `${responsivePad}px`,
-          '--gap': `${responsiveGap}px`,
-        } as React.CSSProperties}
+        style={
+          {
+            height: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            '--pad': `${responsivePad}px`,
+            '--gap': `${responsiveGap}px`,
+          } as React.CSSProperties
+        }
       >
         <div className="ptm-header-row">
           {this.renderIcon()}
@@ -533,9 +562,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         {this.renderAdditionalText(scaledAdditionalTextFontSize)}
 
         {showTrendLine && (
-          <div className="ptm-bottom-trendline">
-            {this.renderTrendline(60)}
-          </div>
+          <div className="ptm-bottom-trendline">{this.renderTrendline(60)}</div>
         )}
       </div>
     );
@@ -553,7 +580,9 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const className = this.getClassName();
     const sizeUnit = 8;
     const padding = sizeUnit * 2 * 2;
-    const titleHeight = title ? (this.props.titleFontSize || 14) * 1.4 + sizeUnit * 2 : 0;
+    const titleHeight = title
+      ? (this.props.titleFontSize || 14) * 1.4 + sizeUnit * 2
+      : 0;
 
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
@@ -562,22 +591,37 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       return (
         <div
           className={className}
-          style={{ height: '100%', boxSizing: 'border-box', overflow: 'hidden' }}
+          style={{
+            height: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          }}
         >
           {this.renderTitle()}
-          <div className="text-container" style={{ height: allTextHeight, minHeight: 0 }}>
+          <div
+            className="text-container"
+            style={{ height: allTextHeight, minHeight: 0 }}
+          >
             {this.renderFallbackWarning()}
             {this.renderKicker(
-              Math.ceil((kickerFontSize || 0) * (1 - PROPORTION.TRENDLINE) * allTextHeight),
+              Math.ceil(
+                (kickerFontSize || 0) *
+                  (1 - PROPORTION.TRENDLINE) *
+                  allTextHeight,
+              ),
             )}
             {this.renderHeader(
               Math.max(
-                Math.ceil(headerFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight),
-                30
+                Math.ceil(
+                  headerFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight,
+                ),
+                30,
               ),
             )}
             {this.renderSubheader(
-              Math.ceil(subheaderFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight),
+              Math.ceil(
+                subheaderFontSize * (1 - PROPORTION.TRENDLINE) * allTextHeight,
+              ),
             )}
           </div>
           {this.renderTrendline(chartHeight)}
@@ -588,7 +632,8 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const availableHeight = height - padding - titleHeight;
     const kickerHeight = (kickerFontSize || 0) * availableHeight;
     const subheaderHeight = subheaderFontSize * availableHeight;
-    const headerAvailableHeight = availableHeight - kickerHeight - subheaderHeight - sizeUnit * 2;
+    const headerAvailableHeight =
+      availableHeight - kickerHeight - subheaderHeight - sizeUnit * 2;
 
     return (
       <div
@@ -598,7 +643,9 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         {this.renderTitle()}
         {this.renderFallbackWarning()}
         {this.renderKicker(kickerHeight)}
-        {this.renderHeader(Math.max(Math.ceil(headerFontSize * headerAvailableHeight), 30))}
+        {this.renderHeader(
+          Math.max(Math.ceil(headerFontSize * headerAvailableHeight), 30),
+        )}
         {this.renderSubheader(Math.ceil(subheaderHeight))}
       </div>
     );
@@ -717,17 +764,17 @@ export default styled(BigNumberVis)`
       color: ${tok.colorSuccess};
       font-weight: 600;
     }
-    
+
     &.positive .subheader-line .trend-icon {
       color: ${tok.colorSuccess};
     }
-    
+
     /* PTM: Negative trend styling - red for decline */
     &.negative .subheader-line {
       color: ${tok.colorError};
       font-weight: 600;
     }
-    
+
     &.negative .subheader-line .trend-icon {
       color: ${tok.colorError};
     }
@@ -850,4 +897,3 @@ export default styled(BigNumberVis)`
   `;
   }}
 `;
-

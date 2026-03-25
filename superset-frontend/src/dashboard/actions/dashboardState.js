@@ -36,7 +36,6 @@ import {
   removeChart,
   refreshChart,
 } from 'src/components/Chart/chartAction';
-import { ADD_SLICES, getDatasourceParameter } from './sliceEntities';
 import { chart as initChart } from 'src/components/Chart/chartReducer';
 import { applyDefaultFormData } from 'src/explore/store';
 import {
@@ -60,6 +59,7 @@ import { logEvent } from 'src/logger/actions';
 import { LOG_ACTIONS_CONFIRM_OVERWRITE_DASHBOARD_METADATA } from 'src/logger/LogUtils';
 import { isEqual } from 'lodash';
 import { navigateWithState, navigateTo } from 'src/utils/navigationUtils';
+import { ADD_SLICES, getDatasourceParameter } from './sliceEntities';
 import { UPDATE_COMPONENTS_PARENTS_LIST } from './dashboardLayout';
 import {
   saveChartConfiguration,
@@ -394,7 +394,7 @@ export function saveDashboardRequest(data, id, saveType) {
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
       }
-      
+
       // Call dashboard save extension hooks (e.g., PTM auto-convert) for copy mode
       const registry = getExtensionsRegistry();
       const hook = registry.get('dashboard.save.before');
@@ -414,7 +414,7 @@ export function saveDashboardRequest(data, id, saveType) {
           // Continue anyway - don't block dashboard creation
         }
       }
-      
+
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
       dispatch(
@@ -435,7 +435,7 @@ export function saveDashboardRequest(data, id, saveType) {
       // syncing with the backend transformations of the metadata
       if (updatedDashboard.json_metadata) {
         const metadata = JSON.parse(updatedDashboard.json_metadata);
-        
+
         // Preserve client headerLayout if server omitted it (e.g. when extension flag is off)
         const clientHeaderLayout =
           getState().dashboardInfo?.metadata?.headerLayout;
@@ -474,15 +474,18 @@ export function saveDashboardRequest(data, id, saveType) {
               // Silently fail - datasets endpoint may not exist, return 404, or dashboard may not have datasets
               // This is not critical for dashboard save functionality
               // Handle Response objects (which SupersetClient throws) and error objects
-              const status = error instanceof Response 
-                ? error.status 
-                : error?.status || error?.response?.status || error?.statusCode;
-              
+              const status =
+                error instanceof Response
+                  ? error.status
+                  : error?.status ||
+                    error?.response?.status ||
+                    error?.statusCode;
+
               // Only log non-404 errors (404 is expected if dashboard has no datasets)
               if (status !== 404 && status !== undefined) {
                 console.debug('Could not fetch dashboard datasets:', error);
               }
-              
+
               // Return a resolved promise to prevent unhandled rejection
               return Promise.resolve();
             });
@@ -558,7 +561,7 @@ export function saveDashboardRequest(data, id, saveType) {
       const updateDashboard = async () => {
         // Call dashboard save extension hooks (e.g., PTM auto-convert)
         await callDashboardSaveHooks('update');
-        
+
         return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${id}`,
           headers: { 'Content-Type': 'application/json' },

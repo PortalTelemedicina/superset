@@ -23,7 +23,6 @@ import {
 } from '@superset-ui/chart-controls';
 import { type TransformConfig } from './transformHelpers/transformRegistry';
 
-
 export const ptmColorPaletteChoices: [string, string][] = [
   ['blue', t('Azul (Padrão)')],
   ['green', t('Verde (Crescimento)')],
@@ -109,7 +108,9 @@ export const ptmTextCasingControls: ControlSetRow = [
     config: {
       type: 'SelectControl',
       label: t('Table text casing'),
-      description: t('Standardize casing for table headers and cell text (Table / Pivot Table).'),
+      description: t(
+        'Standardize casing for table headers and cell text (Table / Pivot Table).',
+      ),
       default: 'none',
       clearable: false,
       choices: ptmTextCaseChoices,
@@ -126,8 +127,8 @@ export const ptmJsonOverrideControl: ControlSetRow = [
       label: t('PTM ECharts JSON Overrides'),
       description: t(
         'Advanced: JSON object to deep-merge into final ECharts options. ' +
-        'Allows fine-grained control over any ECharts property. ' +
-        'Example: {"series": [{"itemStyle": {"borderRadius": 4}}]}',
+          'Allows fine-grained control over any ECharts property. ' +
+          'Example: {"series": [{"itemStyle": {"borderRadius": 4}}]}',
       ),
       default: '',
       language: 'json',

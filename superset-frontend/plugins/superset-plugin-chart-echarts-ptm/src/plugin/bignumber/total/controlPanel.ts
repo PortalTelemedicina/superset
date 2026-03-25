@@ -59,9 +59,7 @@ export default {
               type: 'TextControl',
               label: t('Card Title'),
               renderTrigger: true,
-              description: t(
-                'Title text to display above the number',
-              ),
+              description: t('Title text to display above the number'),
             },
           },
         ],
@@ -175,4 +173,3 @@ export default {
     metric: getStandardizedControls().shiftMetric(),
   }),
 } as ControlPanelConfig;
-

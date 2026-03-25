@@ -17,14 +17,20 @@
  * under the License.
  */
 
-import { applyAllDefaults, applyColorPalette, type TransformConfig } from './transformHelpers';
+import {
+  applyAllDefaults,
+  applyColorPalette,
+  type TransformConfig,
+} from './transformHelpers';
 
 interface EchartOptions {
   series?: Record<string, unknown>[];
   [key: string]: unknown;
 }
 
-export function createDefaultPluginTransform(ptmDefaults: Record<string, unknown>) {
+export function createDefaultPluginTransform(
+  ptmDefaults: Record<string, unknown>,
+) {
   return (
     options: EchartOptions,
     formData: Record<string, unknown>,
@@ -43,4 +49,3 @@ export function createDefaultPluginTransform(ptmDefaults: Record<string, unknown
     return finalOptions;
   };
 }
-

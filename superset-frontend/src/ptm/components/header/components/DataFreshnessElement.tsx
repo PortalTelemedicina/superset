@@ -142,13 +142,12 @@ export const DataFreshnessElement: React.FC<DataFreshnessElementProps> = ({
         timeZone: timezone,
         hour12: false,
       });
-      return formatter.formatToParts(date).reduce<Record<string, string>>(
-        (acc, part) => {
+      return formatter
+        .formatToParts(date)
+        .reduce<Record<string, string>>((acc, part) => {
           acc[part.type] = part.value;
           return acc;
-        },
-        {},
-      );
+        }, {});
     };
 
     const formatPresetValue = formatPreset || '';
