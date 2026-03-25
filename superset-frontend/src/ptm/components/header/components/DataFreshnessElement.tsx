@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 import { SupersetClient } from '@superset-ui/core';
 import { Spin } from 'antd';
 
@@ -71,7 +71,7 @@ const buildDetailsTooltip = (data: DashboardFreshnessResponse) =>
   `Skipped: virtual ${data.skipped.virtual}, non-bigquery ${data.skipped.non_bigquery}, ` +
   `missing ${data.skipped.missing}, views ${data.skipped.views}`;
 
-export const DataFreshnessElement: React.FC<DataFreshnessElementProps> = ({
+export const DataFreshnessElement: FC<DataFreshnessElementProps> = ({
   dashboardId,
   label = 'Última atualização',
   timezone = 'America/Sao_Paulo',

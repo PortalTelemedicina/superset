@@ -1,3 +1,4 @@
+/* eslint-disable global-require, @typescript-eslint/no-var-requires */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

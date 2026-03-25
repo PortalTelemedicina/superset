@@ -59,7 +59,6 @@ import { logEvent } from 'src/logger/actions';
 import { LOG_ACTIONS_CONFIRM_OVERWRITE_DASHBOARD_METADATA } from 'src/logger/LogUtils';
 import { isEqual } from 'lodash';
 import { navigateWithState, navigateTo } from 'src/utils/navigationUtils';
-import { ADD_SLICES, getDatasourceParameter } from './sliceEntities';
 import { UPDATE_COMPONENTS_PARENTS_LIST } from './dashboardLayout';
 import {
   saveChartConfiguration,

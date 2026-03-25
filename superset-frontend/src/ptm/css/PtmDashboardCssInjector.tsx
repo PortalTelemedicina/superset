@@ -85,12 +85,10 @@ export default function PtmDashboardCssInjector({
       if (!removeLinkRef.current) {
         removeLinkRef.current = ensurePtmCssLink();
       }
-    } else {
+    } else if (removeLinkRef.current) {
       // Remove PTM CSS link if dashboard doesn't have PTM tag
-      if (removeLinkRef.current) {
-        removeLinkRef.current();
-        removeLinkRef.current = null;
-      }
+      removeLinkRef.current();
+      removeLinkRef.current = null;
     }
 
     // Inject dashboard custom CSS (without @import, PTM CSS is already loaded via link)

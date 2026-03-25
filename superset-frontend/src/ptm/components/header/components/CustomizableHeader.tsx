@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { styled } from '@superset-ui/core';
 import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import { HeaderLayout, SlotPosition, getSlotsByPosition } from '../types';
@@ -66,7 +66,7 @@ interface CustomizableHeaderProps {
   dashboardId?: number;
 }
 
-export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
+export const CustomizableHeader: FC<CustomizableHeaderProps> = ({
   headerLayout,
   dashboardTitle,
   onTitleChange,

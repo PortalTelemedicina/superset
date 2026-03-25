@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
+import { isValidElement } from 'react';
 import { TypedRegistry } from '../models';
 import { makeSingleton } from '../utils';
 import type {
@@ -77,7 +77,7 @@ function validateSliceHeaderControlsTrigger(
       typeof result === 'string' ||
       typeof result === 'number' ||
       typeof result === 'boolean' ||
-      React.isValidElement(result)
+      isValidElement(result)
     ) {
       return result;
     }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useState, useCallback } from 'react';
+import { type FC, useState, useCallback } from 'react';
 import {
   styled,
   t,
@@ -176,7 +176,7 @@ const ButtonGroup = styled.div`
 `;
 
 /** Wrapper so Form.Item injects value/onChange but Upload receives fileList (antd expects fileList, not value). */
-const LogoUrlUpload: React.FC<{
+const LogoUrlUpload: FC<{
   value?: string;
   onUpload: (file: File) => void;
   uploading: boolean;
@@ -204,7 +204,7 @@ interface HeaderSlotEditorProps {
   onCancel: () => void;
 }
 
-export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
+export const HeaderSlotEditor: FC<HeaderSlotEditorProps> = ({
   headerLayout: initialLayout,
   dashboardTitle,
   onSave,

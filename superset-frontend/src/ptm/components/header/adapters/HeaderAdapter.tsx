@@ -16,7 +16,7 @@
  * specific language governing limitations under the License.
  */
 
-import React, { useMemo, useCallback, useState } from 'react';
+import { type FC, useMemo, useCallback, useState } from 'react';
 import { css, useTheme, t } from '@superset-ui/core';
 import { Button } from '@superset-ui/core/components';
 import { Icons } from '@superset-ui/core/components/Icons';
@@ -66,7 +66,7 @@ export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
  * />
  * ```
  */
-export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
+export const HeaderAdapter: FC<HeaderAdapterProps> = ({
   dashboardInfo,
   editMode = false,
   isEmbedded = false,
