@@ -62,7 +62,8 @@ jobs:
 
       - name: "Set up liccheck"
         run: |
-          uv pip install --system liccheck
+          # liccheck imports pkg_resources (setuptools); not guaranteed on slim Python images
+          uv pip install --system liccheck setuptools
       - name: "Run liccheck"
         run: |
           # run the checks
