@@ -18,7 +18,7 @@
  */
 
 import { css, styled } from '@superset-ui/core';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
+import { getThemeTokens } from '../../shared/themeTokens';
 
 export default styled.div`
   ${({ theme }) => {
