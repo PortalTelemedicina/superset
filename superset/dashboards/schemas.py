@@ -211,11 +211,12 @@ class DashboardJSONMetadataSchema(Schema):
     filter_bar_orientation = fields.Str(allow_none=True)
     native_filter_migration = fields.Dict()
     # Extension-owned dashboard metadata (kept for backward compatibility)
-    headerLayout = fields.Dict(allow_none=True)
+    headerLayout = fields.Dict(allow_none=True)  # noqa: N815
     ptm_autoconvert = fields.Boolean(allow_none=True)
     ptm_locked = fields.Boolean(allow_none=True)
     ptm_locked_reason = fields.Str(allow_none=True)
-    # Frontend-only: set from GET has_shared_charts; not persisted (not in EXTENSION_METADATA_KEYS)
+    # Frontend-only: from GET has_shared_charts; not persisted
+    # (not in EXTENSION_METADATA_KEYS)
     has_shared_charts = fields.Boolean(allow_none=True)
 
     @pre_load

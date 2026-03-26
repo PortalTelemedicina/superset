@@ -20,7 +20,7 @@ This module provides extension fields that can be merged into
 the base dashboard metadata schema without modifying core code.
 """
 
-from typing import Dict
+from typing import Any, Dict
 
 from marshmallow import EXCLUDE, fields, Schema, validate
 
@@ -176,13 +176,15 @@ class PortalDashboardMetadataExtension:
                 allow_none=True,
                 missing=None,
                 metadata={
-                    "description": "Custom header layout configuration for portal branding"
+                    "description": (
+                        "Custom header layout configuration for portal branding"
+                    )
                 },
             ),
         }
 
     @classmethod
-    def merge_into_base_schema(cls, base_schema_class: type) -> None:
+    def merge_into_base_schema(cls, base_schema_class: type[Schema]) -> None:
         """
         Dynamically merges extension fields into the base schema class.
 
@@ -190,28 +192,24 @@ class PortalDashboardMetadataExtension:
         with properly validated nested schemas when available.
 
         Args:
-            base_schema_class: The base schema class to extend (e.g., DashboardJSONMetadataSchema)
+            base_schema_class: Base schema class to extend
+                (e.g. DashboardJSONMetadataSchema).
         """
         extension_fields = cls.get_extension_fields()
+        # Marshmallow mutates class _declared_fields; treat as dynamic Any for typing.
+        base: Any = base_schema_class
 
         for field_name, field_instance in extension_fields.items():
-            # If field already exists (e.g., as a generic Dict), replace it with validated version
-            # If field doesn't exist, add it
-            if hasattr(base_schema_class, field_name):
-                # Field exists, replace with validated version
-                setattr(base_schema_class, field_name, field_instance)
-                # Update _declared_fields if it exists
-                if (
-                    hasattr(base_schema_class, "_declared_fields")
-                    and base_schema_class._declared_fields
-                ):
-                    base_schema_class._declared_fields[field_name] = field_instance
+            # If field already exists (e.g., as a generic Dict), replace it
+            # with validated version. If field doesn't exist, add it.
+            if hasattr(base, field_name):
+                setattr(base, field_name, field_instance)
+                if hasattr(base, "_declared_fields") and base._declared_fields:
+                    base._declared_fields[field_name] = field_instance
             else:
-                # Field doesn't exist, add it
-                setattr(base_schema_class, field_name, field_instance)
-                # Ensure _declared_fields exists and add field to it
-                if not hasattr(base_schema_class, "_declared_fields"):
-                    base_schema_class._declared_fields = {}
-                elif base_schema_class._declared_fields is None:
-                    base_schema_class._declared_fields = {}
-                base_schema_class._declared_fields[field_name] = field_instance
+                setattr(base, field_name, field_instance)
+                if not hasattr(base, "_declared_fields"):
+                    base._declared_fields = {}
+                elif base._declared_fields is None:
+                    base._declared_fields = {}
+                base._declared_fields[field_name] = field_instance

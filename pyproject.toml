@@ -341,6 +341,10 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "superset/translations/utils.py" = ["TID251"]
 "superset/extensions/__init__.py" = ["TID251"]
 "superset/utils/json.py" = ["TID251"]
+# Marshmallow fields use frontend JSON camelCase names
+"superset/extensions/portal/schemas/dashboard_metadata.py" = ["N815"]
+# BigQuery __TABLES__ metadata query uses escaped table_id literals (not user SQL)
+"superset/extensions/portal/services/dashboard_freshness.py" = ["S608"]
 
 [tool.ruff.lint.isort]
 case-sensitive = false

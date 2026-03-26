@@ -60,8 +60,8 @@ class ImageRehostService:
 
         Args:
             file: The file to upload (file uploads only, no URLs)
-            filename: Optional custom filename (will generate UUID-based name if not provided)
-            subfolder: Optional subfolder path (defaults to config or empty for uploads root)
+            filename: Optional custom filename (UUID-based name if omitted)
+            subfolder: Optional subfolder (defaults to config or uploads root)
 
         Returns:
             Tuple of (public_url, storage_path)
@@ -102,7 +102,7 @@ class ImageRehostService:
             raise RuntimeError(
                 "GCP bucket configured but google-cloud-storage not installed. "
                 "Install with: pip install google-cloud-storage"
-            )
+            ) from None
 
         # Initialize GCP client
 
@@ -165,7 +165,7 @@ class ImageRehostService:
             raise RuntimeError(
                 f"Permission denied creating upload directory: {logo_dir_str}. "
                 f"Error: {str(e)}"
-            )
+            ) from e
 
         # Check write permissions
         if not os.access(logo_dir_str, os.W_OK):

@@ -23,13 +23,14 @@ using Superset's authentication and permission system.
 
 import os
 from pathlib import Path
+from typing import Any
 
 from flask import current_app, request
 
 from superset.extensions.portal.services.image_rehost import ImageRehostService
 
 
-def upload_header_image_handler():
+def upload_header_image_handler() -> tuple[int, dict[str, Any] | None, str]:
     """
     Handle header image upload (file uploads only, no URLs).
 
@@ -65,10 +66,11 @@ def upload_header_image_handler():
     file.seek(0)
     max_size = 2 * 1024 * 1024  # 2MB
     if file_size > max_size:
+        size_mb = file_size / 1024 / 1024
         return (
             400,
             None,
-            f"File too large. Maximum size: 2MB. Current size: {file_size / 1024 / 1024:.2f}MB",
+            f"File too large. Maximum size: 2MB. Current size: {size_mb:.2f}MB",
         )
 
     try:

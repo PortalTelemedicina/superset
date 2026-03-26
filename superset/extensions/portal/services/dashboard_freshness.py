@@ -115,6 +115,7 @@ def _query_bigquery_metadata(
     if not escaped_table_ids:
         return []
 
+    # Table IDs are single-quoted literals from _escape_table_id (not user SQL).
     query = (
         "SELECT table_id, last_modified_time, type "
         f"FROM `{catalog}.{schema}.__TABLES__` "

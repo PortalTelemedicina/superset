@@ -23,6 +23,7 @@
 import logging
 import os
 import sys
+from typing import Any, MutableMapping
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
@@ -37,7 +38,9 @@ LANGUAGES = {
 BABEL_DEFAULT_LOCALE = "pt_BR"
 
 
-def override_bootstrap_locale(data):
+def override_bootstrap_locale(
+    data: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
     locale = data.get("locale")
     if locale == "pt":
         data["locale"] = "pt_BR"
@@ -122,10 +125,12 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
-    "ALLOW_FULL_CSV_EXPORT": True,  # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    "ALLOW_FULL_CSV_EXPORT": True,
     "TAGGING_SYSTEM": True,
     "PTM_EXTENSION_ENABLED": True,
-    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,  # Enable Playwright for full-page screenshots
+    # Enable Playwright for full-page screenshots
+    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,
 }
 
 # Tiled screenshot configuration for large dashboards

@@ -20,6 +20,7 @@ Isolated endpoint logic for dashboard freshness metadata.
 """
 
 import logging
+from typing import Any
 
 from superset.extensions.portal.services.dashboard_freshness import (
     compute_dashboard_freshness,
@@ -29,7 +30,9 @@ from superset.models.dashboard import Dashboard
 logger = logging.getLogger(__name__)
 
 
-def dashboard_freshness_handler(dashboard: Dashboard):
+def dashboard_freshness_handler(
+    dashboard: Dashboard,
+) -> tuple[int, dict[str, Any] | None, str]:
     try:
         result = compute_dashboard_freshness(dashboard)
         return 200, result, "OK"

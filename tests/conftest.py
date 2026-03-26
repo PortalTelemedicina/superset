@@ -29,8 +29,9 @@ import functools
 import os
 import time
 
-# GitHub Actions uses UTC. A local TZ (e.g. Americas) shifts calendar-day boundaries
-# and naive-datetime epochs, breaking time_filter, date_parser, and dttm_sql_literal tests.
+# GitHub Actions uses UTC. A local TZ (e.g. Americas) shifts calendar-day
+# boundaries and naive-datetime epochs, breaking time_filter, date_parser,
+# and dttm_sql_literal tests.
 os.environ.setdefault("TZ", "UTC")
 if hasattr(time, "tzset"):
     time.tzset()
