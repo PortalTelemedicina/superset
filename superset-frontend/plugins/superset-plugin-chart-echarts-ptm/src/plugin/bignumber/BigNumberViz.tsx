@@ -27,9 +27,9 @@ import {
   styled,
   BinaryQueryObjectFilterClause,
 } from '@superset-ui/core';
-import { getThemeTokens } from '../../shared/themeTokens';
 import * as LucideIcons from 'lucide-react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { getThemeTokens } from '../../shared/themeTokens';
 import Echart from './EchartWrapper';
 import { BigNumberVizProps } from './types';
 
