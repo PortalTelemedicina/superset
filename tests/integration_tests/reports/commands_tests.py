@@ -106,6 +106,22 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
+@pytest.fixture(autouse=True)
+def force_non_dry_run_notifications() -> None:
+    """
+    Ensure notification-sending tests run with SMTP sends enabled.
+
+    Some tests in this module assert `send_email_smtp` call arguments; those
+    assertions require non-dry-run mode.
+    """
+    original_value = app.config.get("ALERT_REPORTS_NOTIFICATION_DRY_RUN", True)
+    app.config["ALERT_REPORTS_NOTIFICATION_DRY_RUN"] = False
+    try:
+        yield
+    finally:
+        app.config["ALERT_REPORTS_NOTIFICATION_DRY_RUN"] = original_value
+
+
 def get_target_from_report_schedule(report_schedule: ReportSchedule) -> list[str]:
     return [
         json.loads(recipient.recipient_config_json)["target"]
