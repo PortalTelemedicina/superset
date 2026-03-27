@@ -16,7 +16,7 @@
 # under the License.
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Generator, Optional
 from unittest.mock import call, Mock, patch
 from uuid import uuid4
 
@@ -107,7 +107,7 @@ pytestmark = pytest.mark.usefixtures(
 
 
 @pytest.fixture(autouse=True)
-def force_non_dry_run_notifications() -> None:
+def force_non_dry_run_notifications() -> Generator[None, None, None]:
     """
     Ensure notification-sending tests run with SMTP sends enabled.
 
