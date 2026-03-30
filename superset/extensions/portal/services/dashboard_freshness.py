@@ -1,14 +1,30 @@
-"""
-Portal dashboard freshness service.
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+"""Portal dashboard freshness service.
 
 Computes dashboard data freshness based on physical tables used
 by charts in the dashboard. Currently supports BigQuery only.
 """
+
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from datetime import datetime, timezone
-import logging
 from typing import Any
 
 from sqlalchemy import text
@@ -32,11 +48,7 @@ def _get_dashboard_dataset_ids(dashboard: Dashboard) -> set[int]:
 
 
 def _get_datasets(dataset_ids: set[int]) -> tuple[list[SqlaTable], int]:
-    datasets = (
-        db.session.query(SqlaTable)
-        .filter(SqlaTable.id.in_(dataset_ids))
-        .all()
-    )
+    datasets = db.session.query(SqlaTable).filter(SqlaTable.id.in_(dataset_ids)).all()
     datasets_by_id = {dataset.id: dataset for dataset in datasets}
     missing_count = len(dataset_ids - set(datasets_by_id.keys()))
     return datasets, missing_count
@@ -103,6 +115,7 @@ def _query_bigquery_metadata(
     if not escaped_table_ids:
         return []
 
+    # Table IDs are single-quoted literals from _escape_table_id (not user SQL).
     query = (
         "SELECT table_id, last_modified_time, type "
         f"FROM `{catalog}.{schema}.__TABLES__` "
@@ -192,8 +205,7 @@ def _build_result(
 
 def compute_dashboard_freshness(dashboard: Dashboard) -> dict[str, Any]:
     cache_key = f"dashboard_freshness:{dashboard.id}"
-    cached = cache_manager.cache.get(cache_key)
-    if cached:
+    if cached := cache_manager.cache.get(cache_key):
         return cached
 
     skipped = {

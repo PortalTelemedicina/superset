@@ -45,7 +45,7 @@ runs:
         if [ "${{ inputs.install-superset }}" = "true" ]; then
           sudo apt-get update && sudo apt-get -y install libldap2-dev libsasl2-dev
 
-          pip install --upgrade pip setuptools wheel uv
+          pip install --upgrade pip "setuptools>=69,<81" wheel uv
 
           if [ "${{ inputs.requirements-type }}" = "dev" ]; then
             uv pip install --system -r requirements/development.txt

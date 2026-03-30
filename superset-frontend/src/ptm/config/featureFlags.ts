@@ -22,11 +22,13 @@ import getBootstrapData from 'src/utils/getBootstrapData';
 /** Master switch: when true, PTM extensions and plugins are applied. */
 export const PTM_EXTENSION_ENABLED = 'PTM_EXTENSION_ENABLED';
 
-export const PTM_ENABLE_GLOBAL_DASHBOARD_CSS = 'PTM_ENABLE_GLOBAL_DASHBOARD_CSS';
+export const PTM_ENABLE_GLOBAL_DASHBOARD_CSS =
+  'PTM_ENABLE_GLOBAL_DASHBOARD_CSS';
 export const PTM_ENABLE_HEADER_CUSTOM = 'PTM_ENABLE_HEADER_CUSTOM';
 export const PTM_ENABLE_PTM_CHART_PLUGINS = 'PTM_ENABLE_PTM_CHART_PLUGINS';
 export const PTM_ENABLE_FILTERBAR_COLLAPSE = 'PTM_ENABLE_FILTERBAR_COLLAPSE';
-export const PTM_ENABLE_SLICE_HEADER_CONTROLS = 'PTM_ENABLE_SLICE_HEADER_CONTROLS';
+export const PTM_ENABLE_SLICE_HEADER_CONTROLS =
+  'PTM_ENABLE_SLICE_HEADER_CONTROLS';
 export const PTM_ENABLE_DATA_RELIABILITY_INDICATOR =
   'PTM_ENABLE_DATA_RELIABILITY_INDICATOR';
 
@@ -59,7 +61,10 @@ function getWindowFeatureFlags(): FeatureFlags {
 export function isPtmExtensionEnabled(): boolean {
   const flags = getBootstrapFlags();
   const winFlags = getWindowFeatureFlags();
-  return flags[PTM_EXTENSION_ENABLED] === true || winFlags[PTM_EXTENSION_ENABLED] === true;
+  return (
+    flags[PTM_EXTENSION_ENABLED] === true ||
+    winFlags[PTM_EXTENSION_ENABLED] === true
+  );
 }
 
 function isPtmFlagOn(flagKey: string, defaultValue: boolean): boolean {
@@ -68,22 +73,38 @@ function isPtmFlagOn(flagKey: string, defaultValue: boolean): boolean {
   const bootstrap = getBootstrapFlags();
   if (bootstrap[flagKey] !== undefined) return Boolean(bootstrap[flagKey]);
   try {
-    if (typeof window !== 'undefined' && window.featureFlags && flagKey in window.featureFlags) {
+    if (
+      typeof window !== 'undefined' &&
+      window.featureFlags &&
+      flagKey in window.featureFlags
+    ) {
       const value = (window.featureFlags as Record<string, boolean>)[flagKey];
       return Boolean(value);
     }
   } catch {
     // ignore
   }
-  const config = (window as unknown as { SUPERSET_CONFIG?: { extensions?: { portal?: Record<string, boolean> } } })
-    ?.SUPERSET_CONFIG?.extensions?.portal;
-  if (flagKey === PTM_ENABLE_HEADER_CUSTOM && config?.headerCustomEnabled !== undefined) {
+  const config = (
+    window as unknown as {
+      SUPERSET_CONFIG?: { extensions?: { portal?: Record<string, boolean> } };
+    }
+  )?.SUPERSET_CONFIG?.extensions?.portal;
+  if (
+    flagKey === PTM_ENABLE_HEADER_CUSTOM &&
+    config?.headerCustomEnabled !== undefined
+  ) {
     return Boolean(config.headerCustomEnabled);
   }
-  if (flagKey === PTM_ENABLE_GLOBAL_DASHBOARD_CSS && config?.ptmThemeEnabled !== undefined) {
+  if (
+    flagKey === PTM_ENABLE_GLOBAL_DASHBOARD_CSS &&
+    config?.ptmThemeEnabled !== undefined
+  ) {
     return Boolean(config.ptmThemeEnabled);
   }
-  if (flagKey === PTM_ENABLE_FILTERBAR_COLLAPSE && config?.filterBarCustomEnabled !== undefined) {
+  if (
+    flagKey === PTM_ENABLE_FILTERBAR_COLLAPSE &&
+    config?.filterBarCustomEnabled !== undefined
+  ) {
     return Boolean(config.filterBarCustomEnabled);
   }
   return defaultValue;

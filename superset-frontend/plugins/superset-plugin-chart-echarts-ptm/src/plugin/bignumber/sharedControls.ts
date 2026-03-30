@@ -41,7 +41,9 @@ export const headerFontSize: CustomControlItem = {
     renderTrigger: true,
     isFloat: true,
     default: 0.4,
-    description: t('Font size ratio for the big number (0.0-1.0, proportion of available height)'),
+    description: t(
+      'Font size ratio for the big number (0.0-1.0, proportion of available height)',
+    ),
     placeholder: '0.4',
   },
 };
@@ -54,7 +56,9 @@ export const subheaderFontSize: CustomControlItem = {
     renderTrigger: true,
     isFloat: true,
     default: 0.15,
-    description: t('Font size ratio for the percentage/comparison text (0.0-1.0)'),
+    description: t(
+      'Font size ratio for the percentage/comparison text (0.0-1.0)',
+    ),
     placeholder: '0.15',
   },
 };
@@ -93,7 +97,9 @@ export const iconName: CustomControlItem = {
     label: t('Icon Name'),
     renderTrigger: true,
     default: 'Activity',
-    description: t('Name of the Lucide icon (e.g., Activity, TrendingUp, Users, Calendar, Heart)'),
+    description: t(
+      'Name of the Lucide icon (e.g., Activity, TrendingUp, Users, Calendar, Heart)',
+    ),
     visibility: ({ controls }: any) => controls?.show_icon?.value === true,
   },
 };
@@ -148,7 +154,9 @@ export const additionalText: CustomControlItem = {
     label: t('Additional Text'),
     renderTrigger: true,
     default: '',
-    description: t('Additional text to display below the number (PTM layout only)'),
+    description: t(
+      'Additional text to display below the number (PTM layout only)',
+    ),
   },
 };
 
@@ -162,7 +170,8 @@ export const additionalTextFontSize: CustomControlItem = {
     default: 12,
     description: t('Font size for additional text (in pixels)'),
     placeholder: '12',
-    visibility: ({ controls }: any) => Boolean(controls?.additional_text?.value),
+    visibility: ({ controls }: any) =>
+      Boolean(controls?.additional_text?.value),
   },
 };
 
@@ -178,4 +187,3 @@ export const autofit: CustomControlItem = {
     ),
   },
 };
-

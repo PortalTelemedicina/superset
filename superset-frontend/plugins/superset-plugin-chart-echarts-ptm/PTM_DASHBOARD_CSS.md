@@ -1,3 +1,22 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
 # PTM Dashboard CSS Template
 
 Copy and paste this CSS into **Dashboard > Edit > CSS** to apply the Portal Telemedicina theme.
@@ -47,7 +66,7 @@ If you can't add the Markdown component, the CSS below will automatically fall b
   --ptm-success: #5AD7A5;
   --ptm-error: #EC4B60;
   --ptm-attention: #F5C451;
-  
+
   --ptm-neutral-white: #FFFFFF;
   --ptm-neutral-100: #F7F7F6;
   --ptm-neutral-200: #F1F1F1;
@@ -55,15 +74,15 @@ If you can't add the Markdown component, the CSS below will automatically fall b
   --ptm-neutral-400: #979797;
   --ptm-neutral-500: #666666;
   --ptm-neutral-600: #222222;
-  
+
   /* Fonts with system fallbacks */
   --ptm-font-title: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
+
   --ptm-radius-sm: 8px;
   --ptm-radius-md: 12px;
   --ptm-radius-lg: 16px;
-  
+
   --ptm-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
   --ptm-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
 }

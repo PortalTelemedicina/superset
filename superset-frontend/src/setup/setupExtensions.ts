@@ -31,7 +31,9 @@ export default function setupExtensions() {
   }
 
   const bootstrapData = getBootstrapData();
-  const flags = bootstrapData?.common?.feature_flags as Record<string, boolean> | undefined;
+  const flags = bootstrapData?.common?.feature_flags as
+    | Record<string, boolean>
+    | undefined;
   const ptmExtensionEnabled = flags?.PTM_EXTENSION_ENABLED === true;
 
   if (ptmExtensionEnabled) {

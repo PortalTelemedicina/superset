@@ -21,6 +21,8 @@
  * Timeseries-specific transform helpers
  */
 
-export { applySeriesTypeOverride, type PtmSeriesType } from './seriesTypeOverride';
+export {
+  applySeriesTypeOverride,
+  type PtmSeriesType,
+} from './seriesTypeOverride';
 export { getThemeDataZoom, type DataZoomConfig } from './dataZoom';
-

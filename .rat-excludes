@@ -84,3 +84,6 @@ CLAUDE.md
 CURSOR.md
 GEMINI.md
 GPT.md
+
+# Local migration / diff artifacts (not source files)
+extension-migration-diffs.patch

@@ -18,8 +18,11 @@
  */
 import { useEffect, createRef } from 'react';
 import { styled } from '@superset-ui/core';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
-import { SupersetPluginChartEchartsPtmProps, SupersetPluginChartEchartsPtmStylesProps } from './types';
+import { getThemeTokens } from './shared/themeTokens';
+import {
+  SupersetPluginChartEchartsPtmProps,
+  SupersetPluginChartEchartsPtmStylesProps,
+} from './types';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
 // For docs, visit https://emotion.sh/docs/styled
@@ -36,12 +39,12 @@ const Styles = styled.div<SupersetPluginChartEchartsPtmStylesProps>`
   width: ${({ width }) => width}px;
 `;
 
-
-export default function SupersetPluginChartEchartsPtm(props: SupersetPluginChartEchartsPtmProps) {
+export default function SupersetPluginChartEchartsPtm(
+  props: SupersetPluginChartEchartsPtmProps,
+) {
   const { data, height, width } = props;
 
   const rootElem = createRef<HTMLDivElement>();
-
 
   useEffect(() => {
     // Reserved for future DOM manipulations if needed

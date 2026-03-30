@@ -148,13 +148,32 @@ geographiclib==2.0
     # via geopy
 geopy==2.4.1
     # via apache-superset (pyproject.toml)
+google-api-core==2.30.0
+    # via
+    #   google-cloud-core
+    #   google-cloud-storage
 google-auth==2.40.3
-    # via shillelagh
+    # via
+    #   google-api-core
+    #   google-cloud-core
+    #   google-cloud-storage
+    #   shillelagh
+google-cloud-core==2.5.0
+    # via google-cloud-storage
+google-cloud-storage==3.10.1
+    # via -r requirements/base.in
+google-crc32c==1.8.0
+    # via
+    #   google-cloud-storage
+    #   google-resumable-media
+google-resumable-media==2.8.0
+    # via google-cloud-storage
+googleapis-common-protos==1.73.0
+    # via google-api-core
 greenlet==3.1.1
     # via
     #   apache-superset (pyproject.toml)
     #   shillelagh
-    #   sqlalchemy
 gunicorn==23.0.0
     # via apache-superset (pyproject.toml)
 h11==0.16.0
@@ -234,6 +253,7 @@ numpy==1.26.4
     #   bottleneck
     #   numexpr
     #   pandas
+    #   pyarrow
 odfpy==1.4.1
     # via pandas
 openapi-schema-validator==0.6.3
@@ -266,7 +286,7 @@ parsedatetime==2.6
 pgsanity==0.2.9
     # via apache-superset (pyproject.toml)
 pillow==11.3.0
-    # via apache_superset (pyproject.toml)
+    # via apache-superset (pyproject.toml)
 platformdirs==4.3.8
     # via requests-cache
 ply==3.11
@@ -277,6 +297,13 @@ prison==0.2.1
     # via flask-appbuilder
 prompt-toolkit==3.0.51
     # via click-repl
+proto-plus==1.27.1
+    # via google-api-core
+protobuf==6.33.6
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
+    #   proto-plus
 pyarrow==16.1.0
     # via apache-superset (pyproject.toml)
 pyasn1==0.6.1
@@ -334,6 +361,8 @@ referencing==0.36.2
     #   jsonschema-specifications
 requests==2.32.4
     # via
+    #   google-api-core
+    #   google-cloud-storage
     #   requests-cache
     #   shillelagh
 requests-cache==1.2.1
@@ -370,7 +399,6 @@ sqlalchemy==1.4.54
     # via
     #   apache-superset (pyproject.toml)
     #   alembic
-    #   apache-superset-core
     #   flask-appbuilder
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
@@ -379,12 +407,9 @@ sqlalchemy==1.4.54
 sqlalchemy-utils==0.38.3
     # via
     #   apache-superset (pyproject.toml)
-    #   apache-superset-core
     #   flask-appbuilder
 sqlglot==27.15.2
-    # via
-    #   apache-superset (pyproject.toml)
-    #   apache-superset-core
+    # via apache-superset (pyproject.toml)
 sshtunnel==0.4.0
     # via apache-superset (pyproject.toml)
 tabulate==0.9.0
@@ -399,11 +424,8 @@ typing-extensions==4.14.0
     # via
     #   apache-superset (pyproject.toml)
     #   alembic
-    #   apache-superset-core
     #   cattrs
     #   limits
-    #   pyopenssl
-    #   referencing
     #   selenium
     #   shillelagh
 tzdata==2025.2

@@ -22,7 +22,11 @@
  * Plugin-specific helpers are in their respective plugin folders
  */
 
-export { getColorPalette, cleanSeriesColors, applyColorPalette } from './colorPalette';
+export {
+  getColorPalette,
+  cleanSeriesColors,
+  applyColorPalette,
+} from './colorPalette';
 export { applyAllDefaults } from './applyDefaults';
 
 export {
@@ -46,4 +50,3 @@ export {
   getCasingFromFormData,
   type PtmTextCase,
 } from './textCasing';
-

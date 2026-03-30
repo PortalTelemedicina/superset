@@ -53,7 +53,6 @@ export function applyAllDefaults(
   return result;
 }
 
-
 function applyMergeStrategy(
   options: EchartOptions,
   propertyName: string,
@@ -63,23 +62,32 @@ function applyMergeStrategy(
 ): EchartOptions {
   switch (strategy) {
     case 'merge-into-items':
-      return applyMergeIntoItems(options, propertyName, currentValue, defaultValue);
-    
+      return applyMergeIntoItems(
+        options,
+        propertyName,
+        currentValue,
+        defaultValue,
+      );
+
     case 'deep-merge':
       return applyDeepMerge(options, propertyName, currentValue, defaultValue);
-    
+
     case 'set-if-missing':
-      return applySetIfMissing(options, propertyName, currentValue, defaultValue);
-    
+      return applySetIfMissing(
+        options,
+        propertyName,
+        currentValue,
+        defaultValue,
+      );
+
     case 'replace':
       return applyReplace(options, propertyName, defaultValue);
-    
+
     default:
       // Unknown strategy, default to deep merge (safe fallback)
       return applyDeepMerge(options, propertyName, currentValue, defaultValue);
   }
 }
-
 
 function applyMergeIntoItems(
   options: EchartOptions,
@@ -88,16 +96,29 @@ function applyMergeIntoItems(
   defaultValue: unknown,
 ): EchartOptions {
   if (Array.isArray(currentValue)) {
-    return mergeIntoEachArrayItem(options, propertyName, currentValue, defaultValue);
+    return mergeIntoEachArrayItem(
+      options,
+      propertyName,
+      currentValue,
+      defaultValue,
+    );
   }
-  
-  if (currentValue !== undefined && typeof currentValue === 'object' && typeof defaultValue === 'object') {
+
+  if (
+    currentValue !== undefined &&
+    typeof currentValue === 'object' &&
+    typeof defaultValue === 'object'
+  ) {
     return {
       ...options,
-      [propertyName]: merge({}, currentValue as Record<string, unknown>, defaultValue as Record<string, unknown>),
+      [propertyName]: merge(
+        {},
+        currentValue as Record<string, unknown>,
+        defaultValue as Record<string, unknown>,
+      ),
     };
   }
-  
+
   if (currentValue === undefined) {
     return {
       ...options,
@@ -107,7 +128,6 @@ function applyMergeIntoItems(
 
   return options;
 }
-
 
 function applyDeepMerge(
   options: EchartOptions,
@@ -115,17 +135,24 @@ function applyDeepMerge(
   currentValue: unknown,
   defaultValue: unknown,
 ): EchartOptions {
-  if (currentValue !== undefined && typeof currentValue === 'object' && typeof defaultValue === 'object') {
-    const merged = merge({}, currentValue as Record<string, unknown>, defaultValue as Record<string, unknown>);
- 
+  if (
+    currentValue !== undefined &&
+    typeof currentValue === 'object' &&
+    typeof defaultValue === 'object'
+  ) {
+    const merged = merge(
+      {},
+      currentValue as Record<string, unknown>,
+      defaultValue as Record<string, unknown>,
+    );
+
     return {
       ...options,
       [propertyName]: merged,
     };
   }
-  
-  if (currentValue === undefined) {
 
+  if (currentValue === undefined) {
     return {
       ...options,
       [propertyName]: defaultValue,
@@ -134,7 +161,6 @@ function applyDeepMerge(
 
   return options;
 }
-
 
 function applySetIfMissing(
   options: EchartOptions,
@@ -143,7 +169,6 @@ function applySetIfMissing(
   defaultValue: unknown,
 ): EchartOptions {
   if (currentValue === undefined) {
-
     return {
       ...options,
       [propertyName]: defaultValue,
@@ -153,19 +178,16 @@ function applySetIfMissing(
   return options;
 }
 
-
 function applyReplace(
   options: EchartOptions,
   propertyName: string,
   defaultValue: unknown,
 ): EchartOptions {
-
   return {
     ...options,
     [propertyName]: defaultValue,
   };
 }
-
 
 function mergeIntoEachArrayItem(
   options: EchartOptions,
@@ -173,14 +195,16 @@ function mergeIntoEachArrayItem(
   currentArray: Record<string, unknown>[],
   defaultValue: unknown,
 ): EchartOptions {
-  const defaultStyle = Array.isArray(defaultValue) ? defaultValue[0] : defaultValue;
-  
+  const defaultStyle = Array.isArray(defaultValue)
+    ? defaultValue[0]
+    : defaultValue;
+
   if (!defaultStyle || typeof defaultStyle !== 'object') {
     return options;
   }
 
   const mergedArray = currentArray.map((item: Record<string, unknown>) =>
-    merge({}, defaultStyle as Record<string, unknown>, item)
+    merge({}, defaultStyle as Record<string, unknown>, item),
   );
 
   return {

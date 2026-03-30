@@ -21,7 +21,10 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import buildQuery from './buildQuery';
 import thumbnail from '../images/thumbnail.png';
-import { BigNumberWithTrendlineChartProps, BigNumberWithTrendlineFormData } from '../types';
+import {
+  BigNumberWithTrendlineChartProps,
+  BigNumberWithTrendlineFormData,
+} from '../types';
 
 const metadata = new ChartMetadata({
   category: t('KPI'),
@@ -55,4 +58,3 @@ export default class BigNumberWithTrendlineChartPlugin extends ChartPlugin<
     });
   }
 }
-

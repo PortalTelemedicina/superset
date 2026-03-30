@@ -878,10 +878,10 @@ UPLOAD_FOLDER = BASE_DIR + "/static/uploads/"
 UPLOAD_CHUNK_SIZE = 4096
 
 # GCP Cloud Storage bucket for dashboard logo uploads (secure rehosting)
-# 
+#
 # If set, dashboard logos will be uploaded to this GCP bucket and the returned
 # GCP public URL will be used directly in HTML for rendering.
-# 
+#
 # If not set (None), logos are stored in local static files (/static/uploads/)
 # and the static file URL is used in HTML.
 #
@@ -897,8 +897,8 @@ DASHBOARD_LOGO_GCP_BUCKET = os.environ.get("DASHBOARD_LOGO_GCP_BUCKET", None)
 # If empty string or not set, images are stored directly in uploads root
 # If set (e.g., "dashboard_logos"), images are stored in uploads/dashboard_logos/
 # Applies to both GCP bucket and local filesystem storage
-# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # Store in uploads root
-# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"  # Store in uploads/dashboard_logos/
+# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # uploads root
+# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"  # uploads/dashboard_logos/
 DASHBOARD_LOGO_SUBFOLDER = ""
 
 # ---------------------------------------------------

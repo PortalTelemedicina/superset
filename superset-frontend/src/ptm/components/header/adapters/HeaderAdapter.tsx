@@ -16,7 +16,7 @@
  * specific language governing limitations under the License.
  */
 
-import React, { useMemo, useCallback, useState } from 'react';
+import { type FC, useMemo, useCallback, useState } from 'react';
 import { css, useTheme, t } from '@superset-ui/core';
 import { Button } from '@superset-ui/core/components';
 import { Icons } from '@superset-ui/core/components/Icons';
@@ -25,16 +25,16 @@ import {
   PageHeaderWithActionsProps,
 } from '@superset-ui/core/components/PageHeaderWithActions';
 import { useDispatch } from 'react-redux';
-import { CustomizableHeader } from '../components/CustomizableHeader';
-import { HeaderSlotEditor } from '../components/HeaderSlotEditor';
-import { useStandaloneMode } from '../hooks/useStandaloneMode';
-import { useHeaderPreview } from '../hooks/useHeaderPreview';
-import { HeaderLayout, getDefaultHeaderLayout } from '../types';
 import OverwriteConfirm from 'src/dashboard/components/OverwriteConfirm';
 import {
   setDashboardMetadata,
   setUnsavedChanges,
 } from 'src/dashboard/actions/dashboardState';
+import { CustomizableHeader } from '../components/CustomizableHeader';
+import { HeaderSlotEditor } from '../components/HeaderSlotEditor';
+import { useStandaloneMode } from '../hooks/useStandaloneMode';
+import { useHeaderPreview } from '../hooks/useHeaderPreview';
+import { HeaderLayout, getDefaultHeaderLayout } from '../types';
 import '../styles/header-custom.css';
 
 export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
@@ -52,10 +52,10 @@ export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
 
 /**
  * Non-intrusive adapter for custom header rendering.
- * 
+ *
  * This adapter wraps Superset's PageHeaderWithActions and conditionally
  * renders the custom header when enabled and in standalone/preview mode.
- * 
+ *
  * @example
  * ```tsx
  * <HeaderAdapter
@@ -66,7 +66,7 @@ export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
  * />
  * ```
  */
-export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
+export const HeaderAdapter: FC<HeaderAdapterProps> = ({
   dashboardInfo,
   editMode = false,
   isEmbedded = false,
@@ -77,14 +77,11 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
   const dispatch = useDispatch();
   const [showHeaderEditorModal, setShowHeaderEditorModal] = useState(false);
   const isStandaloneMode = useStandaloneMode(isEmbedded);
-  const {
-    previewMode,
-    togglePreview,
-    resetPreview,
-  } = useHeaderPreview();
+  const { previewMode, togglePreview, resetPreview } = useHeaderPreview();
 
   const headerLayout = useMemo<HeaderLayout>(() => {
-    const raw = dashboardInfo?.metadata?.headerLayout || getDefaultHeaderLayout();
+    const raw =
+      dashboardInfo?.metadata?.headerLayout || getDefaultHeaderLayout();
     return {
       enabled: Boolean(raw?.enabled),
       slots: Array.isArray(raw?.slots) ? raw.slots : [],
@@ -117,10 +114,12 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
   // Add preview button to title panel when custom header is enabled (view mode only)
   // IMPORTANT: All hooks must be called before any conditional returns
   const enhancedTitlePanelItems = useMemo(() => {
-    const originalItems = Array.isArray(pageHeaderProps.titlePanelAdditionalItems) 
-      ? pageHeaderProps.titlePanelAdditionalItems 
+    const originalItems = Array.isArray(
+      pageHeaderProps.titlePanelAdditionalItems,
+    )
+      ? pageHeaderProps.titlePanelAdditionalItems
       : [];
-    
+
     if (!editMode && headerLayout.enabled && !isStandaloneMode) {
       const previewButton = (
         <Button
@@ -148,7 +147,7 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
 
       return [...originalItems, previewButton];
     }
-    
+
     return originalItems;
   }, [
     editMode,
@@ -191,38 +190,39 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
   }, [editMode, pageHeaderProps.rightPanelAdditionalItems, theme.sizeUnit]);
 
   // Render preview banner when in preview mode (not standalone)
-  const PreviewBanner = previewMode && !isStandaloneMode ? (
-    <div
-      css={css`
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 16px;
-        background-color: ${theme.colorPrimary};
-        color: white;
-        font-size: ${theme.fontSizeSM}px;
-      `}
-      className="portal-header-preview-banner"
-    >
-      <span>{t('Preview Mode: Custom Header')}</span>
-      <Button
-        buttonStyle="link"
+  const PreviewBanner =
+    previewMode && !isStandaloneMode ? (
+      <div
         css={css`
-          color: white !important;
-          padding: 0 8px;
-          height: auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 16px;
+          background-color: ${theme.colorPrimary};
+          color: white;
           font-size: ${theme.fontSizeSM}px;
-          &:hover {
-            color: ${theme.colorBgContainer} !important;
-          }
         `}
-        onClick={resetPreview}
+        className="portal-header-preview-banner"
       >
-        <Icons.CloseOutlined iconSize="m" />
-        {t('Exit Preview')}
-      </Button>
-    </div>
-  ) : null;
+        <span>{t('Preview Mode: Custom Header')}</span>
+        <Button
+          buttonStyle="link"
+          css={css`
+            color: white !important;
+            padding: 0 8px;
+            height: auto;
+            font-size: ${theme.fontSizeSM}px;
+            &:hover {
+              color: ${theme.colorBgContainer} !important;
+            }
+          `}
+          onClick={resetPreview}
+        >
+          <Icons.CloseOutlined iconSize="m" />
+          {t('Exit Preview')}
+        </Button>
+      </div>
+    ) : null;
 
   // Now we can do conditional returns after all hooks are called
   if (shouldShowCustomHeader) {
@@ -254,7 +254,8 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
         <div
           data-test="header-layout-editor-inline"
           css={css`
-            margin: ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px;
+            margin: ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px
+              ${theme.sizeUnit * 4}px ${theme.sizeUnit * 4}px;
             padding: ${theme.sizeUnit * 4}px;
             background: ${theme.colorBgContainer};
             border: 1px solid ${theme.colorBorder};
@@ -273,4 +274,3 @@ export const HeaderAdapter: React.FC<HeaderAdapterProps> = ({
     </>
   );
 };
-

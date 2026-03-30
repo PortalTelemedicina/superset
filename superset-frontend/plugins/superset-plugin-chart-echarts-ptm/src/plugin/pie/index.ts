@@ -16,20 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
-import { PIE_TRANSFORM_CONFIG } from './pieTransformConfig';
-import thumbnail from './images/thumbnail.png';
 
 import PieTransformProps from '@superset-ui/plugin-chart-echarts/Pie/transformProps';
 import PieBuildQuery from '@superset-ui/plugin-chart-echarts/Pie/buildQuery';
 import PieControlPanel from '@superset-ui/plugin-chart-echarts/Pie/controlPanel';
 import EchartsPie from '@superset-ui/plugin-chart-echarts/Pie/EchartsPie';
+import thumbnail from './images/thumbnail.png';
+import { PIE_TRANSFORM_CONFIG } from './pieTransformConfig';
+import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 
 import PIE_PTM_DEFAULTS from './defaults';
 
 const PtmPieChartPlugin = createPtmPlugin({
   name: 'PTM Pie Chart',
-  description: 'Pie/Donut chart with Portal Telemedicina styling and customization options.',
+  description:
+    'Pie/Donut chart with Portal Telemedicina styling and customization options.',
   category: 'Part of a Whole',
   tags: ['ECharts', 'Pie', 'Donut', 'Categorical'],
   thumbnail,

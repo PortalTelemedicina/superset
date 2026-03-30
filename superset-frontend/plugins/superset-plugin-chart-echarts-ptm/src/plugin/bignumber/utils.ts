@@ -47,4 +47,3 @@ export const getDateFormatter = (
   timeFormat === SMART_DATE_ID
     ? getTimeFormatterForGranularity(granularity)
     : getTimeFormatter(timeFormat ?? fallbackFormat);
-

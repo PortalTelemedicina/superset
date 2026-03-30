@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useState, useCallback } from 'react';
-import { styled, t, SupersetClient, getClientErrorObject } from '@superset-ui/core';
+import { type FC, useState, useCallback } from 'react';
+import {
+  styled,
+  t,
+  SupersetClient,
+  getClientErrorObject,
+} from '@superset-ui/core';
 import {
   Button,
   Modal,
@@ -40,6 +45,7 @@ import {
   PictureOutlined,
 } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import {
   HeaderLayout,
   HeaderSlot,
@@ -55,7 +61,6 @@ import {
   BadgeSlot,
 } from '../types';
 import CustomizableHeader from './CustomizableHeader';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 const EditorContainer = styled.div`
   padding: 24px;
@@ -171,7 +176,7 @@ const ButtonGroup = styled.div`
 `;
 
 /** Wrapper so Form.Item injects value/onChange but Upload receives fileList (antd expects fileList, not value). */
-const LogoUrlUpload: React.FC<{
+const LogoUrlUpload: FC<{
   value?: string;
   onUpload: (file: File) => void;
   uploading: boolean;
@@ -180,18 +185,13 @@ const LogoUrlUpload: React.FC<{
     accept="image/*"
     fileList={value ? [{ uid: 'logo', name: 'logo', url: value }] : []}
     showUploadList={false}
-    beforeUpload={(file) => {
+    beforeUpload={file => {
       onUpload(file as File);
       return false;
     }}
     disabled={uploading}
   >
-    <Button
-      icon={<PictureOutlined />}
-      loading={uploading}
-      type="default"
-      block
-    >
+    <Button icon={<PictureOutlined />} loading={uploading} type="default" block>
       {uploading ? t('Uploading...') : t('Upload Image')}
     </Button>
   </Upload>
@@ -204,7 +204,7 @@ interface HeaderSlotEditorProps {
   onCancel: () => void;
 }
 
-export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
+export const HeaderSlotEditor: FC<HeaderSlotEditorProps> = ({
   headerLayout: initialLayout,
   dashboardTitle,
   onSave,
@@ -259,7 +259,9 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
   const handleEditSlot = useCallback((slot: HeaderSlot) => {
     setEditingSlot(slot);
     setCurrentSlotType(slot.type);
-    setUploadedImageUrl(slot.type === SlotType.LOGO ? (slot as LogoSlot).url || null : null);
+    setUploadedImageUrl(
+      slot.type === SlotType.LOGO ? (slot as LogoSlot).url || null : null,
+    );
     setIsModalVisible(true);
   }, []);
 
@@ -286,68 +288,74 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
     [layout],
   );
 
-  const handleTypeChange = useCallback((newType: SlotType) => {
-    if (!editingSlot) return;
-    
-    // Create new slot with the new type, preserving position and order
-    const newSlot = createDefaultSlot(newType, editingSlot.position);
-    newSlot.id = editingSlot.id; // Keep same ID
-    newSlot.order = editingSlot.order; // Keep same order
-    newSlot.visible = editingSlot.visible; // Keep visibility
-    
-    setEditingSlot(newSlot);
-    setCurrentSlotType(newType);
-    
-    // Reset form and set new values
-    form.resetFields();
-    form.setFieldsValue({
-      type: newType,
-      position: newSlot.position,
-      visible: newSlot.visible,
-    });
-    
-    // Set type-specific initial values
-    switch (newType) {
-      case SlotType.LOGO:
-        form.setFieldsValue({
-          size: { maxHeight: 40 },
-        });
-        break;
-      case SlotType.TITLE:
-        form.setFieldsValue({
-          fontSize: 20,
-        });
-        break;
-      case SlotType.DATE:
-        form.setFieldsValue({
-          format: 'DD/MM/YYYY',
-          showTime: false,
-        });
-        break;
-      case SlotType.DATA_FRESHNESS:
-        form.setFieldsValue({
-          label: 'Última atualização',
-          timezone: 'America/Sao_Paulo',
-          showTime: true,
-          aggregation: 'min',
-          formatPreset: 'pt_long',
-          showDetails: false,
-        });
-        break;
-      case SlotType.BADGE:
-        form.setFieldsValue({
-          badgeType: 'default',
-        });
-        break;
-    }
-  }, [editingSlot, form]);
+  const handleTypeChange = useCallback(
+    (newType: SlotType) => {
+      if (!editingSlot) return;
+
+      // Create new slot with the new type, preserving position and order
+      const newSlot = createDefaultSlot(newType, editingSlot.position);
+      newSlot.id = editingSlot.id; // Keep same ID
+      newSlot.order = editingSlot.order; // Keep same order
+      newSlot.visible = editingSlot.visible; // Keep visibility
+
+      setEditingSlot(newSlot);
+      setCurrentSlotType(newType);
+
+      // Reset form and set new values
+      form.resetFields();
+      form.setFieldsValue({
+        type: newType,
+        position: newSlot.position,
+        visible: newSlot.visible,
+      });
+
+      // Set type-specific initial values
+      switch (newType) {
+        case SlotType.LOGO:
+          form.setFieldsValue({
+            size: { maxHeight: 40 },
+          });
+          break;
+        case SlotType.TITLE:
+          form.setFieldsValue({
+            fontSize: 20,
+          });
+          break;
+        case SlotType.DATE:
+          form.setFieldsValue({
+            format: 'DD/MM/YYYY',
+            showTime: false,
+          });
+          break;
+        case SlotType.DATA_FRESHNESS:
+          form.setFieldsValue({
+            label: 'Última atualização',
+            timezone: 'America/Sao_Paulo',
+            showTime: true,
+            aggregation: 'min',
+            formatPreset: 'pt_long',
+            showDetails: false,
+          });
+          break;
+        case SlotType.BADGE:
+          form.setFieldsValue({
+            badgeType: 'default',
+          });
+          break;
+      }
+    },
+    [editingSlot, form],
+  );
 
   const handleModalOk = useCallback(() => {
     form.validateFields().then(values => {
       // If type changed, create new slot with new type
       let updatedSlot: HeaderSlot;
       if (values.type && values.type !== editingSlot!.type) {
-        updatedSlot = createDefaultSlot(values.type, values.position || editingSlot!.position);
+        updatedSlot = createDefaultSlot(
+          values.type,
+          values.position || editingSlot!.position,
+        );
         updatedSlot.id = editingSlot!.id; // Keep same ID
         updatedSlot.order = editingSlot!.order; // Keep same order
         updatedSlot.visible = editingSlot!.visible; // Keep visibility
@@ -363,7 +371,9 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
         };
       }
 
-      const existingIndex = layout.slots.findIndex(s => s.id === updatedSlot.id);
+      const existingIndex = layout.slots.findIndex(
+        s => s.id === updatedSlot.id,
+      );
       const newSlots =
         existingIndex >= 0
           ? layout.slots.map(s => (s.id === updatedSlot.id ? updatedSlot : s))
@@ -383,34 +393,38 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
     message.success(t('Header layout saved'));
   }, [layout, onSave]);
 
-  const handleImageUpload = useCallback(async (file: File) => {
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+  const handleImageUpload = useCallback(
+    async (file: File) => {
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      const response = await SupersetClient.post({
-        endpoint: '/api/v1/dashboard/upload_header_image/',
-        body: formData,
-        headers: { Accept: 'application/json' },
-      });
+        const response = await SupersetClient.post({
+          endpoint: '/api/v1/dashboard/upload_header_image/',
+          body: formData,
+          headers: { Accept: 'application/json' },
+        });
 
-      const { url } = response.json.result;
-      form.setFieldsValue({ url });
-      setUploadedImageUrl(url);
-      message.success(t('Image uploaded successfully'));
-      return false; // Prevent default upload
-    } catch (error) {
-      getClientErrorObject(error).then(errorObj => {
-        const errorMessage = errorObj.message || errorObj.error || t('Unknown error');
-        message.error(t('Failed to upload image: ') + errorMessage);
-        console.error('Upload error:', errorObj);
-      });
-      return false;
-    } finally {
-      setUploading(false);
-    }
-  }, [form]);
+        const { url } = response.json.result;
+        form.setFieldsValue({ url });
+        setUploadedImageUrl(url);
+        message.success(t('Image uploaded successfully'));
+        return false; // Prevent default upload
+      } catch (error) {
+        getClientErrorObject(error).then(errorObj => {
+          const errorMessage =
+            errorObj.message || errorObj.error || t('Unknown error');
+          message.error(t('Failed to upload image: ') + errorMessage);
+          console.error('Upload error:', errorObj);
+        });
+        return false;
+      } finally {
+        setUploading(false);
+      }
+    },
+    [form],
+  );
 
   const renderSlotForm = () => {
     if (!editingSlot || !currentSlotType) return null;
@@ -425,15 +439,22 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
         >
           <Select>
             <Select.Option value={SlotPosition.LEFT}>{t('Left')}</Select.Option>
-            <Select.Option value={SlotPosition.CENTER}>{t('Center')}</Select.Option>
-            <Select.Option value={SlotPosition.RIGHT}>{t('Right')}</Select.Option>
+            <Select.Option value={SlotPosition.CENTER}>
+              {t('Center')}
+            </Select.Option>
+            <Select.Option value={SlotPosition.RIGHT}>
+              {t('Right')}
+            </Select.Option>
           </Select>
         </Form.Item>
-        
-        <Divider orientation="left" style={{ margin: '12px 0', fontSize: 12, color: '#999' }}>
+
+        <Divider
+          orientation="left"
+          style={{ margin: '12px 0', fontSize: 12, color: '#999' }}
+        >
           {t('Layout Controls (Advanced)')}
         </Divider>
-        
+
         <Form.Item
           name="align"
           label={t('Alignment within section')}
@@ -455,7 +476,9 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
         >
           <Select>
             <Select.Option value={0}>{t('Fixed - Keep size')}</Select.Option>
-            <Select.Option value={1}>{t('Flexible - Can shrink')}</Select.Option>
+            <Select.Option value={1}>
+              {t('Flexible - Can shrink')}
+            </Select.Option>
           </Select>
         </Form.Item>
 
@@ -475,7 +498,10 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
 
     switch (currentSlotType) {
       case SlotType.LOGO:
-        const logoSlot = currentSlotType === editingSlot.type ? (editingSlot as LogoSlot) : null;
+        const logoSlot =
+          currentSlotType === editingSlot.type
+            ? (editingSlot as LogoSlot)
+            : null;
         return (
           <>
             {commonFields}
@@ -483,8 +509,12 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
               name="url"
               label={t('Logo Image')}
               initialValue={logoSlot?.url || ''}
-              rules={[{ required: true, message: t('Please upload an image file') }]}
-              extra={t('Upload an image file (PNG, JPG, SVG, GIF, or WebP, max 2MB)')}
+              rules={[
+                { required: true, message: t('Please upload an image file') },
+              ]}
+              extra={t(
+                'Upload an image file (PNG, JPG, SVG, GIF, or WebP, max 2MB)',
+              )}
             >
               <LogoUrlUpload
                 onUpload={handleImageUpload}
@@ -493,23 +523,25 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
             </Form.Item>
             {/* Show preview of uploaded/selected image */}
             {(uploadedImageUrl || logoSlot?.url) && (
-              <div style={{ marginTop: 16, marginBottom: 16, textAlign: 'center' }}>
+              <div
+                style={{ marginTop: 16, marginBottom: 16, textAlign: 'center' }}
+              >
                 <div style={{ marginBottom: 8, fontSize: 12, color: '#666' }}>
                   {t('Preview')}:
                 </div>
-                <img 
-                  src={uploadedImageUrl || logoSlot?.url} 
-                  alt="Logo preview" 
-                  style={{ 
-                    maxHeight: 100, 
-                    maxWidth: 200, 
+                <img
+                  src={uploadedImageUrl || logoSlot?.url}
+                  alt="Logo preview"
+                  style={{
+                    maxHeight: 100,
+                    maxWidth: 200,
                     objectFit: 'contain',
                     border: '1px solid #d9d9d9',
                     borderRadius: 4,
                     padding: 8,
-                    backgroundColor: '#fafafa'
+                    backgroundColor: '#fafafa',
                   }}
-                  onError={(e) => {
+                  onError={e => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
@@ -647,14 +679,30 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
               initialValue={freshnessSlot.formatPreset || 'pt_long'}
             >
               <Select>
-                <Select.Option value="pt_full">{t('Português (completo)')}</Select.Option>
-                <Select.Option value="pt_long">{t('Português (longo)')}</Select.Option>
-                <Select.Option value="pt_medium">{t('Português (médio)')}</Select.Option>
-                <Select.Option value="pt_short">{t('Português (curto)')}</Select.Option>
-                <Select.Option value="numeric_date">{t('Data numérica (14/01/2025)')}</Select.Option>
-                <Select.Option value="iso_date">{t('ISO (2025-01-14)')}</Select.Option>
-                <Select.Option value="iso_datetime">{t('ISO data e hora (2025-01-14 15:04:05)')}</Select.Option>
-                <Select.Option value="time_hms">{t('Hora (15:04:05)')}</Select.Option>
+                <Select.Option value="pt_full">
+                  {t('Português (completo)')}
+                </Select.Option>
+                <Select.Option value="pt_long">
+                  {t('Português (longo)')}
+                </Select.Option>
+                <Select.Option value="pt_medium">
+                  {t('Português (médio)')}
+                </Select.Option>
+                <Select.Option value="pt_short">
+                  {t('Português (curto)')}
+                </Select.Option>
+                <Select.Option value="numeric_date">
+                  {t('Data numérica (14/01/2025)')}
+                </Select.Option>
+                <Select.Option value="iso_date">
+                  {t('ISO (2025-01-14)')}
+                </Select.Option>
+                <Select.Option value="iso_datetime">
+                  {t('ISO data e hora (2025-01-14 15:04:05)')}
+                </Select.Option>
+                <Select.Option value="time_hms">
+                  {t('Hora (15:04:05)')}
+                </Select.Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -681,7 +729,11 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
             >
               <Input placeholder="Status" />
             </Form.Item>
-            <Form.Item name="value" label={t('Value (optional)')} initialValue={badgeSlot.value}>
+            <Form.Item
+              name="value"
+              label={t('Value (optional)')}
+              initialValue={badgeSlot.value}
+            >
               <Input placeholder="Active" />
             </Form.Item>
             <Form.Item
@@ -710,11 +762,18 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
       case SlotType.LOGO:
         return { type: 'Logo', details: (slot as LogoSlot).url || 'No URL' };
       case SlotType.TITLE:
-        return { type: 'Title', details: (slot as TitleSlot).content || dashboardTitle || 'Dashboard Title' };
+        return {
+          type: 'Title',
+          details:
+            (slot as TitleSlot).content || dashboardTitle || 'Dashboard Title',
+        };
       case SlotType.TEXT:
         return { type: 'Text', details: (slot as TextSlot).content };
       case SlotType.DATE:
-        return { type: 'Date', details: (slot as DateSlot).format || 'DD/MM/YYYY' };
+        return {
+          type: 'Date',
+          details: (slot as DateSlot).format || 'DD/MM/YYYY',
+        };
       case SlotType.DATA_FRESHNESS:
         return {
           type: 'Data Freshness',
@@ -762,11 +821,18 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="slots" direction="horizontal">
                 {provided => (
-                  <SlotList {...provided.droppableProps} ref={provided.innerRef}>
+                  <SlotList
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
                     {layout.slots.map((slot, index) => {
                       const displayInfo = getSlotDisplayInfo(slot);
                       return (
-                        <Draggable key={slot.id} draggableId={slot.id} index={index}>
+                        <Draggable
+                          key={slot.id}
+                          draggableId={slot.id}
+                          index={index}
+                        >
                           {(provided, snapshot) => (
                             <SlotItem
                               ref={provided.innerRef}
@@ -774,16 +840,32 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
                               {...provided.dragHandleProps}
                               isDragging={snapshot.isDragging}
                             >
-                              <DragOutlined style={{ fontSize: 16, color: '#999', cursor: 'grab' }} />
+                              <DragOutlined
+                                style={{
+                                  fontSize: 16,
+                                  color: '#999',
+                                  cursor: 'grab',
+                                }}
+                              />
                               <SlotInfo>
-                                <SlotTypeLabel>{displayInfo.type}</SlotTypeLabel>
+                                <SlotTypeLabel>
+                                  {displayInfo.type}
+                                </SlotTypeLabel>
                                 <SlotDetails>{displayInfo.details}</SlotDetails>
                               </SlotInfo>
                               <ButtonGroup>
                                 <Button
                                   size="small"
-                                  icon={slot.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                                  onClick={() => handleToggleVisibility(slot.id)}
+                                  icon={
+                                    slot.visible ? (
+                                      <EyeOutlined />
+                                    ) : (
+                                      <EyeInvisibleOutlined />
+                                    )
+                                  }
+                                  onClick={() =>
+                                    handleToggleVisibility(slot.id)
+                                  }
                                 />
                                 <Button
                                   size="small"
@@ -834,30 +916,38 @@ export const HeaderSlotEditor: React.FC<HeaderSlotEditorProps> = ({
       >
         {editingSlot && (
           <Form form={form} layout="vertical">
-            <Form.Item 
-              name="type" 
+            <Form.Item
+              name="type"
               label={t('Element Type')}
               initialValue={editingSlot.type}
             >
               <Select onChange={handleTypeChange}>
                 <Select.Option value={SlotType.LOGO}>{t('Logo')}</Select.Option>
-                <Select.Option value={SlotType.TITLE}>{t('Title')}</Select.Option>
+                <Select.Option value={SlotType.TITLE}>
+                  {t('Title')}
+                </Select.Option>
                 <Select.Option value={SlotType.TEXT}>{t('Text')}</Select.Option>
                 <Select.Option value={SlotType.DATE}>{t('Date')}</Select.Option>
-                <Select.Option value={SlotType.DATA_FRESHNESS}>{t('Data Freshness')}</Select.Option>
-                <Select.Option value={SlotType.BADGE}>{t('Badge')}</Select.Option>
-                <Select.Option value={SlotType.SPACER}>{t('Spacer')}</Select.Option>
-                <Select.Option value={SlotType.DIVIDER}>{t('Divider')}</Select.Option>
+                <Select.Option value={SlotType.DATA_FRESHNESS}>
+                  {t('Data Freshness')}
+                </Select.Option>
+                <Select.Option value={SlotType.BADGE}>
+                  {t('Badge')}
+                </Select.Option>
+                <Select.Option value={SlotType.SPACER}>
+                  {t('Spacer')}
+                </Select.Option>
+                <Select.Option value={SlotType.DIVIDER}>
+                  {t('Divider')}
+                </Select.Option>
               </Select>
             </Form.Item>
             {renderSlotForm()}
           </Form>
         )}
       </Modal>
-
     </EditorContainer>
   );
 };
 
 export default HeaderSlotEditor;
-

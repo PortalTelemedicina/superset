@@ -166,8 +166,9 @@ export const timeseriesZoomControl: ControlSetRow = [
       default: '24',
       isInt: true,
       renderTrigger: true,
-      description: t('Adds padding inside the grid so the zoom bar does not span full width.'),
+      description: t(
+        'Adds padding inside the grid so the zoom bar does not span full width.',
+      ),
     },
   },
 ];
-

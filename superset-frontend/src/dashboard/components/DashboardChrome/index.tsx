@@ -37,9 +37,13 @@ const DashboardChrome: FC<DashboardChromeProps> = ({
 }) => (
   <>
     {!hideDashboardHeader && <DashboardHeader />}
-    {showFilterBar && filterBarOrientation === FilterBarOrientation.Horizontal && (
-      <FilterBar orientation={FilterBarOrientation.Horizontal} hidden={isReport} />
-    )}
+    {showFilterBar &&
+      filterBarOrientation === FilterBarOrientation.Horizontal && (
+        <FilterBar
+          orientation={FilterBarOrientation.Horizontal}
+          hidden={isReport}
+        />
+      )}
   </>
 );
 

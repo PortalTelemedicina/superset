@@ -17,7 +17,7 @@
  */
 
 import { css, styled } from '@superset-ui/core';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
+import { getThemeTokens } from '../../shared/themeTokens';
 
 export default styled.div`
   ${({ theme }) => {
@@ -41,14 +41,14 @@ export default styled.div`
         border-spacing: 0 !important;
         font-family: 'Inter', ${tok.fontFamily} !important;
         line-height: 1.4 !important;
-        background: #FFFFFF !important;
+        background: #ffffff !important;
       }
 
       /* ========================================
          HEADER STYLES
          ======================================== */
       table.pvtTable thead {
-        background-color: #FFFFFF !important;
+        background-color: #ffffff !important;
         position: sticky !important;
         top: 0 !important;
         z-index: 10 !important;
@@ -56,15 +56,15 @@ export default styled.div`
 
       table.pvtTable thead tr th,
       table.pvtTable tbody tr th {
-        border-top: 1px solid #E5E7EB !important;
-        border-left: 1px solid #E5E7EB !important;
+        border-top: 1px solid #e5e7eb !important;
+        border-left: 1px solid #e5e7eb !important;
         font-size: 12px !important;
         padding: 12px 16px !important;
         font-weight: 600 !important;
-        color: #6B7280 !important;
+        color: #6b7280 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
-        background-color: #FFFFFF !important;
+        background-color: #ffffff !important;
       }
 
       table.pvtTable thead tr:last-of-type th,
@@ -73,7 +73,7 @@ export default styled.div`
       table.pvtTable thead th.pvtSubtotalLabel,
       table.pvtTable tbody tr:last-of-type th,
       table.pvtTable tbody tr:last-of-type td {
-        border-bottom: 1px solid #E5E7EB !important;
+        border-bottom: 1px solid #e5e7eb !important;
       }
 
       table.pvtTable
@@ -88,7 +88,7 @@ export default styled.div`
 
       table.pvtTable tbody tr td:last-of-type,
       table.pvtTable thead tr th:last-of-type:not(.pvtSubtotalLabel) {
-        border-right: 1px solid #E5E7EB !important;
+        border-right: 1px solid #e5e7eb !important;
       }
 
       /* ========================================
@@ -96,15 +96,15 @@ export default styled.div`
          ======================================== */
       table.pvtTable tbody tr {
         font-feature-settings: 'tnum' 1 !important;
-        background-color: #FFFFFF !important;
+        background-color: #ffffff !important;
       }
 
       table.pvtTable tbody tr td {
         color: #374151 !important;
         padding: 8px 16px !important;
-        background-color: #FFFFFF !important;
-        border-top: 1px solid #F3F4F6 !important;
-        border-left: 1px solid #E5E7EB !important;
+        background-color: #ffffff !important;
+        border-top: 1px solid #f3f4f6 !important;
+        border-left: 1px solid #e5e7eb !important;
         vertical-align: top !important;
         text-align: right !important;
         font-size: 14px !important;
@@ -122,12 +122,12 @@ export default styled.div`
       table.pvtTable tbody tr.pvtRowTotals {
         position: sticky !important;
         bottom: 0 !important;
-        background-color: #F9FAFB !important;
+        background-color: #f9fafb !important;
       }
 
       table.pvtTable tbody tr.pvtRowTotals th,
       table.pvtTable tbody tr.pvtRowTotals td {
-        background-color: #F9FAFB !important;
+        background-color: #f9fafb !important;
         font-weight: 600 !important;
         color: #111827 !important;
       }
@@ -160,11 +160,11 @@ export default styled.div`
          INTERACTIVE STATES
          ======================================== */
       table.pvtTable tr th.active {
-        background-color: #EFF6FF !important;
+        background-color: #eff6ff !important;
       }
 
       .hoverable:hover {
-        background-color: #F9FAFB !important;
+        background-color: #f9fafb !important;
         cursor: pointer !important;
       }
 
@@ -182,7 +182,7 @@ export default styled.div`
       .toggle {
         padding-right: ${tok.sizeUnit}px !important;
         cursor: pointer !important;
-        color: #6B7280 !important;
+        color: #6b7280 !important;
       }
 
       .toggle:hover {

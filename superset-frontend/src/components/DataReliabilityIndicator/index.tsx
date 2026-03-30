@@ -70,7 +70,9 @@ export const DataReliabilityIndicator: FC<DataReliabilityIndicatorProps> = ({
 
   const tooltipTitle = (
     <div>
-      <div css={{ fontWeight: theme.fontWeightStrong }}>{t('Data Reliability')}</div>
+      <div css={{ fontWeight: theme.fontWeightStrong }}>
+        {t('Data Reliability')}
+      </div>
       {message ? (
         <div style={{ whiteSpace: 'pre-wrap', marginTop: 4 }}>{message}</div>
       ) : null}

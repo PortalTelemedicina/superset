@@ -16,7 +16,7 @@
 # under the License.
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Generator, Optional
 from unittest.mock import call, Mock, patch
 from uuid import uuid4
 
@@ -104,6 +104,22 @@ from tests.integration_tests.test_app import app
 pytestmark = pytest.mark.usefixtures(
     "load_world_bank_dashboard_with_slices_module_scope"
 )
+
+
+@pytest.fixture(autouse=True)
+def force_non_dry_run_notifications() -> Generator[None, None, None]:
+    """
+    Ensure notification-sending tests run with SMTP sends enabled.
+
+    Some tests in this module assert `send_email_smtp` call arguments; those
+    assertions require non-dry-run mode.
+    """
+    original_value = app.config.get("ALERT_REPORTS_NOTIFICATION_DRY_RUN", True)
+    app.config["ALERT_REPORTS_NOTIFICATION_DRY_RUN"] = False
+    try:
+        yield
+    finally:
+        app.config["ALERT_REPORTS_NOTIFICATION_DRY_RUN"] = original_value
 
 
 def get_target_from_report_schedule(report_schedule: ReportSchedule) -> list[str]:

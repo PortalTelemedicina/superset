@@ -45,15 +45,13 @@ export interface PtmPluginConfig {
   transforms?: TransformConfig;
 
   additionalPtmControls?: ControlSetRow[];
-  
+
   pluginTransform?: (
     options: Record<string, unknown>,
     formData: Record<string, unknown>,
     transforms: TransformConfig,
   ) => Record<string, unknown>;
-  
 }
-
 
 export interface ChartPluginClass {
   new (): ChartPlugin;
@@ -83,8 +81,10 @@ export function createPtmPlugin(config: PtmPluginConfig): ChartPluginClass {
 
   const finalTransforms = resolveTransformConfig(transformsConfig);
 
-
-  const ptmSection = createPtmControlSection(finalTransforms, additionalPtmControls);
+  const ptmSection = createPtmControlSection(
+    finalTransforms,
+    additionalPtmControls,
+  );
   const extendedControlPanel: ControlPanelConfig = {
     ...base.controlPanel,
     controlPanelSections: [

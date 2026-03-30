@@ -399,7 +399,6 @@ export const mapStyle = {
   },
 };
 
-
 export const geojsonColumn = {
   name: 'geojson',
   config: {

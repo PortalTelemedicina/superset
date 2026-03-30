@@ -62,4 +62,3 @@ export const PIE_PTM_DEFAULTS = {
 };
 
 export default PIE_PTM_DEFAULTS;
-

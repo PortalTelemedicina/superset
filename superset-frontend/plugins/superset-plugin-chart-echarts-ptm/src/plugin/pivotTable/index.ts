@@ -53,7 +53,9 @@ const PtmPivotTableChartPlugin = createPtmPlugin({
   base: {
     buildQuery: PivotTableBuildQuery,
     transformProps: wrapPivotTableTransformProps(
-      PivotTableTransformProps as (chartProps: ChartProps) => Record<string, unknown>,
+      PivotTableTransformProps as (
+        chartProps: ChartProps,
+      ) => Record<string, unknown>,
     ) as (chartProps: ChartProps) => any,
     controlPanel: PivotTableControlPanel,
     Chart: PtmPivotTableChart as any,

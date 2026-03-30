@@ -23,27 +23,28 @@
 import logging
 import os
 import sys
+from typing import Any, MutableMapping
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
 
+from superset.translations.utils import get_language_pack
+
 LANGUAGES = {
-    'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
-    'en': {'flag': 'us', 'name': 'English'}
+    "pt_BR": {"flag": "br", "name": "Brazilian Portuguese"},
+    "en": {"flag": "us", "name": "English"},
 }
 
-BABEL_DEFAULT_LOCALE = 'pt_BR'
+BABEL_DEFAULT_LOCALE = "pt_BR"
 
 
-def override_bootstrap_locale(data):
-    from flask import current_app
-
+def override_bootstrap_locale(
+    data: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
     locale = data.get("locale")
     if locale == "pt":
         data["locale"] = "pt_BR"
-    elif locale == "en":
-        # Use default locale when server sent "en" (e.g. get_locale() was None)
-        data["locale"] = current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
+        data["language_pack"] = get_language_pack("pt_BR")
     return data
 
 
@@ -124,10 +125,12 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
-    "ALLOW_FULL_CSV_EXPORT": True,  # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    "ALLOW_FULL_CSV_EXPORT": True,
     "TAGGING_SYSTEM": True,
     "PTM_EXTENSION_ENABLED": True,
-    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,  # Enable Playwright for full-page screenshots
+    # Enable Playwright for full-page screenshots
+    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,
 }
 
 # Tiled screenshot configuration for large dashboards
@@ -135,7 +138,9 @@ FEATURE_FLAGS = {
 # and stitching them together, preventing PDF reports from being cut off
 SCREENSHOT_TILED_ENABLED = True  # Enable tiled screenshots for large dashboards
 SCREENSHOT_TILED_CHART_THRESHOLD = 20  # Minimum charts to trigger tiled screenshots
-SCREENSHOT_TILED_HEIGHT_THRESHOLD = 5000  # Minimum height (px) to trigger tiled screenshots
+SCREENSHOT_TILED_HEIGHT_THRESHOLD = (
+    5000  # Minimum height (px) to trigger tiled screenshots
+)
 SCREENSHOT_TILED_VIEWPORT_HEIGHT = 2000  # Height of each tile in pixels
 
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True

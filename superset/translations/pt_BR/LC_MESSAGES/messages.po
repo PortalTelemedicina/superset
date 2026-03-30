@@ -187,17 +187,17 @@ msgstr ""
 "%(dialect)s não pode ser usado como uma fonte de dados por motivos de "
 "segurança."
 
-#, fuzzy, python-format
+#, python-format
 msgid "%(label)s file"
-msgstr "%(type)s do Arquivo"
+msgstr "Arquivo %(label)s"
 
 #, python-format
 msgid "%(name)s.csv"
 msgstr "%(name)s.csv"
 
-#, fuzzy, python-format
+#, python-format
 msgid "%(name)s.pdf"
-msgstr "%(name)s.csv"
+msgstr "%(name)s.pdf"
 
 #, python-format
 msgid "%(object)s does not exist in this database."
@@ -451,9 +451,8 @@ msgstr "Frequência de início de 1 ano"
 msgid "10 minute"
 msgstr "10 minutos"
 
-#, fuzzy
 msgid "10/90 percentiles"
-msgstr "9/91 percentis"
+msgstr "Percentis 10/90"
 
 msgid "10000"
 msgstr ""
@@ -560,9 +559,8 @@ msgstr "5 segundos"
 msgid "5 seconds"
 msgstr "5 segundos"
 
-#, fuzzy
 msgid "5/95 percentiles"
-msgstr "9/91 percentis"
+msgstr "Percentis 5/95"
 
 msgid "52 weeks"
 msgstr "52 semanas"
@@ -692,17 +690,14 @@ msgstr ""
 msgid "A metric to use for color"
 msgstr "Uma métrica para cor"
 
-#, fuzzy
 msgid "A new chart and dashboard will be created."
-msgstr "Não foi possível criar o painel."
+msgstr "Um novo gráfico e painel serão criados."
 
-#, fuzzy
 msgid "A new chart will be created."
-msgstr "Não foi possível criar o gráfico."
+msgstr "Um novo gráfico será criado."
 
-#, fuzzy
 msgid "A new dashboard will be created."
-msgstr "Não foi possível criar o painel."
+msgstr "Um novo painel será criado."
 
 msgid ""
 "A polar coordinate chart where the circle is broken into wedges of equal "
@@ -799,9 +794,8 @@ msgstr "Ativo"
 msgid "Actual Values"
 msgstr "Valores reais"
 
-#, fuzzy
 msgid "Actual range for comparison"
-msgstr "Comparação de tempo"
+msgstr "Intervalo real para comparação"
 
 msgid "Actual time range"
 msgstr "Intervalo de tempo real"
@@ -821,13 +815,11 @@ msgstr "Adicionar"
 msgid "Add Alert"
 msgstr "Adicionar alerta"
 
-#, fuzzy
 msgid "Add BCC Recipients"
-msgstr "Adicionar Recipientes BCC"
+msgstr "Adicionar Destinatários BCC"
 
-#, fuzzy
 msgid "Add CC Recipients"
-msgstr "recentes"
+msgstr "Adicionar Destinatários CC"
 
 msgid "Add CSS template"
 msgstr "Adicionar modelo CSS"
@@ -835,17 +827,15 @@ msgstr "Adicionar modelo CSS"
 msgid "Add Dashboard"
 msgstr "Adicionar Painel"
 
-#, fuzzy
 msgid "Add divider"
-msgstr "Divisor"
+msgstr "Adicionar divisor"
 
 #, fuzzy
 msgid "Add filter"
 msgstr "Adicionar filtro"
 
-#, fuzzy
 msgid "Add Layer"
-msgstr "Esconder camada"
+msgstr "Adicionar Camada"
 
 msgid "Add Log"
 msgstr "Adicionar Log"
@@ -853,9 +843,8 @@ msgstr "Adicionar Log"
 msgid "Add Report"
 msgstr "Adicionar Relatório"
 
-#, fuzzy
 msgid "Add Role"
-msgstr "(excluído)"
+msgstr "Adicionar Papel"
 
 #, fuzzy
 msgid "Add Rule"
@@ -1177,7 +1166,6 @@ msgstr "Alerta disparado durante o período de carência."
 msgid "Alert found an error while executing a query."
 msgstr "O alerta encontrou um erro durante a execução de uma consulta."
 
-#, fuzzy
 msgid "Alert is active"
 msgstr "Alerta está ativo"
 
@@ -2647,9 +2635,8 @@ msgstr "A escolha de [Raio do ponto] deve estar presente em [Agrupar por]"
 msgid "Choose File"
 msgstr "Escolher Arquivo"
 
-#, fuzzy
 msgid "Choose a chart for displaying on the map"
-msgstr "Escolha um gráfico ou painel, não ambos"
+msgstr "Escolha um gráfico para exibir no mapa"
 
 msgid "Choose a chart or dashboard not both"
 msgstr "Escolha um gráfico ou painel, não ambos"
@@ -2660,9 +2647,8 @@ msgstr "Escolha um banco de dados..."
 msgid "Choose a dataset"
 msgstr "Escolha um conjunto de dados"
 
-#, fuzzy
 msgid "Choose a delimiter"
-msgstr "Escolha um conjunto de dados"
+msgstr "Escolha um delimitador"
 
 msgid "Choose a metric for right axis"
 msgstr "Escolha uma métrica para o eixo direito"
@@ -2676,39 +2662,32 @@ msgstr "Escolha uma fonte"
 msgid "Choose a target"
 msgstr "Escolha um alvo"
 
-#, fuzzy
 msgid "Choose already exists"
-msgstr "O rótulo já existe"
+msgstr "A seleção já existe"
 
 msgid "Choose chart type"
 msgstr "Escolha o tipo de gráfico"
 
-#, fuzzy
 msgid "Choose columns to be parsed as dates"
-msgstr "Colunas a serem analisadas como datas"
+msgstr "Escolha colunas a serem analisadas como datas"
 
-#, fuzzy
 msgid "Choose columns to read"
-msgstr "Colunas a serem lidas"
+msgstr "Escolha colunas a serem lidas"
 
-#, fuzzy
 msgid "Choose index column"
-msgstr "Coluna de índice"
+msgstr "Escolha a coluna de índice"
 
-#, fuzzy
 msgid "Choose notification method and recipients."
-msgstr "Adicionar método de notificação"
+msgstr "Escolha o método de notificação e os destinatários."
 
 msgid "Choose one of the available databases from the panel on the left."
 msgstr "Escolha um dos bancos de dados disponíveis no painel na esquerda."
 
-#, fuzzy
 msgid "Choose one of the available databases on the left panel."
-msgstr "Escolha um dos bancos de dados disponíveis no painel na esquerda."
+msgstr "Escolha um dos bancos de dados disponíveis no painel à esquerda."
 
-#, fuzzy
 msgid "Choose sheet name"
-msgstr "Nome da planilha"
+msgstr "Escolha o nome da planilha"
 
 msgid "Choose the annotation layer type"
 msgstr "Escolha o tipo da camada de anotação"
@@ -3165,9 +3144,8 @@ msgstr "Configurar este painel para incorporá-lo em um aplicativo web externo."
 msgid "Configure your how you overlay is displayed here."
 msgstr "Configure a forma como a sobreposição é apresentada aqui."
 
-#, fuzzy
 msgid "Confirm Password"
-msgstr "Mostrar senha."
+msgstr "Confirmar Senha"
 
 msgid "Confirm overwrite"
 msgstr "Confirmar a substituição"
@@ -3176,7 +3154,7 @@ msgid "Confirm save"
 msgstr "Confirmar salvar"
 
 msgid "Confirm the user's password"
-msgstr ""
+msgstr "Confirme a senha do usuário"
 
 msgid "Connect"
 msgstr "Conectar"
@@ -3690,9 +3668,8 @@ msgstr "Uso do painel"
 msgid "Dashboards"
 msgstr "Painéis"
 
-#, fuzzy
 msgid "Dashboards could not be created."
-msgstr "Não foi possível criar o painel."
+msgstr "Não foi possível criar os painéis."
 
 msgid "Dashboards do not exist"
 msgstr "Os painéis não existem"
@@ -4332,9 +4309,8 @@ msgstr "Texto descritivo que aparece abaixo do seu Número Grande"
 msgid "Deselect all"
 msgstr "Desmarcar tudo"
 
-#, fuzzy
 msgid "Details"
-msgstr "Totais"
+msgstr "Detalhes"
 
 msgid "Details of the certification"
 msgstr "Detalhes da certificação"
@@ -4842,13 +4818,11 @@ msgstr "Nome de usuário ou a senha está incorreto."
 msgid "Elevation"
 msgstr "Elevação"
 
-#, fuzzy
 msgid "Email"
-msgstr "Totais"
+msgstr "E-mail"
 
-#, fuzzy
 msgid "Email is required"
-msgstr "O valor é necessário"
+msgstr "O e-mail é obrigatório"
 
 msgid "Email reports active"
 msgstr "Relatórios por e-mail ativo"
@@ -4990,9 +4964,8 @@ msgstr "Digite um nome para essa planilha"
 msgid "Enter a new title for the tab"
 msgstr "Digite um novo título para a aba"
 
-#, fuzzy
 msgid "Enter alert name"
-msgstr "Nome do alerta"
+msgstr "Insira o nome do alerta"
 
 msgid "Enter duration in seconds"
 msgstr "Insira a duração em segundos"
@@ -5012,18 +4985,19 @@ msgid "Enter the unique project id for your database."
 msgstr ""
 
 msgid "Enter the user's email"
-msgstr ""
+msgstr "Insira o e-mail do usuário"
 
-#, fuzzy
 msgid "Enter the user's first name"
-msgstr "Nome do alerta"
+msgstr "Insira o nome do usuário"
 
-#, fuzzy
 msgid "Enter the user's last name"
-msgstr "Nome do alerta"
+msgstr "Insira o sobrenome do usuário"
 
 msgid "Enter the user's username"
-msgstr ""
+msgstr "Insira o nome de usuário"
+
+msgid "Enter the user's password"
+msgstr "Insira a senha do usuário"
 
 msgid "Entity"
 msgstr "Entidade"
@@ -5585,11 +5559,9 @@ msgstr "Finalizar"
 msgid "First"
 msgstr "Primeiro"
 
-#, fuzzy
 msgid "First name"
-msgstr "Nome do gráfico"
+msgstr "Nome"
 
-#, fuzzy
 msgid "First name is required"
 msgstr "O nome é obrigatório"
 
@@ -6309,9 +6281,8 @@ msgstr "Seleção inversa"
 msgid "Invert current page"
 msgstr "Inverter a página atual"
 
-#, fuzzy
 msgid "Is active?"
-msgstr "Alerta está ativo"
+msgstr "Está ativo?"
 
 msgid "Is certified"
 msgstr "É certificado"
@@ -6525,13 +6496,11 @@ msgstr "Última modificação"
 msgid "Last month"
 msgstr "mês passado"
 
-#, fuzzy
 msgid "Last name"
-msgstr "nome do conjunto de dados"
+msgstr "Sobrenome"
 
-#, fuzzy
 msgid "Last name is required"
-msgstr "O nome é obrigatório"
+msgstr "O sobrenome é obrigatório"
 
 #, fuzzy
 msgid "Last quarter"
@@ -6562,9 +6531,8 @@ msgstr "Latitude da janela de visualização padrão"
 msgid "Layer"
 msgstr "ano"
 
-#, fuzzy
 msgid "Layer Name"
-msgstr "Nome do alerta"
+msgstr "Nome da Camada"
 
 msgid "Layer URL"
 msgstr ""
@@ -6738,15 +6706,17 @@ msgstr "Codificação de linhas"
 msgid "Link Copied!"
 msgstr "Link copiado!"
 
+msgid "List Groups"
+msgstr "Lista de Grupos"
+
 msgid "List Roles"
-msgstr ""
+msgstr "Lista de papéis"
 
 msgid "List Unique Values"
 msgstr "Listar valores exclusivos"
 
-#, fuzzy
 msgid "List Users"
-msgstr "Número de divisão"
+msgstr "Lista de Usuários"
 
 msgid "List of extra columns made available in JavaScript functions"
 msgstr "Lista de colunas extra disponibilizadas em funções JavaScript"
@@ -6754,9 +6724,8 @@ msgstr "Lista de colunas extra disponibilizadas em funções JavaScript"
 msgid "List of n+1 values for bucketing metric into n buckets."
 msgstr "Lista de n+1 valores para a métrica de agrupamento em n agrupamentos."
 
-#, fuzzy
 msgid "List of the column names that should be read"
-msgstr "Lista Json dos nomes das colunas que devem ser lidas"
+msgstr "Lista dos nomes das colunas que devem ser lidas"
 
 msgid "List of values to mark with lines"
 msgstr "Lista de valores a marcar com linhas"
@@ -8960,9 +8929,8 @@ msgstr "Relatório enviado"
 msgid "Report failed"
 msgstr "Relatório falhou"
 
-#, fuzzy
 msgid "Report is active"
-msgstr "Relatórios por e-mail ativo"
+msgstr "Relatório está ativo"
 
 msgid "Report name"
 msgstr "Nome do relatório"
@@ -9106,17 +9074,14 @@ msgstr ""
 msgid "Role"
 msgstr "Função"
 
-#, fuzzy
 msgid "Role Name"
-msgstr "Nome do alerta"
+msgstr "Nome do Papel"
 
-#, fuzzy
 msgid "Role is required"
-msgstr "O valor é necessário"
+msgstr "O papel é obrigatório"
 
-#, fuzzy
 msgid "Role name is required"
-msgstr "O nome é obrigatório"
+msgstr "O nome do papel é obrigatório"
 
 #, fuzzy
 msgid "Role successfully updated!"
@@ -9868,13 +9833,14 @@ msgstr "Selecione ou digite o nome do conjunto de dados"
 msgid "Select owners"
 msgstr "Selecionar proprietários"
 
-#, fuzzy
 msgid "Select page size"
-msgstr "Desmarcar tudo"
+msgstr "Selecionar tamanho da página"
 
-#, fuzzy
 msgid "Select roles"
-msgstr "Selecionar proprietários"
+msgstr "Selecionar papéis"
+
+msgid "Select groups"
+msgstr "Selecionar grupos"
 
 msgid "Select saved metrics"
 msgstr "Selecionar métricas salvas"
@@ -10535,7 +10501,7 @@ msgstr ""
 "Presto para permitir a estimativa do custo da consulta."
 
 msgid "Split number"
-msgstr "Número de divisão"
+msgstr "Número de subdivisões"
 
 msgid "Square kilometers"
 msgstr "Quilômetros quadrados"
@@ -11649,9 +11615,8 @@ msgstr ""
 msgid "The report has been created"
 msgstr "O relatório foi criado"
 
-#, fuzzy
 msgid "The report will be sent to your email at"
-msgstr "Uma captura de tela do painel vai ser enviado para seu e-mail em"
+msgstr "O relatório será enviado para seu e-mail em"
 
 msgid ""
 "The result of this query must be a value capable of numeric "
@@ -11877,6 +11842,9 @@ msgstr "A largura das linhas"
 
 msgid "The width of the lines"
 msgstr "A largura das linhas"
+
+msgid "Themes"
+msgstr "Temas"
 
 msgid "There are associated alerts or reports"
 msgstr "Há alertas ou relatórios associados"
@@ -14629,9 +14597,8 @@ msgstr "ex. xy12345.us-east-2.aws"
 msgid "edit mode"
 msgstr "modo de edição"
 
-#, fuzzy
 msgid "email subject"
-msgstr "assunto do email"
+msgstr "assunto do e-mail"
 
 msgid "entries"
 msgstr "entradas"
@@ -14714,9 +14681,8 @@ msgstr "em"
 msgid "in modal"
 msgstr "no modal"
 
-#, fuzzy
 msgid "invalid email"
-msgstr "Chave de permalink inválida"
+msgstr "e-mail inválido"
 
 #, fuzzy
 msgid "is"

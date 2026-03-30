@@ -17,15 +17,14 @@
  * under the License.
  */
 
-import { getExtensionsRegistry } from '@superset-ui/core';
-import { SupersetClient } from '@superset-ui/core';
+import { getExtensionsRegistry, SupersetClient } from '@superset-ui/core';
+import type { DashboardSaveHookArgs } from '@superset-ui/core';
 import { isPtmExtensionEnabled } from '../config/featureFlags';
 import {
   getPtmChartMapping,
   getLegacyChartMapping,
   isPtmVizType,
 } from '../utils/ptmChartMapping';
-import type { DashboardSaveHookArgs } from '@superset-ui/core';
 
 type PtmFormData = Record<string, unknown> & {
   viz_type?: string;
@@ -137,7 +136,8 @@ async function ptmDashboardSaveHook(
 
   // Block convert/revert when dashboard has charts shared with other dashboards.
   // Backend also forces ptm_locked in that case; this avoids any convert/revert in the same save.
-  const idToCheck = mode === 'update' ? dashboardId : mode === 'copy' ? newDashboardId : null;
+  const idToCheck =
+    mode === 'update' ? dashboardId : mode === 'copy' ? newDashboardId : null;
   if (idToCheck != null) {
     try {
       const { json } = await SupersetClient.get({
@@ -160,7 +160,9 @@ async function ptmDashboardSaveHook(
         endpoint: `/api/v1/dashboard/${dashboardId}/charts`,
       });
       const charts = chartsResponse.json?.result ?? [];
-      const allowedIds = new Set(charts.map((c: { id: number }) => String(c.id)));
+      const allowedIds = new Set(
+        charts.map((c: { id: number }) => String(c.id)),
+      );
       if (allowedIds.size > 0) {
         slicesForDashboard = {};
         for (const sliceId of Object.keys(slices)) {
@@ -219,8 +221,15 @@ async function ptmDashboardSaveHook(
         const conversionPromises = [];
 
         for (const slice of fetchedSlices) {
-          const formData = (slice.form_data ?? (slice.params ? JSON.parse(slice.params as string) : {})) as Record<string, unknown>;
-          const currentVizType = getVizType(formData, (slice as { viz_type?: string }).viz_type);
+          const formData = (slice.form_data ??
+            (slice.params ? JSON.parse(slice.params as string) : {})) as Record<
+            string,
+            unknown
+          >;
+          const currentVizType = getVizType(
+            formData,
+            (slice as { viz_type?: string }).viz_type,
+          );
 
           if (!currentVizType) continue;
 
@@ -263,8 +272,12 @@ async function ptmDashboardSaveHook(
               params: JSON.stringify(updatedFormData),
               viz_type: mapping.ptmVizType,
               slice_name: slice.slice_name,
-              datasource_id: sliceForPayload.datasource_id ?? updatedFormData.datasource_id,
-              datasource_type: sliceForPayload.datasource_type ?? updatedFormData.datasource_type ?? 'table',
+              datasource_id:
+                sliceForPayload.datasource_id ?? updatedFormData.datasource_id,
+              datasource_type:
+                sliceForPayload.datasource_type ??
+                updatedFormData.datasource_type ??
+                'table',
             }),
           }).catch(error => {
             console.warn(
@@ -385,14 +398,33 @@ export async function revertPtmChartsForDashboard(
         datasource?: string | number;
       }
     > = {};
-    charts.forEach((chart: { id: number; form_data?: Record<string, unknown>; params?: string; slice_name?: string; datasource_id?: number; datasource_type?: string }) => {
-      const formData = (chart.form_data ?? (chart.params ? JSON.parse(chart.params) : {})) as Record<string, unknown>;
-      slices[String(chart.id)] = {
-        form_data: { ...formData, datasource_id: chart.datasource_id ?? formData.datasource_id, datasource_type: chart.datasource_type ?? formData.datasource_type },
-        slice_name: chart.slice_name,
-        datasource: chart.datasource_id ?? (formData.datasource_id as number | undefined),
-      };
-    });
+    charts.forEach(
+      (chart: {
+        id: number;
+        form_data?: Record<string, unknown>;
+        params?: string;
+        slice_name?: string;
+        datasource_id?: number;
+        datasource_type?: string;
+      }) => {
+        const formData = (chart.form_data ??
+          (chart.params ? JSON.parse(chart.params) : {})) as Record<
+          string,
+          unknown
+        >;
+        slices[String(chart.id)] = {
+          form_data: {
+            ...formData,
+            datasource_id: chart.datasource_id ?? formData.datasource_id,
+            datasource_type: chart.datasource_type ?? formData.datasource_type,
+          },
+          slice_name: chart.slice_name,
+          datasource:
+            chart.datasource_id ??
+            (formData.datasource_id as number | undefined),
+        };
+      },
+    );
 
     const hasAnyPtmChart = Object.values(slices).some(s => {
       const vizType = getVizType(s.form_data);

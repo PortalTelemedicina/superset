@@ -1,3 +1,4 @@
+/* eslint-disable global-require, @typescript-eslint/no-var-requires */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -51,4 +52,3 @@ test('applies PTM extensions when PTM_EXTENSION_ENABLED is true', () => {
   setup();
   expect(ptm.applyPTMExtensions).toHaveBeenCalledTimes(1);
 });
-

@@ -41,7 +41,7 @@ x-common-build: &common-build
     DEV_MODE: "true"
     INCLUDE_CHROMIUM: ${INCLUDE_CHROMIUM:-false}
     INCLUDE_FIREFOX: ${INCLUDE_FIREFOX:-false}
-    BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-false}
+    BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-true}
 
 services:
   nginx:
@@ -170,7 +170,7 @@ services:
         # and build it on startup while firing docker-frontend.sh in dev mode, where
         # it'll mount and watch local files and rebuild as you update them
         DEV_MODE: "true"
-        BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-false}
+        BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-true}
     environment:
       # set this to false if you have perf issues running the npm i; npm run dev in-docker
       # if you do so, you have to run this manually on the host, which should perform better!
@@ -179,6 +179,10 @@ services:
       SCARF_ANALYTICS: "${SCARF_ANALYTICS:-}"
       # configuring the dev-server to use the host.docker.internal to connect to the backend
       superset: "http://superset:8088"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - "127.0.0.1:9000:9000"  # exposing the dynamic webpack dev server
     container_name: superset_node
@@ -266,7 +270,6 @@ volumes:
   superset_home:
     external: false
   db_home:
-    external: true
-    name: superset_db_home
+    external: false
   redis:
     external: false
