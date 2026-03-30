@@ -24,37 +24,6 @@
  * to their PTM equivalents, including special handling for timeseries variants.
  */
 
-const PTM_TAG_NAME = 'PTM';
-
-/**
- * Check if a dashboard is a PTM dashboard based on tags or metadata flag.
- * Used for theme/CSS (e.g. tag PTM). For save-hook conversion, use isPtmAutoconvertEnabled instead.
- */
-export function isPtmDashboard(
-  dashboard:
-    | {
-        tags?: Array<{ name?: string }>;
-        metadata?: { ptm_autoconvert?: boolean };
-      }
-    | null
-    | undefined,
-): boolean {
-  if (!dashboard) return false;
-
-  // Check metadata flag
-  if (dashboard.metadata?.ptm_autoconvert === true) {
-    return true;
-  }
-
-  // Check PTM tag
-  const { tags } = dashboard;
-  if (Array.isArray(tags)) {
-    return tags.some(t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
-  }
-
-  return false;
-}
-
 /**
  * Whether PTM auto-convert is explicitly enabled for this dashboard.
  * Only the metadata flag is used; the PTM tag does not trigger conversion.

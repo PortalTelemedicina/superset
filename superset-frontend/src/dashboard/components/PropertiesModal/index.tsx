@@ -81,7 +81,7 @@ type PropertiesModalProps = {
   show?: boolean;
   onHide?: () => void;
   colorScheme?: string;
-  onSubmit?: (params: Record<string, any>) => void;
+  onSubmit?: (params: Record<string, any> & { persisted?: boolean }) => void;
   addSuccessToast: (message: string) => void;
   addDangerToast: (message: string) => void;
   onlyApply?: boolean;
@@ -425,9 +425,7 @@ const PropertiesModal = ({
     };
     // Only include PTM flags when the extension is enabled (avoid persisting in production)
     if (isPtmExtensionEnabled()) {
-      completeMetadata.ptm_autoconvert = hasSharedCharts
-        ? false
-        : ptmAutoconvert;
+      completeMetadata.ptm_autoconvert = ptmAutoconvert;
       completeMetadata.ptm_locked = hasSharedCharts
         ? true
         : (originalDashboardMetadata.current?.ptm_locked ?? ptmLocked);
@@ -464,7 +462,7 @@ const PropertiesModal = ({
       ...moreOnSubmitProps,
     };
     if (onlyApply) {
-      onSubmit(onSubmitProps);
+      onSubmit({ ...onSubmitProps, persisted: false });
       onHide();
       addSuccessToast(t('Dashboard properties updated'));
     } else {
@@ -488,7 +486,7 @@ const PropertiesModal = ({
         });
       };
       saveDashboard().then(() => {
-        onSubmit(onSubmitProps);
+        onSubmit({ ...onSubmitProps, persisted: true });
         onHide();
         addSuccessToast(t('The dashboard has been saved'));
       }, handleErrorResponse);

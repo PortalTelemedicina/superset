@@ -28,6 +28,15 @@ import { HEALTH_POP_FORM_DATA_DEFAULTS } from './visualizations/shared.helper';
 const apiURL = (endpoint: string, queryObject: Record<string, unknown>) =>
   `${endpoint}?q=${rison.encode(queryObject)}`;
 
+const selectDashboardOption = (dashboardTitle: string) => {
+  cy.get('.ant-select-dropdown:not(.ant-select-dropdown-hidden)', {
+    timeout: 20000,
+  }).should('be.visible');
+  cy.contains('.ant-select-item-option-content', dashboardTitle, {
+    timeout: 20000,
+  }).click({ force: true });
+};
+
 describe('Test explore links', () => {
   beforeEach(() => {
     interceptChart({ legacy: false }).as('chartData');
@@ -124,9 +133,7 @@ describe('Test explore links', () => {
       .find('input[aria-label="Select a dashboard"]')
       .type(`${dashboardTitle}`, { force: true });
 
-    cy.get(`.ant-select-item[title="${dashboardTitle}"]`).click({
-      force: true,
-    });
+    selectDashboardOption(dashboardTitle);
 
     cy.get('[data-test="btn-modal-save"]').click();
     cy.verifySliceSuccess({ waitAlias: '@chartData' });
@@ -157,9 +164,7 @@ describe('Test explore links', () => {
       .find('input[aria-label^="Select a dashboard"]')
       .type(`${dashboardTitle}{enter}`, { force: true });
 
-    cy.get(`.ant-select-item[title="${dashboardTitle}"]`).click({
-      force: true,
-    });
+    selectDashboardOption(dashboardTitle);
 
     cy.get('[data-test="btn-modal-save"]').click();
     cy.verifySliceSuccess({ waitAlias: '@chartData' });
