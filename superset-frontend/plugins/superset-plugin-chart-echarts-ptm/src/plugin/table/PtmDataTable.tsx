@@ -56,7 +56,7 @@ import SelectPageSize, {
   SelectPageSizeRendererProps,
   SizeOption,
 } from '../../../../plugin-chart-table/src/DataTable/components/SelectPageSize';
-import useSticky from '../../../../plugin-chart-table/src/DataTable/hooks/useSticky';
+import useStickyPtm from './useStickyPtm';
 import { PAGE_SIZE_OPTIONS } from '../../../../plugin-chart-table/src/consts';
 import { sortAlphanumericCaseInsensitive } from '../../../../plugin-chart-table/src/DataTable/utils/sortAlphanumericCaseInsensitive';
 
@@ -213,7 +213,7 @@ export default typedMemo(function DataTable<D extends object>({
         useSortBy,
         usePagination,
         useColumnOrder,
-        doSticky ? useSticky : [],
+        doSticky ? useStickyPtm : [],
         hooks || [],
     ].flat();
     const columnNames = Object.keys(data?.[0] || {});

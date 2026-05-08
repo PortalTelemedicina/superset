@@ -98,13 +98,19 @@ export default styled.div`
 
   table.table thead th > div[data-column-name] {
     width: 100% !important;
-    /* Use the header's natural unwrapped width as the column's lower bound.
-       This makes truncate-enabled cells default to the header text width
-       (since the sizer's auto layout takes max(this, cells) for each column).
-       The customize columns columnWidth still overrides via the th width hint. */
-    min-width: max-content !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
+  }
+
+  /* Default minimum width = header's natural (unwrapped) text width.
+     This rule only applies when there is NO columnWidth configured for the
+     column, because in that case the data-column-name div is the th's first
+     (and only) child. When the user sets columnWidth in "Customize columns",
+     PtmTableChart renders a width-hint div BEFORE the data-column-name div,
+     so this :first-child selector no longer matches and the user-configured
+     columnWidth wins - the title wraps to fit and the whole column follows. */
+  table.table thead th > div[data-column-name]:first-child {
+    min-width: max-content !important;
   }
 
   table.table thead th span[data-column-name] {
