@@ -98,7 +98,11 @@ export default styled.div`
 
   table.table thead th > div[data-column-name] {
     width: 100% !important;
-    min-width: 0 !important;
+    /* Use the header's natural unwrapped width as the column's lower bound.
+       This makes truncate-enabled cells default to the header text width
+       (since the sizer's auto layout takes max(this, cells) for each column).
+       The customize columns columnWidth still overrides via the th width hint. */
+    min-width: max-content !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
   }
@@ -519,6 +523,13 @@ export default styled.div`
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
+      /* Block-level so it fills the column width set by the colgroup,
+         and inline-size containment so the nowrap content does NOT
+         propagate its natural width back to the column sizer.
+         This makes truncate-enabled cells default to the header's
+         natural width instead of expanding the column to fit the value. */
+      display: block !important;
+      contain: inline-size !important;
     }
 
     .dt-truncate-cell:hover {
