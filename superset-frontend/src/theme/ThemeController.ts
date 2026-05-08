@@ -632,8 +632,8 @@ export class ThemeController {
     const savedMode: ThemeMode | null = this.loadSavedMode();
     if (savedMode && this.isValidThemeMode(savedMode)) return savedMode;
 
-    // Default to system preference when both themes are available
-    return ThemeMode.SYSTEM;
+    // Default to light mode on first load when both themes are available
+    return ThemeMode.DEFAULT;
   }
 
   /**

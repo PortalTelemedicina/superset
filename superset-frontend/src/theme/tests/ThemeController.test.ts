@@ -273,7 +273,7 @@ describe('ThemeController', () => {
     );
   });
 
-  it('should handle system theme preference', () => {
+  it('should initialize with default mode when both themes are available', () => {
     mockGetBootstrapData.mockReturnValue(
       createMockBootstrapData({
         default: DEFAULT_THEME,
@@ -285,7 +285,7 @@ describe('ThemeController', () => {
       themeObject: mockThemeObject,
     });
 
-    expect(controller.getCurrentMode()).toBe(ThemeMode.SYSTEM);
+    expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
   });
 
   it('should handle only default theme', () => {
