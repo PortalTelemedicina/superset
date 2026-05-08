@@ -940,55 +940,89 @@ import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/form
               </StyledCell>
             );
           },
-          Header: ({ column: col, onClick, style, onDragStart, onDrop }) => (
-            <th
-              id={`header-${column.key}`}
-              title={t('Shift + Click to sort by multiple columns')}
-              className={[className, col.isSorted ? 'is-sorted' : ''].join(' ')}
-              style={{
-                ...sharedStyle,
-                ...style,
-              }}
-              onKeyDown={(e: ReactKeyboardEvent<HTMLElement>) => {
-                // programatically sort column on keypress
-                if (Object.values(ACTION_KEYS).includes(e.key)) {
-                  col.toggleSortBy();
-                }
-              }}
-              role="columnheader button"
-              onClick={onClick}
-              data-column-name={col.id}
-              {...(allowRearrangeColumns && {
-                draggable: 'true',
-                onDragStart,
-                onDragOver: e => e.preventDefault(),
-                onDragEnter: e => e.preventDefault(),
-                onDrop,
-              })}
-              tabIndex={0}
-            >
-              {/* can't use `columnWidth &&` because it may also be zero */}
-              {config.columnWidth ? (
-                // column width hint
-                <div
-                  style={{
-                    width: columnWidth,
-                    height: 0.01,
-                  }}
-                />
-              ) : null}
-              <div
-                data-column-name={col.id}
-                css={{
-                  display: 'inline-flex',
-                  alignItems: 'flex-end',
+          Header: ({ column: col, onClick, style, onDragStart, onDrop }) => {
+            const justifyContent =
+              sharedStyle.textAlign === 'right'
+                ? 'flex-end'
+                : sharedStyle.textAlign === 'center'
+                  ? 'center'
+                  : 'flex-start';
+          
+            return (
+              <th
+                id={`header-${column.key}`}
+                title={t('Shift + Click to sort by multiple columns')}
+                className={[className, col.isSorted ? 'is-sorted' : ''].join(' ')}
+                style={{
+                  ...style,
+                  ...sharedStyle,
+                  whiteSpace: 'normal',
+                  overflowWrap: 'anywhere',
                 }}
+                onKeyDown={(e: ReactKeyboardEvent<HTMLElement>) => {
+                  if (Object.values(ACTION_KEYS).includes(e.key)) {
+                    col.toggleSortBy();
+                  }
+                }}
+                role="columnheader button"
+                onClick={onClick}
+                data-column-name={col.id}
+                {...(allowRearrangeColumns && {
+                  draggable: 'true',
+                  onDragStart,
+                  onDragOver: e => e.preventDefault(),
+                  onDragEnter: e => e.preventDefault(),
+                  onDrop,
+                })}
+                tabIndex={0}
               >
-                <span data-column-name={col.id}>{displayLabel}</span>
-                <SortIcon column={col} />
-              </div>
-            </th>
-          ),
+                {config.columnWidth ? (
+                  <div
+                    style={{
+                      width: columnWidth,
+                      height: 0.01,
+                    }}
+                  />
+                ) : null}
+          
+                <div
+                  data-column-name={col.id}
+                  css={{
+                    display: 'flex',
+                    width: '100%',
+                    minWidth: 0,
+                    alignItems: 'flex-end',
+                    justifyContent,
+                    gap: 4,
+                    textAlign: sharedStyle.textAlign,
+                    whiteSpace: 'normal',
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  <span
+                    data-column-name={col.id}
+                    css={{
+                      minWidth: 0,
+                      whiteSpace: 'normal',
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'normal',
+                    }}
+                  >
+                    {displayLabel}
+                  </span>
+          
+                  <span
+                    css={{
+                      flex: '0 0 auto',
+                      display: 'inline-flex',
+                    }}
+                  >
+                    <SortIcon column={col} />
+                  </span>
+                </div>
+              </th>
+            );
+          },
           Footer: totals ? (
             i === 0 ? (
               <th key={`footer-summary-${i}`}>

@@ -43,11 +43,28 @@ export default styled.div`
     }
 
     /* Sticky table: add side padding and avoid forcing full width */
-    & div[role="table"] > div[role="presentation"] {
-      width: auto !important;
+    & div[role="table"] {
+      overflow-x: auto !important;
+      overflow-y: auto !important;
       max-width: 100% !important;
+    }
+
+    & div[role="table"] > div[role="presentation"] {
+      width: max-content !important;
+      min-width: 100% !important;
+      max-width: none !important;
       padding: 0 16px !important;
       box-sizing: border-box !important;
+    }
+
+    table.table {
+      width: max-content !important;
+      min-width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      border-collapse: collapse !important;
+      border-spacing: 0 !important;
+      background: #FFFFFF !important;
     }
 
     /* ========================================
@@ -76,9 +93,22 @@ export default styled.div`
       letter-spacing: 0.05em !important;
       border: none !important;
       border-bottom: 1px solid #E5E7EB !important;
-      text-align: left !important;
-      white-space: nowrap !important;
+      text-align: left;
     }
+
+  table.table thead th > div[data-column-name] {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  table.table thead th span[data-column-name] {
+    min-width: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
 
     /* Sort icons - subtle */
     table.table thead th svg {
