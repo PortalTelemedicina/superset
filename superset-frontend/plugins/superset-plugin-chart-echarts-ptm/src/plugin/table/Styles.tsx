@@ -42,41 +42,33 @@ export default styled.div`
       max-width: none !important;
     }
 
-    /* Sticky table: add side padding and avoid forcing full width */
-    & div[role="table"] {
-      overflow-x: auto !important;
-      overflow-y: auto !important;
-      max-width: 100% !important;
-    }
-
-    & div[role="table"] > div[role="presentation"] {
-      width: max-content !important;
-      min-width: 100% !important;
-      max-width: none !important;
+    /* Scroll wrapper added by PtmDataTable when sticky=false.
+       Provides the scroll context for the position: sticky thead. */
+    .ptm-dt-scroll {
+      overflow: auto !important;
+      width: 100% !important;
       padding: 0 16px !important;
       box-sizing: border-box !important;
     }
 
+    /* ========================================
+       TABLE BASE STYLES
+       Auto layout + width:100% means columns share the container width and
+       each column gets at least its min-content, which equals the unwrapped
+       header title (because of min-width:max-content on the title div).
+       Body cells use overflow-wrap:anywhere + word-break:break-word so their
+       min-content is ~1 character; this prevents long unbroken text in cells
+       from inflating the column past the title width. The whole row stays
+       inside the container; only when the sum of titles exceeds the
+       container does horizontal scroll kick in (handled by .ptm-dt-scroll). */
     table.table {
-      width: max-content !important;
-      min-width: 100% !important;
+      width: 100% !important;
       max-width: none !important;
       margin: 0 !important;
       border-collapse: collapse !important;
       border-spacing: 0 !important;
       background: #FFFFFF !important;
-    }
-
-    /* ========================================
-       TABLE BASE STYLES
-       ======================================== */
-    table.table {
-      width: auto !important;
-      max-width: 100% !important;
-      margin: 0 !important;
-      border-collapse: collapse !important;
-      border-spacing: 0 !important;
-      background: #FFFFFF !important;
+      table-layout: auto !important;
     }
 
     /* ========================================
@@ -85,7 +77,9 @@ export default styled.div`
     table.table > thead > tr > th,
     table.table thead th {
       padding: 12px 16px !important;
-      background: transparent !important;
+      /* Solid background so rows do NOT show through when the header is
+         pinned via position: sticky during scroll. */
+      background: #FFFFFF !important;
       font-weight: 600 !important;
       font-size: 12px !important;
       color: #6B7280 !important;
@@ -94,6 +88,12 @@ export default styled.div`
       border: none !important;
       border-bottom: 1px solid #E5E7EB !important;
       text-align: left;
+      /* Sticky header: reimplements what useSticky used to do, but lets the
+         table keep table-layout: auto so column widths are driven by the
+         header text (see comments in PtmTableChart.tsx and on table.table). */
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 2 !important;
     }
 
   table.table thead th > div[data-column-name] {
@@ -140,7 +140,10 @@ export default styled.div`
 
     /* ========================================
        BODY / DATA CELLS - Clean
-       ======================================== */
+       Use overflow-wrap: anywhere + word-break: break-word so the cell's
+       MIN content width is ~1 character. This is what lets the column lower
+       bound come from the header (min-width:max-content on the title) instead
+       of from the longest word in the data. */
     table.table > tbody > tr > td,
     table.table tbody td {
       padding: 8px 16px !important;
@@ -154,6 +157,8 @@ export default styled.div`
       vertical-align: middle !important;
       white-space: normal !important;
       word-wrap: break-word !important;
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
     }
 
     /* Row styling - NO alternating colors */

@@ -56,7 +56,7 @@ import SelectPageSize, {
   SelectPageSizeRendererProps,
   SizeOption,
 } from '../../../../plugin-chart-table/src/DataTable/components/SelectPageSize';
-import useStickyPtm from './useStickyPtm';
+import useSticky from '../../../../plugin-chart-table/src/DataTable/hooks/useSticky';
 import { PAGE_SIZE_OPTIONS } from '../../../../plugin-chart-table/src/consts';
 import { sortAlphanumericCaseInsensitive } from '../../../../plugin-chart-table/src/DataTable/utils/sortAlphanumericCaseInsensitive';
 
@@ -213,7 +213,7 @@ export default typedMemo(function DataTable<D extends object>({
         useSortBy,
         usePagination,
         useColumnOrder,
-        doSticky ? useStickyPtm : [],
+        doSticky ? useSticky : [],
         hooks || [],
     ].flat();
     const columnNames = Object.keys(data?.[0] || {});
@@ -490,7 +490,26 @@ export default typedMemo(function DataTable<D extends object>({
                     ) : null}
                 </div>
             ) : null}
-            {wrapStickyTable ? wrapStickyTable(renderTable) : renderTable()}
+            {wrapStickyTable ? (
+              wrapStickyTable(renderTable)
+            ) : (
+              <div
+                className="ptm-dt-scroll"
+                style={{
+                  maxHeight:
+                    typeof initialHeight === 'number'
+                      ? Math.max(
+                          0,
+                          initialHeight -
+                            (globalControlRef.current?.clientHeight || 0) -
+                            (paginationRef.current?.clientHeight || 0),
+                        )
+                      : undefined,
+                }}
+              >
+                {renderTable()}
+              </div>
+            )}
             {hasPagination ? (() => {
                 const total = resultsSize;
                 const pageSizeValue =

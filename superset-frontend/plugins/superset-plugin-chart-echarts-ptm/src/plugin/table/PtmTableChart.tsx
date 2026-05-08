@@ -1146,8 +1146,15 @@ import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/form
           noResults={getNoResultsMessage}
           searchInput={includeSearch && SearchInput}
           selectPageSize={pageSize !== null && SelectPageSize}
-          // PTM: Enable sticky so table body scrolls when rows exceed height, keeping footer visible
-          sticky={true}
+          // PTM: Disable the useSticky hook (it forces table-layout: fixed and
+          // measures column widths from a sizer that includes the full body,
+          // which makes wide cells inflate columns past the header text width).
+          // Sticky-header behavior is reimplemented via CSS `position: sticky`
+          // on `thead th` in Styles.tsx, scoped to a scroll wrapper added by
+          // PtmDataTable when sticky is off. This lets the table use natural
+          // table-layout: auto with `min-width: max-content` on the title,
+          // so each column's lower bound is the unwrapped header text width.
+          sticky={false}
           renderGroupingHeaders={
             !isEmpty(groupHeaderColumns) ? renderGroupingHeaders : undefined
           }
