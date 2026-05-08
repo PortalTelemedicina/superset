@@ -157,6 +157,20 @@ const Register = lazy(
   () => import(/* webpackChunkName: "Register" */ 'src/pages/Register'),
 );
 
+const ForgotPassword = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ForgotPassword" */ 'src/pages/ForgotPassword'
+    ),
+);
+
+const ResetPassword = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ResetPassword" */ 'src/pages/ResetPassword'
+    ),
+);
+
 const GroupsList: LazyExoticComponent<any> = lazy(
   () => import(/* webpackChunkName: "GroupsList" */ 'src/pages/GroupsList'),
 );
@@ -186,6 +200,14 @@ export const routes: Routes = [
   {
     path: '/register/',
     Component: Register,
+  },
+  {
+    path: '/forgot-password/',
+    Component: ForgotPassword,
+  },
+  {
+    path: '/reset-password/',
+    Component: ResetPassword,
   },
   {
     path: '/logout/',

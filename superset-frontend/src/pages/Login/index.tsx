@@ -17,7 +17,14 @@
  * under the License.
  */
 
-import { SupersetClient, styled, t, css } from '@superset-ui/core';
+import {
+  SupersetClient,
+  styled,
+  t,
+  css,
+  FeatureFlag,
+  isFeatureEnabled,
+} from '@superset-ui/core';
 import {
   Button,
   Card,
@@ -104,6 +111,9 @@ export default function Login() {
   const providers: Provider[] = bootstrapData.common.conf.AUTH_PROVIDERS;
   const authRegistration: boolean =
     bootstrapData.common.conf.AUTH_USER_REGISTRATION;
+  const enableForgotPassword = isFeatureEnabled(
+    FeatureFlag.EnableForgotPassword,
+  );
 
   const onFinish = (values: LoginForm) => {
     setLoading(true);
@@ -241,6 +251,17 @@ export default function Login() {
                 </Flex>
               </Form.Item>
             </Form>
+            {enableForgotPassword && (
+              <Flex justify="center">
+                <Button
+                  type="link"
+                  href="/forgot-password/"
+                  data-test="forgot-password-link"
+                >
+                  {t('Esqueceu sua senha?')}
+                </Button>
+              </Flex>
+            )}
           </Flex>
         )}
       </StyledCard>
