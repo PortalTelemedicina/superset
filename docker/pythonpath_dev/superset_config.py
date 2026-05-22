@@ -26,9 +26,9 @@ import sys
 from typing import Any
 
 from celery.schedules import crontab
-from flask import g, has_request_context, request
 from flask_caching.backends.filesystemcache import FileSystemCache
 
+from cost_tagging import extract_chart_context
 from superset.utils import json
 
 logger = logging.getLogger()
@@ -122,101 +122,15 @@ log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
 LOG_LEVEL = getattr(logging, log_level_text.upper(), logging.INFO)
 
 
-# ---------------------------------------------------------------------------
-# Cost attribution: prefix SQL queries with dashboard_id / slice_id / user_id
-# so BigQuery cost can be split by dashboard via INFORMATION_SCHEMA.JOBS.
-# ---------------------------------------------------------------------------
-
-
-def _parse_form_data_blob(blob: Any) -> dict[str, Any]:
-    """Parse a possibly-JSON form_data blob into a dict (empty on failure)."""
-    if isinstance(blob, dict):
-        return blob
-    if isinstance(blob, str) and blob:
-        try:
-            parsed = json.loads(blob)
-        except (TypeError, ValueError):
-            return {}
-        if isinstance(parsed, dict):
-            return parsed
-    return {}
-
-
-def _pick_ids(form_data: dict[str, Any], root: dict[str, Any]) -> dict[str, int]:
-    """Extract dashboard_id / slice_id from a form_data dict + request root."""
-    ids: dict[str, int] = {}
-    dashboard_id = form_data.get("dashboardId") or form_data.get("dashboard_id")
-    slice_id = (
-        form_data.get("slice_id")
-        or form_data.get("sliceId")
-        or root.get("slice_id")
-    )
-    try:
-        if dashboard_id is not None:
-            ids["dashboard_id"] = int(dashboard_id)
-    except (TypeError, ValueError):
-        pass
-    try:
-        if slice_id is not None:
-            ids["slice_id"] = int(slice_id)
-    except (TypeError, ValueError):
-        pass
-    return ids
-
-
-def _extract_chart_context() -> dict[str, int]:
-    """Best-effort extraction of dashboard_id / slice_id / user_id from request.
-
-    Order of sources:
-      1. JSON body (chart data API: form_data.dashboardId / form_data.slice_id).
-      2. request.form["form_data"] (legacy /explore_json).
-      3. request.args["form_data"] (URL-encoded explore links).
-      4. flask.g.form_data (cache warmup, async queries).
-    Returns only keys whose values were resolved.
-    """
-    ctx: dict[str, int] = {}
-
-    if has_request_context():
-        try:
-            json_body = request.get_json(cache=True, silent=True) or {}
-        except Exception:
-            json_body = {}
-        if isinstance(json_body, dict):
-            ctx.update(
-                _pick_ids(_parse_form_data_blob(json_body.get("form_data")), json_body)
-            )
-
-        for source in (request.form.get("form_data"), request.args.get("form_data")):
-            if not source:
-                continue
-            parsed = _parse_form_data_blob(source)
-            ctx = {**_pick_ids(parsed, parsed), **ctx}
-
-    if ("dashboard_id" not in ctx or "slice_id" not in ctx) and hasattr(g, "form_data"):
-        g_form_data = _parse_form_data_blob(getattr(g, "form_data", None))
-        ctx = {**_pick_ids(g_form_data, g_form_data), **ctx}
-
-    try:
-        user = getattr(g, "user", None)
-        user_id = getattr(user, "id", None)
-        if user_id is not None:
-            ctx["user_id"] = int(user_id)
-    except Exception:
-        pass
-
-    return ctx
-
-
 def SQL_QUERY_MUTATOR(  # pylint: disable=invalid-name,unused-argument  # noqa: N802
     sql: str, **kwargs: Any
 ) -> str:
-    """Prefix the query with a JSON tag so BQ cost can be attributed.
-
-    The tag has the form `/* superset: {"dashboard_id":..,"slice_id":..,"user_id":..} */`
-    and is omitted entirely when no chart context is available (e.g. SQL Lab).
+    """Prefix the query with a JSON tag so BQ cost can be attributed per
+    dashboard / chart / user. Returns ``sql`` unchanged when no chart context
+    is available (e.g. SQL Lab), to avoid polluting INFORMATION_SCHEMA.JOBS.
     """
     try:
-        ctx = _extract_chart_context()
+        ctx = extract_chart_context()
     except Exception:
         logger.exception("SQL_QUERY_MUTATOR: failed to build context")
         return sql
