@@ -23,9 +23,13 @@
 import logging
 import os
 import sys
+from typing import Any
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
+
+from cost_tagging import extract_chart_context
+from superset.utils import json
 
 LANGUAGES = {
     'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
@@ -146,6 +150,27 @@ SQLLAB_CTAS_NO_LIMIT = True
 
 log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
 LOG_LEVEL = getattr(logging, log_level_text.upper(), logging.INFO)
+
+
+def SQL_QUERY_MUTATOR(  # pylint: disable=invalid-name,unused-argument  # noqa: N802
+    sql: str, **kwargs: Any
+) -> str:
+    """Prefix the query with a JSON tag so BQ cost can be attributed per
+    dashboard / chart / user. Returns ``sql`` unchanged when no chart context
+    is available (e.g. SQL Lab), to avoid polluting INFORMATION_SCHEMA.JOBS.
+    """
+    try:
+        ctx = extract_chart_context()
+    except Exception:
+        logger.exception("SQL_QUERY_MUTATOR: failed to build context")
+        return sql
+
+    if not ctx:
+        return sql
+
+    tag = json.dumps(ctx, separators=(",", ":"), sort_keys=True)
+    return f"/* superset: {tag} */\n{sql}"
+
 
 if os.getenv("CYPRESS_CONFIG") == "true":
     # When running the service as a cypress backend, we need to import the config
