@@ -155,6 +155,11 @@ UUIDS: dict[str, str] = {
     # v2 charts — Section 5 (State Monitoring)
     "chart.v2.19_state_priority_table": _uid("chart.v2.19_state_priority_table"),
     "chart.v2.20_state_coverage_matrix": _uid("chart.v2.20_state_coverage_matrix"),
+    "chart.v2.21_kpi_cross_jurisdiction": _uid("chart.v2.21_kpi_cross_jurisdiction"),
+    "chart.v2.22_cross_jurisdiction_origin": _uid("chart.v2.22_cross_jurisdiction_origin"),
+    "chart.v2.23_forecast_attended": _uid("chart.v2.23_forecast_attended"),
+    "chart.v2.24_forecast_resident": _uid("chart.v2.24_forecast_resident"),
+    "dataset.dose_forecast_monthly": _uid("dataset.gold_immunization_dose_forecast_monthly"),
     # v2 dashboard
     "dashboard.gestao_imunizacao_operacional_v2": _uid(
         "dashboard.gestao_imunizacao_operacional_v2"
@@ -470,6 +475,17 @@ _COLUMN_LABELS: dict[str, str] = {
     # Geo / org
     "municipality_code": "Cód. IBGE",
     "municipality_name": "Município",
+    "residence_municipality_name": "Município de residência",
+    "residence_municipality_code": "IBGE residência",
+    "residence_state_code": "UF residência (cód.)",
+    "residence_state_name": "Estado de residência",
+    "establishment_municipality_name": "Município da unidade",
+    "establishment_municipality_code": "IBGE da unidade",
+    "establishment_state_code": "UF unidade (cód.)",
+    "establishment_state_name": "Estado da unidade",
+    "is_cross_jurisdiction": "Cross-jurisdição",
+    "forecast_month": "Mês previsto",
+    "expected_doses": "Doses previstas",
     "municipality_state_code": "UF (cód.)",
     "municipality_state_name": "Estado",
     "state_code": "UF (cód.)",
@@ -788,6 +804,73 @@ def _filter_temporal(col: str) -> dict:
 # date you have. The right semantic for these tables is "latest
 # snapshot" (no temporal filter), since the table already IS today.
 _SNAPSHOT_TIME_RANGE: dict = {"time_range": "No filter"}
+
+_CROSS_JURISDICTION_FILTER: dict = {
+    "expressionType": "SIMPLE",
+    "subject": "is_cross_jurisdiction",
+    "operator": "==",
+    "comparator": True,
+    "clause": "WHERE",
+    "filterOptionName": "filter_cross_jurisdiction",
+}
+
+# Hybrid municipality scope (ADR-0012): operational charts filter by CNES unit
+# municipality; coverage / PNI / resident forecast filter by patient residence.
+_ESTABLISHMENT_SCOPE_CHARTS: frozenset[str] = frozenset({
+    "chart.v2.01_kpi_overdue",
+    "chart.v2.02_kpi_due_next_30",
+    "chart.v2.07_backlog_vaccine",
+    "chart.v2.10_backlog_establishment",
+    "chart.v2.11_upcoming_workload",
+    "chart.v2.12_overdue_bucket_dist",
+    "chart.v2.21_kpi_cross_jurisdiction",
+    "chart.v2.22_cross_jurisdiction_origin",
+    "chart.v2.23_forecast_attended",
+})
+
+_RESIDENCE_SCOPE_CHARTS: frozenset[str] = frozenset({
+    "chart.v2.03_kpi_applied",
+    "chart.v2.05_kpi_dq_issues",
+    "chart.v2.06_priority_ranking",
+    "chart.v2.08_timeliness_trend",
+    "chart.v2.09_coverage_heatmap",
+    "chart.v2.13_dropout_ranking",
+    "chart.v2.14_dropout_bar",
+    "chart.v2.15_suspicious_by_reason",
+    "chart.v2.16_suspicious_by_vaccine",
+    "chart.v2.18_unknown_municipality",
+    "chart.v2.19_state_priority_table",
+    "chart.v2.20_state_coverage_matrix",
+    "chart.v2.24_forecast_resident",
+})
+
+
+def _municipality_scope_column(base_key: str, dataset_key: str) -> str | None:
+    """Return the municipality column to bake into scoped chart filters."""
+    if base_key in _ESTABLISHMENT_SCOPE_CHARTS:
+        if dataset_key in (
+            "dataset.operational_backlog_daily_v2",
+            "dataset.dose_forecast_monthly",
+        ):
+            return "establishment_municipality_name"
+        return None
+    if base_key in _RESIDENCE_SCOPE_CHARTS:
+        if dataset_key == "dataset.dose_forecast_monthly":
+            return "residence_municipality_name"
+        return "municipality_name"
+    return "municipality_name"
+
+
+def _state_scope_column(base_key: str, dataset_key: str) -> str | None:
+    """Return the state column to bake into scoped chart filters."""
+    if base_key in _ESTABLISHMENT_SCOPE_CHARTS:
+        if dataset_key in (
+            "dataset.operational_backlog_daily_v2",
+            "dataset.dose_forecast_monthly",
+        ):
+            return "establishment_state_name"
+        return None
+    return "state_name"
 
 # Chart params shared by bar/column/line timeseries (upstream ECharts plugin).
 _PTM_SHOW_VALUE: dict = {"show_value": True}
@@ -1839,6 +1922,28 @@ DATASETS_V2: list[dict] = [
                 ),
                 "d3format": ".1%",
             },
+            {
+                "metric_name": "cross_jurisdiction_pairs",
+                "verbose_name": "Pares cross-jurisdição",
+                "expression": (
+                    "SUM(CASE WHEN is_cross_jurisdiction THEN child_rule_pairs ELSE 0 END)"
+                ),
+                "d3format": ",",
+            },
+        ],
+    },
+    {
+        "key": "dataset.dose_forecast_monthly",
+        "table_name": "gold_immunization_dose_forecast_monthly",
+        "main_dttm_col": "forecast_month",
+        "cache_timeout": 1800,
+        "metrics": [
+            {
+                "metric_name": "expected_doses_total",
+                "verbose_name": "Doses previstas",
+                "expression": "SUM(expected_doses)",
+                "d3format": ",",
+            },
         ],
     },
     {
@@ -2417,6 +2522,92 @@ CHARTS_V2: list[dict] = [
             "aggregateFunction": "Sum",
         },
     },
+    # -------------------------------------------------------------------------
+    # Section 6 — Cross-jurisdiction & dose forecast (ADR-0012 / ADR-0013)
+    # -------------------------------------------------------------------------
+    {
+        "key": "chart.v2.21_kpi_cross_jurisdiction",
+        "slice_name": "Atendimentos de fora do município",
+        "viz_type": "ptm_big_number_total",
+        "dataset_key": "dataset.operational_backlog_daily_v2",
+        "params": _ptm_kpi(
+            icon_name="Users",
+            icon_color="#6A1B9A",
+            icon_background_color="#F3E5F5",
+            additional_text=(
+                "Crianças cadastradas em unidades deste município "
+                "com residência em outro município"
+            ),
+            extra={
+                "metric": "cross_jurisdiction_pairs",
+                "adhoc_filters": [_CROSS_JURISDICTION_FILTER],
+                **_SNAPSHOT_TIME_RANGE,
+                "y_axis_format": ",",
+            },
+        ),
+    },
+    {
+        "key": "chart.v2.22_cross_jurisdiction_origin",
+        "slice_name": "Origem por município de residência (cross-jurisdição)",
+        "viz_type": "ptm_echarts_timeseries",
+        "dataset_key": "dataset.operational_backlog_daily_v2",
+        "params": {
+            "x_axis": "residence_municipality_name",
+            "metrics": [_metric("Crianças", "SUM", "child_rule_pairs")],
+            "groupby": [],
+            "adhoc_filters": [_CROSS_JURISDICTION_FILTER],
+            **_SNAPSHOT_TIME_RANGE,
+            "row_limit": 50,
+            "show_legend": False,
+            "y_axis_format": ",",
+            "ptm_series_type": "bar",
+            "orientation": "horizontal",
+            "x_axis_sort": "Crianças",
+            "x_axis_sort_asc": True,
+            **_PTM_BAR_RADIUS,
+            **_PTM_SHOW_VALUE,
+        },
+    },
+    {
+        "key": "chart.v2.23_forecast_attended",
+        "slice_name": "Previsão de doses — unidades do município",
+        "viz_type": "ptm_echarts_timeseries",
+        "dataset_key": "dataset.dose_forecast_monthly",
+        "params": {
+            "x_axis": "forecast_month",
+            "time_grain_sqla": "P1M",
+            "metrics": [_metric("Doses previstas", "SUM", "expected_doses")],
+            "groupby": ["vaccine_name"],
+            "adhoc_filters": [_filter_temporal("forecast_month")],
+            "row_limit": 10000,
+            "show_legend": True,
+            "y_axis_format": ",",
+            "ptm_series_type": "bar",
+            "stack": "Stack",
+            **_PTM_BAR_RADIUS,
+            **_PTM_SHOW_VALUE,
+        },
+    },
+    {
+        "key": "chart.v2.24_forecast_resident",
+        "slice_name": "Previsão de doses — população residente",
+        "viz_type": "ptm_echarts_timeseries",
+        "dataset_key": "dataset.dose_forecast_monthly",
+        "params": {
+            "x_axis": "forecast_month",
+            "time_grain_sqla": "P1M",
+            "metrics": [_metric("Doses previstas", "SUM", "expected_doses")],
+            "groupby": ["vaccine_name"],
+            "adhoc_filters": [_filter_temporal("forecast_month")],
+            "row_limit": 10000,
+            "show_legend": True,
+            "y_axis_format": ",",
+            "ptm_series_type": "bar",
+            "stack": "Stack",
+            **_PTM_BAR_RADIUS,
+            **_PTM_SHOW_VALUE,
+        },
+    },
 ]
 
 
@@ -2540,7 +2731,19 @@ _NATIVE_FILTER_SPECS_V2: list[dict] = [
 # ---------------------------------------------------------------------------
 
 _SCOPE_COLUMNS_BY_DATASET: dict[str, set[str]] = {
-    "dataset.operational_backlog_daily_v2": {"municipality_name", "state_name"},
+    "dataset.operational_backlog_daily_v2": {
+        "municipality_name",
+        "residence_municipality_name",
+        "establishment_municipality_name",
+        "state_name",
+        "establishment_state_name",
+    },
+    "dataset.dose_forecast_monthly": {
+        "residence_municipality_name",
+        "establishment_municipality_name",
+        "residence_state_name",
+        "establishment_state_name",
+    },
     "dataset.priority_daily_v2": {"municipality_name", "state_name"},
     "dataset.dropout_by_series_v2": {"municipality_name", "state_name"},
     "dataset.data_quality_daily_v2": {"municipality_name", "state_name"},
@@ -2580,12 +2783,19 @@ def scoped_chart_specs(
         spec["base_key"] = base_key
         spec["key"] = f"{base_key}.{scope_kind}.{scope_id}"
         spec["uuid"] = _uid(f"{base_key}.{scope_kind}.{scope_id}")
-        cols = _SCOPE_COLUMNS_BY_DATASET.get(base["dataset_key"], set())
         predicate: dict | None = None
-        if municipality_name and "municipality_name" in cols:
-            predicate = _scope_filter("municipality_name", municipality_name)
-        elif state_name and "state_name" in cols:
-            predicate = _scope_filter("state_name", state_name)
+        if municipality_name:
+            scope_col = _municipality_scope_column(base_key, base["dataset_key"])
+            if scope_col:
+                cols = _SCOPE_COLUMNS_BY_DATASET.get(base["dataset_key"], set())
+                if scope_col in cols or scope_col == "municipality_name":
+                    predicate = _scope_filter(scope_col, municipality_name)
+        elif state_name:
+            scope_col = _state_scope_column(base_key, base["dataset_key"])
+            if scope_col:
+                cols = _SCOPE_COLUMNS_BY_DATASET.get(base["dataset_key"], set())
+                if scope_col in cols:
+                    predicate = _scope_filter(scope_col, state_name)
         if predicate:
             params = dict(spec["params"])
             params["adhoc_filters"] = list(
@@ -2759,6 +2969,18 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
         ("ROW-V2-backlog-establishment", [
             ("chart.v2.10_backlog_establishment", 12, 55),
         ]),
+        ("ROW-V2-cross-kpi", [
+            ("chart.v2.21_kpi_cross_jurisdiction", 4, 22),
+        ]),
+        ("ROW-V2-cross-origin", [
+            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+        ]),
+        ("ROW-V2-forecast-attended", [
+            ("chart.v2.23_forecast_attended", 12, 55),
+        ]),
+        ("ROW-V2-forecast-resident", [
+            ("chart.v2.24_forecast_resident", 12, 55),
+        ]),
         ("ROW-V2-trends", [
             ("chart.v2.08_timeliness_trend", 6, 50),
         ]),
@@ -2821,6 +3043,18 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
         ("ROW-STATE-establishment", [
             ("chart.v2.10_backlog_establishment", 12, 55),
         ]),
+        ("ROW-STATE-cross-kpi", [
+            ("chart.v2.21_kpi_cross_jurisdiction", 4, 22),
+        ]),
+        ("ROW-STATE-cross-origin", [
+            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+        ]),
+        ("ROW-STATE-forecast-attended", [
+            ("chart.v2.23_forecast_attended", 12, 55),
+        ]),
+        ("ROW-STATE-forecast-resident", [
+            ("chart.v2.24_forecast_resident", 12, 55),
+        ]),
         ("ROW-STATE-trends", [
             ("chart.v2.08_timeliness_trend", 12, 50),
         ]),
@@ -2860,6 +3094,18 @@ def build_dashboard_position_muni(chart_id_by_key: dict[str, int]) -> dict[str, 
         ]),
         ("ROW-MUNI-establishment", [
             ("chart.v2.10_backlog_establishment", 12, 55),
+        ]),
+        ("ROW-MUNI-cross-kpi", [
+            ("chart.v2.21_kpi_cross_jurisdiction", 4, 22),
+        ]),
+        ("ROW-MUNI-cross-origin", [
+            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+        ]),
+        ("ROW-MUNI-forecast-attended", [
+            ("chart.v2.23_forecast_attended", 12, 55),
+        ]),
+        ("ROW-MUNI-forecast-resident", [
+            ("chart.v2.24_forecast_resident", 12, 55),
         ]),
         ("ROW-MUNI-vaccine", [
             ("chart.v2.07_backlog_vaccine", 12, 55),
