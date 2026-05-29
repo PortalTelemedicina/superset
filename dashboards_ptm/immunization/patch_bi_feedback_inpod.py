@@ -43,6 +43,7 @@ from bootstrap_via_api import (  # noqa: E402
     build_native_filters_v2,
     chart_keys_for_layout,
     scope_dashboard_uuid,
+    scoped_chart_specs,
 )
 
 LOG = logging.getLogger("ptm.imm.patch_inpod")
@@ -143,36 +144,82 @@ def patch_datasets(schema: str) -> dict[str, int]:
     return ids
 
 
-def patch_charts(dataset_ids: dict[str, int]) -> dict[str, int]:
+def _upsert_chart(spec: dict, dataset_ids: dict[str, int]) -> int | None:
+    """Create or update a single chart by UUID (ORM). Returns chart id."""
     from superset import db
     from superset.models.slice import Slice
 
+    chart_uuid = uuid_mod.UUID(spec.get("uuid") or UUIDS[spec["key"]])
+    dataset_id = dataset_ids.get(spec["dataset_key"])
+    if not dataset_id:
+        LOG.warning("dataset for %s missing", spec["key"])
+        return None
+    params = dict(spec["params"])
+    params["datasource"] = f"{dataset_id}__table"
+    params["viz_type"] = spec["viz_type"]
+    params_json = json.dumps(params, default=str)
+
+    chart = (
+        db.session.query(Slice)
+        .filter(Slice.uuid == chart_uuid)
+        .one_or_none()
+    )
+    if not chart:
+        chart = Slice(uuid=chart_uuid)
+        db.session.add(chart)
+    chart.slice_name = spec["slice_name"]
+    chart.viz_type = spec["viz_type"]
+    chart.datasource_id = dataset_id
+    chart.datasource_type = "table"
+    chart.params = params_json
+    db.session.flush()
+    return chart.id
+
+
+def patch_charts(dataset_ids: dict[str, int]) -> dict[str, int]:
+    """Upsert the base (national) chart set; returns key -> chart id."""
+    from superset import db
+
     chart_ids: dict[str, int] = {}
     for spec in CHARTS_V2:
-        chart = (
-            db.session.query(Slice)
-            .filter(Slice.uuid == _chart_uuid(spec["key"]))
-            .one_or_none()
-        )
-        if not chart:
-            LOG.warning("chart %s missing — skipping", spec["slice_name"])
-            continue
-        dataset_id = dataset_ids.get(spec["dataset_key"])
-        if not dataset_id:
-            LOG.warning("dataset for %s missing", spec["key"])
-            continue
-        params = dict(spec["params"])
-        params["datasource"] = f"{dataset_id}__table"
-        params["viz_type"] = spec["viz_type"]
-        chart.slice_name = spec["slice_name"]
-        chart.viz_type = spec["viz_type"]
-        chart.datasource_id = dataset_id
-        chart.datasource_type = "table"
-        chart.params = json.dumps(params, default=str)
-        chart_ids[spec["key"]] = chart.id
-        LOG.info("patched chart %s (id=%s)", spec["slice_name"], chart.id)
+        cid = _upsert_chart(spec, dataset_ids)
+        if cid is not None:
+            chart_ids[spec["key"]] = cid
+            LOG.info("patched chart %s (id=%s)", spec["slice_name"], cid)
     db.session.commit()
     return chart_ids
+
+
+def provision_scoped_charts(
+    dataset_ids: dict[str, int],
+    scope_kind: str,
+    scope_id: str,
+    *,
+    municipality_name: str | None = None,
+    state_name: str | None = None,
+) -> dict[str, int]:
+    """Create/update scope-exclusive charts; returns base_key -> chart id."""
+    from superset import db
+
+    specs = scoped_chart_specs(
+        scope_kind,
+        scope_id,
+        municipality_name=municipality_name,
+        state_name=state_name,
+    )
+    chart_id_by_base_key: dict[str, int] = {}
+    for spec in specs:
+        cid = _upsert_chart(spec, dataset_ids)
+        if cid is not None:
+            chart_id_by_base_key[spec["base_key"]] = cid
+    db.session.commit()
+    LOG.info(
+        "provisioned %d scoped charts for %s/%s",
+        len(chart_id_by_base_key),
+        scope_kind,
+        scope_id,
+    )
+    return chart_id_by_base_key
 
 
 def _patch_dashboard(
@@ -262,29 +309,39 @@ def patch_dashboards(
         registry_env=registry_env,
     )
     for state_row in unique_states(scopes):
+        uf = state_row.state_code.lower()
+        scoped_ids = provision_scoped_charts(
+            dataset_ids,
+            "state",
+            uf,
+            state_name=state_row.state_name,
+        )
         _patch_dashboard(
-            dash_uuid=uuid_mod.UUID(
-                scope_dashboard_uuid("state", state_row.state_code.lower())
-            ),
+            dash_uuid=uuid_mod.UUID(scope_dashboard_uuid("state", uf)),
             title=f"Gestão de Imunização — {state_row.state_name}",
-            slug=f"gestao-imunizacao-estado-{state_row.state_code.lower()}",
-            position=build_dashboard_position_state(chart_ids),
-            chart_ids=chart_ids,
+            slug=f"gestao-imunizacao-estado-{uf}",
+            position=build_dashboard_position_state(scoped_ids),
+            chart_ids=scoped_ids,
             dataset_ids=dataset_ids,
             default_state_name=state_row.state_name,
         )
     for muni_row in scopes:
+        ibge = muni_row.municipality_code
+        scoped_ids = provision_scoped_charts(
+            dataset_ids,
+            "muni",
+            ibge,
+            municipality_name=muni_row.municipality_name,
+        )
         _patch_dashboard(
-            dash_uuid=uuid_mod.UUID(
-                scope_dashboard_uuid("muni", muni_row.municipality_code)
-            ),
+            dash_uuid=uuid_mod.UUID(scope_dashboard_uuid("muni", ibge)),
             title=(
                 f"Gestão de Imunização — "
                 f"{muni_row.municipality_name}/{muni_row.state_code}"
             ),
-            slug=f"gestao-imunizacao-municipio-{muni_row.municipality_code}",
-            position=build_dashboard_position_muni(chart_ids),
-            chart_ids=chart_ids,
+            slug=f"gestao-imunizacao-municipio-{ibge}",
+            position=build_dashboard_position_muni(scoped_ids),
+            chart_ids=scoped_ids,
             dataset_ids=dataset_ids,
             default_state_name=muni_row.state_name,
             default_municipality_name=muni_row.municipality_name,
