@@ -48,6 +48,49 @@ from bootstrap_via_api import (  # noqa: E402
 
 LOG = logging.getLogger("ptm.imm.patch_inpod")
 
+# Mirrors the certification badge applied to the original dashboards so that
+# every scoped dashboard (state/municipality) shows the same blue seal.
+_CERTIFIED_BY = "Data Engineering — PTM"
+_PTM_TAG_NAME = "PTM"
+
+
+def _ensure_ptm_tag(dash) -> None:
+    """Attach the ``PTM`` custom tag to ``dash`` via the ORM (idempotent).
+
+    The PTM plugins rely on this tag (isPtmDashboard) and scoped dashboards
+    created here would otherwise be missing it.
+    """
+    from superset import db
+    from superset.tags.models import ObjectType, Tag, TaggedObject, TagType
+
+    tag = (
+        db.session.query(Tag)
+        .filter(Tag.name == _PTM_TAG_NAME, Tag.type == TagType.custom)
+        .one_or_none()
+    )
+    if tag is None:
+        tag = Tag(name=_PTM_TAG_NAME, type=TagType.custom)
+        db.session.add(tag)
+        db.session.flush()
+    exists = (
+        db.session.query(TaggedObject)
+        .filter(
+            TaggedObject.tag_id == tag.id,
+            TaggedObject.object_id == dash.id,
+            TaggedObject.object_type == ObjectType.dashboard,
+        )
+        .first()
+    )
+    if exists is None:
+        db.session.add(
+            TaggedObject(
+                tag_id=tag.id,
+                object_id=dash.id,
+                object_type=ObjectType.dashboard,
+            )
+        )
+        LOG.info("tagged dashboard id=%s with %s", dash.id, _PTM_TAG_NAME)
+
 _FALLBACK_SCOPES = [
     ScopeRow(
         municipality_code="220270",
@@ -271,6 +314,7 @@ def _patch_dashboard(
 
     dash.position_json = json.dumps(position)
     dash.json_metadata = json.dumps(metadata)
+    dash.certified_by = _CERTIFIED_BY
 
     keep_ids = set(subset.values())
     for chart_id in keep_ids:
@@ -281,6 +325,9 @@ def _patch_dashboard(
     for chart in list(dash.slices):
         if chart.id not in keep_ids:
             chart.dashboards.remove(dash)
+
+    db.session.flush()
+    _ensure_ptm_tag(dash)
 
     LOG.info("patched dashboard %s (id=%s, %d charts)", slug, dash.id, len(subset))
     db.session.commit()
