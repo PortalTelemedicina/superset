@@ -158,8 +158,16 @@ def patch_datasets(schema: str) -> dict[str, int]:
             .one_or_none()
         )
         if not dataset:
-            LOG.warning("dataset %s missing — skipping", spec["table_name"])
-            continue
+            LOG.info("creating dataset %s", spec["table_name"])
+            dataset = SqlaTable(
+                uuid=ds_uuid,
+                table_name=spec["table_name"],
+                schema=schema,
+                database=database,
+                cache_timeout=spec.get("cache_timeout"),
+            )
+            db.session.add(dataset)
+            db.session.flush()
         ids[spec["key"]] = dataset.id
         # Re-introspect the physical table so newly added dbt columns
         # (e.g. vaccine_name, severity_label, freshness_status_label) become
