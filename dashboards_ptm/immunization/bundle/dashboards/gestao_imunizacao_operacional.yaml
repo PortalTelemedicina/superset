@@ -1,0 +1,287 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+dashboard_title: Gestão de Imunização — Visão Operacional
+description: 'Dashboard operacional para gestores municipais e regionais de imunização.
+  Origem: ptm-data-prod.gold.gold_immunization_*'
+css: ''
+slug: gestao-imunizacao-operacional
+certified_by: Data Engineering — PTM
+certification_details: Modelos dbt validados em ptm-dw-modeling (gold layer).
+published: true
+uuid: d3c77fed-f119-576c-b53d-e322bedab20a
+position:
+  DASHBOARD_VERSION_KEY: v2
+  ROOT_ID:
+    type: ROOT
+    id: ROOT_ID
+    children:
+    - GRID_ID
+  GRID_ID:
+    type: GRID
+    id: GRID_ID
+    children:
+    - ROW-kpis
+    - ROW-trend
+    - ROW-detail
+    - ROW-aux
+    parents:
+    - ROOT_ID
+  HEADER_ID:
+    type: HEADER
+    id: HEADER_ID
+    meta:
+      text: Gestão de Imunização — Visão Operacional
+  CHART-01_kpi_cobertura_media:
+    type: CHART
+    id: CHART-01_kpi_cobertura_media
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-kpis
+    meta:
+      width: 4
+      height: 50
+      uuid: 080ef4cc-d3cd-53ca-b043-cda380bbe5d3
+  CHART-02_kpi_criancas_em_atraso:
+    type: CHART
+    id: CHART-02_kpi_criancas_em_atraso
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-kpis
+    meta:
+      width: 4
+      height: 50
+      uuid: 845e6550-5ce6-56f4-be6f-d3a576a8633d
+  CHART-03_kpi_proximas_30_dias:
+    type: CHART
+    id: CHART-03_kpi_proximas_30_dias
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-kpis
+    meta:
+      width: 4
+      height: 50
+      uuid: 5824d3e5-4992-5145-bf0f-2783388f8763
+  ROW-kpis:
+    type: ROW
+    id: ROW-kpis
+    children:
+    - CHART-01_kpi_cobertura_media
+    - CHART-02_kpi_criancas_em_atraso
+    - CHART-03_kpi_proximas_30_dias
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    meta:
+      background: BACKGROUND_TRANSPARENT
+  CHART-04_timeline_doses:
+    type: CHART
+    id: CHART-04_timeline_doses
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-trend
+    meta:
+      width: 4
+      height: 60
+      uuid: 79b14e51-4742-5c87-be18-51266bcf8f01
+  CHART-05_mapa_alerta:
+    type: CHART
+    id: CHART-05_mapa_alerta
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-trend
+    meta:
+      width: 4
+      height: 60
+      uuid: 18a56f57-4800-5afc-a76c-a3adbbde7d7e
+  CHART-07_timeliness:
+    type: CHART
+    id: CHART-07_timeliness
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-trend
+    meta:
+      width: 4
+      height: 60
+      uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+  ROW-trend:
+    type: ROW
+    id: ROW-trend
+    children:
+    - CHART-04_timeline_doses
+    - CHART-05_mapa_alerta
+    - CHART-07_timeliness
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    meta:
+      background: BACKGROUND_TRANSPARENT
+  CHART-06_heatmap_atraso:
+    type: CHART
+    id: CHART-06_heatmap_atraso
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-detail
+    meta:
+      width: 6
+      height: 70
+      uuid: d6491d0d-da03-5cc6-9816-74e24d72b317
+  CHART-09_ranking_municipios:
+    type: CHART
+    id: CHART-09_ranking_municipios
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-detail
+    meta:
+      width: 6
+      height: 70
+      uuid: f69796b6-fd9a-5fd2-817a-87fd103d0bdf
+  ROW-detail:
+    type: ROW
+    id: ROW-detail
+    children:
+    - CHART-06_heatmap_atraso
+    - CHART-09_ranking_municipios
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    meta:
+      background: BACKGROUND_TRANSPARENT
+  CHART-08_dropout_serie:
+    type: CHART
+    id: CHART-08_dropout_serie
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-aux
+    meta:
+      width: 4
+      height: 60
+      uuid: 5ac02086-3fa9-51f2-aff2-8dd346ca7768
+  CHART-10_registros_suspeitos:
+    type: CHART
+    id: CHART-10_registros_suspeitos
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-aux
+    meta:
+      width: 5
+      height: 60
+      uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+  CHART-11_freshness:
+    type: CHART
+    id: CHART-11_freshness
+    children: []
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-aux
+    meta:
+      width: 3
+      height: 60
+      uuid: 00dfe0f2-417f-5985-9bf7-5cc0b56b5811
+  ROW-aux:
+    type: ROW
+    id: ROW-aux
+    children:
+    - CHART-08_dropout_serie
+    - CHART-10_registros_suspeitos
+    - CHART-11_freshness
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    meta:
+      background: BACKGROUND_TRANSPARENT
+metadata:
+  color_scheme: supersetColors
+  refresh_frequency: 300
+  cross_filters_enabled: true
+  native_filter_configuration:
+  - id: NATIVE_FILTER-municipality
+    name: Município (IBGE)
+    filterType: filter_select
+    targets:
+    - column:
+        name: municipality_code
+    defaultDataMask:
+      filterState:
+        value:
+        - '220850'
+    controlValues:
+      multiSelect: true
+      enableEmptyFilter: false
+      inverseSelection: false
+      searchAllOptions: true
+    type: NATIVE_FILTER
+  - id: NATIVE_FILTER-vaccine
+    name: Vacina
+    filterType: filter_select
+    targets:
+    - column:
+        name: vaccine_code
+    controlValues:
+      multiSelect: true
+      enableEmptyFilter: false
+    type: NATIVE_FILTER
+  - id: NATIVE_FILTER-dose
+    name: Dose
+    filterType: filter_select
+    targets:
+    - column:
+        name: dose_sequence
+    controlValues:
+      multiSelect: true
+      enableEmptyFilter: false
+    type: NATIVE_FILTER
+  - id: NATIVE_FILTER-ref-date
+    name: Período
+    filterType: filter_time
+    targets:
+    - {}
+    defaultDataMask:
+      filterState:
+        value: Last year
+    type: NATIVE_FILTER
+  chart_configuration: {}
+  global_chart_configuration:
+    scope:
+      rootPath:
+      - ROOT_ID
+      excluded: []
+    chartsInScope: []
+  ptm_autoconvert: true
+tags:
+- name: PTM
+version: 1.0.0
