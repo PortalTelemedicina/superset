@@ -34,6 +34,7 @@ It targets Apache Superset 4.x/5.x/6.x REST APIs (paths under ``/api/v1/``).
 from __future__ import annotations
 
 import argparse
+import copy
 import io
 import json
 import logging
@@ -1514,7 +1515,7 @@ def ensure_chart(
     dataset_id_by_key: dict[str, int],
     dry_run: bool,
 ) -> int:
-    chart_uuid = UUIDS[chart_spec["key"]]
+    chart_uuid = chart_spec.get("uuid") or UUIDS[chart_spec["key"]]
     existing = find_chart_by_uuid(c, chart_uuid)
     dataset_id = dataset_id_by_key[chart_spec["dataset_key"]]
     params = dict(chart_spec["params"])
@@ -2518,6 +2519,102 @@ _NATIVE_FILTER_SPECS_V2: list[dict] = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Per-scope chart cloning
+#
+# PTM's plugin locks layout customization when a chart is shared across
+# dashboards, and shared charts also make per-dashboard native-filter
+# defaults unreliable (all tiers render the national total). So each scoped
+# dashboard (state / municipality) gets its OWN exclusive copy of every
+# chart, with the scope predicate baked into ``adhoc_filters`` — the data is
+# correctly scoped regardless of native-filter behavior.
+#
+# Datasets that expose the scope columns; charts on datasets NOT listed here
+# (e.g. data_freshness — RNDS freshness is national) stay global.
+# ---------------------------------------------------------------------------
+
+_SCOPE_COLUMNS_BY_DATASET: dict[str, set[str]] = {
+    "dataset.operational_backlog_daily_v2": {"municipality_name", "state_name"},
+    "dataset.priority_daily_v2": {"municipality_name", "state_name"},
+    "dataset.dropout_by_series_v2": {"municipality_name", "state_name"},
+    "dataset.data_quality_daily_v2": {"municipality_name", "state_name"},
+    "dataset.timeliness_monthly": {"municipality_name", "state_name"},
+}
+
+
+def _scope_filter(column: str, value: str) -> dict:
+    return {
+        "clause": "WHERE",
+        "subject": column,
+        "operator": "IN",
+        "comparator": [value],
+        "expressionType": "SIMPLE",
+    }
+
+
+def scoped_chart_specs(
+    scope_kind: str,
+    scope_id: str,
+    *,
+    municipality_name: str | None = None,
+    state_name: str | None = None,
+) -> list[dict]:
+    """Deep-copy CHARTS_V2 into a scope-exclusive set with baked filters.
+
+    Each returned spec carries:
+      - ``base_key``: the original CHARTS_V2 key (used by layout builders).
+      - ``key`` / ``uuid``: scope-suffixed, stable across re-runs.
+      - ``params.adhoc_filters``: scope predicate appended when the chart's
+        dataset exposes ``municipality_name`` / ``state_name``.
+    """
+    specs: list[dict] = []
+    for base in CHARTS_V2:
+        spec = copy.deepcopy(base)
+        base_key = base["key"]
+        spec["base_key"] = base_key
+        spec["key"] = f"{base_key}.{scope_kind}.{scope_id}"
+        spec["uuid"] = _uid(f"{base_key}.{scope_kind}.{scope_id}")
+        cols = _SCOPE_COLUMNS_BY_DATASET.get(base["dataset_key"], set())
+        predicate: dict | None = None
+        if municipality_name and "municipality_name" in cols:
+            predicate = _scope_filter("municipality_name", municipality_name)
+        elif state_name and "state_name" in cols:
+            predicate = _scope_filter("state_name", state_name)
+        if predicate:
+            params = dict(spec["params"])
+            params["adhoc_filters"] = list(
+                params.get("adhoc_filters") or []
+            ) + [predicate]
+            spec["params"] = params
+        specs.append(spec)
+    return specs
+
+
+def provision_scoped_charts(
+    c: SupersetClient,
+    dataset_id_by_key: dict[str, int],
+    scope_kind: str,
+    scope_id: str,
+    *,
+    municipality_name: str | None = None,
+    state_name: str | None = None,
+    dry_run: bool,
+) -> dict[str, int]:
+    """Create/update scope-exclusive charts; return base_key -> chart id."""
+    specs = scoped_chart_specs(
+        scope_kind,
+        scope_id,
+        municipality_name=municipality_name,
+        state_name=state_name,
+    )
+    chart_id_by_base_key: dict[str, int] = {}
+    for spec in specs:
+        chart_id_by_base_key[spec["base_key"]] = ensure_chart(
+            c, spec, dataset_id_by_key, dry_run
+        )
+    return chart_id_by_base_key
+
+
 def build_native_filters_v2(
     dataset_id_by_key: dict[str, int],
     *,
@@ -2883,14 +2980,22 @@ def ensure_dashboard_state(
     dry_run: bool,
 ) -> str:
     uf = scope.state_code.lower()
-    position = build_dashboard_position_state(chart_id_by_key)
+    scoped_ids = provision_scoped_charts(
+        c,
+        dataset_id_by_key,
+        "state",
+        uf,
+        state_name=scope.state_name,
+        dry_run=dry_run,
+    )
+    position = build_dashboard_position_state(scoped_ids)
     return ensure_scoped_dashboard(
         c,
         dash_uuid=scope_dashboard_uuid("state", uf),
         dashboard_title=f"Gestão de Imunização — {scope.state_name}",
         slug=f"gestao-imunizacao-estado-{uf}",
         position=position,
-        chart_id_by_key=chart_id_by_key,
+        chart_id_by_key=scoped_ids,
         dataset_id_by_key=dataset_id_by_key,
         dry_run=dry_run,
         default_state_name=scope.state_name,
@@ -2905,7 +3010,15 @@ def ensure_dashboard_muni(
     dry_run: bool,
 ) -> str:
     ibge = scope.municipality_code
-    position = build_dashboard_position_muni(chart_id_by_key)
+    scoped_ids = provision_scoped_charts(
+        c,
+        dataset_id_by_key,
+        "muni",
+        ibge,
+        municipality_name=scope.municipality_name,
+        dry_run=dry_run,
+    )
+    position = build_dashboard_position_muni(scoped_ids)
     return ensure_scoped_dashboard(
         c,
         dash_uuid=scope_dashboard_uuid("muni", ibge),
@@ -2914,7 +3027,7 @@ def ensure_dashboard_muni(
         ),
         slug=f"gestao-imunizacao-municipio-{ibge}",
         position=position,
-        chart_id_by_key=chart_id_by_key,
+        chart_id_by_key=scoped_ids,
         dataset_id_by_key=dataset_id_by_key,
         dry_run=dry_run,
         default_state_name=scope.state_name,
