@@ -1,0 +1,58 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+slice_name: Timeline de doses aplicadas
+description: null
+certified_by: null
+certification_details: null
+viz_type: ptm_echarts_timeseries
+params:
+  x_axis: reference_month
+  time_grain_sqla: P1M
+  metrics:
+  - label: Doses aplicadas
+    expressionType: SIMPLE
+    aggregate: SUM
+    column:
+      column_name: dose_count
+  groupby:
+  - vaccine_code
+  adhoc_filters:
+  - clause: WHERE
+    subject: reference_month
+    operator: TEMPORAL_RANGE
+    comparator: Last year
+    expressionType: SIMPLE
+  row_limit: 10000
+  color_scheme: supersetColors
+  show_legend: true
+  x_axis_time_format: smart_date
+  y_axis_format: ','
+  ptm_series_type: bar
+  ptm_bar_radius_enabled: true
+  ptm_bar_radius_size: '8'
+  ptm_bar_radius_round_top: true
+  ptm_bar_radius_round_bottom: true
+  ptm_zoom_enabled: true
+  ptm_zoom_axis: x
+  ptm_zoom_size: xs
+  ptm_zoom_inset: '24'
+  viz_type: ptm_echarts_timeseries
+  datasource: '{dataset_id}__table'
+cache_timeout: null
+uuid: 79b14e51-4742-5c87-be18-51266bcf8f01
+version: 1.0.0
+dataset_uuid: cdd26e01-50da-5a89-98a0-ab0ee38b9487

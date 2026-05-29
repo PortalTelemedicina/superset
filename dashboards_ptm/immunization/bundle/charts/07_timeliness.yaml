@@ -1,0 +1,69 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+slice_name: Timeliness (no prazo vs atrasadas)
+description: null
+certified_by: null
+certification_details: null
+viz_type: ptm_mixed_timeseries
+params:
+  x_axis: reference_month
+  time_grain_sqla: P1M
+  metrics:
+  - label: No prazo
+    expressionType: SIMPLE
+    aggregate: SUM
+    column:
+      column_name: on_time_count
+  metrics_b:
+  - label: Atrasadas
+    expressionType: SIMPLE
+    aggregate: SUM
+    column:
+      column_name: late_count
+  groupby: []
+  groupby_b: []
+  adhoc_filters:
+  - clause: WHERE
+    subject: reference_month
+    operator: TEMPORAL_RANGE
+    comparator: Last year
+    expressionType: SIMPLE
+  adhoc_filters_b:
+  - clause: WHERE
+    subject: reference_month
+    operator: TEMPORAL_RANGE
+    comparator: Last year
+    expressionType: SIMPLE
+  seriesType: echarts_timeseries_bar
+  seriesTypeB: echarts_timeseries_line
+  show_legend: true
+  y_axis_format: ','
+  x_axis_time_format: smart_date
+  ptm_bar_radius_enabled: true
+  ptm_bar_radius_size: '8'
+  ptm_bar_radius_round_top: true
+  ptm_bar_radius_round_bottom: true
+  ptm_zoom_enabled: true
+  ptm_zoom_axis: x
+  ptm_zoom_size: xs
+  ptm_zoom_inset: '24'
+  viz_type: ptm_mixed_timeseries
+  datasource: '{dataset_id}__table'
+cache_timeout: null
+uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+version: 1.0.0
+dataset_uuid: f3a5e35c-c2a1-5efd-bf2f-ec3b7ce49f13

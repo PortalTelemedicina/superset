@@ -1,0 +1,49 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+slice_name: Cobertura média (D1)
+description: null
+certified_by: null
+certification_details: null
+viz_type: ptm_big_number_trendline
+params:
+  metric: coverage_pct_d1
+  x_axis: ref_date
+  time_grain_sqla: P1D
+  adhoc_filters:
+  - clause: WHERE
+    subject: ref_date
+    operator: TEMPORAL_RANGE
+    comparator: Last year
+    expressionType: SIMPLE
+  show_trend_line: true
+  start_y_axis_at_zero: true
+  y_axis_format: .1%
+  header_font_size: 0.4
+  subheader_font_size: 0.15
+  time_format: smart_date
+  rolling_type: None
+  color_picker:
+    r: 0
+    g: 122
+    b: 135
+    a: 1
+  viz_type: ptm_big_number_trendline
+  datasource: '{dataset_id}__table'
+cache_timeout: null
+uuid: 080ef4cc-d3cd-53ca-b043-cda380bbe5d3
+version: 1.0.0
+dataset_uuid: 1398b0d3-9206-5577-a140-21c0f59a19f1
