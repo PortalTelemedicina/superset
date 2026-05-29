@@ -2182,7 +2182,9 @@ CHARTS_V2: list[dict] = [
             "ptm_series_type": "bar",
             "orientation": "horizontal",
             "x_axis_sort": "Doses em atraso",
-            "x_axis_sort_asc": False,
+            # Horizontal bars render bottom-to-top, so ascending puts the
+            # largest backlog at the TOP (most-actionable units first).
+            "x_axis_sort_asc": True,
             **_PTM_BAR_RADIUS,
             **_PTM_ZOOM,
             **_PTM_SHOW_VALUE,
@@ -2738,11 +2740,12 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
     """Internal (Nacional) layout — full-width tables, DQ unknown-muni KPI."""
     rows = [
         ("ROW-V2-kpis", [
-            ("chart.v2.01_kpi_overdue", 3, 22),
-            ("chart.v2.02_kpi_due_next_30", 3, 22),
+            ("chart.v2.01_kpi_overdue", 2, 22),
+            ("chart.v2.02_kpi_due_next_30", 2, 22),
             ("chart.v2.03_kpi_applied", 2, 22),
-            ("chart.v2.04_kpi_freshness", 2, 22),
             ("chart.v2.05_kpi_dq_issues", 2, 22),
+            # Wider (4) so the full RNDS date/time string fits without clipping.
+            ("chart.v2.04_kpi_freshness", 4, 22),
         ]),
         ("ROW-V2-unknown-muni", [
             ("chart.v2.18_unknown_municipality", 3, 22),
@@ -2763,8 +2766,10 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
             ("chart.v2.11_upcoming_workload", 12, 55),
         ]),
         ("ROW-V2-dropout", [
-            ("chart.v2.13_dropout_ranking", 6, 50),
-            ("chart.v2.14_dropout_bar", 6, 50),
+            ("chart.v2.13_dropout_ranking", 12, 50),
+        ]),
+        ("ROW-V2-dropout-bar", [
+            ("chart.v2.14_dropout_bar", 12, 55),
         ]),
         ("ROW-V2-state-priority-table", [
             ("chart.v2.19_state_priority_table", 12, 55),
@@ -2797,11 +2802,12 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
     """
     rows = [
         ("ROW-STATE-kpis", [
-            ("chart.v2.01_kpi_overdue", 3, 22),
-            ("chart.v2.02_kpi_due_next_30", 3, 22),
+            ("chart.v2.01_kpi_overdue", 2, 22),
+            ("chart.v2.02_kpi_due_next_30", 2, 22),
             ("chart.v2.03_kpi_applied", 2, 22),
-            ("chart.v2.04_kpi_freshness", 2, 22),
             ("chart.v2.05_kpi_dq_issues", 2, 22),
+            # Wider (4) so the full RNDS date/time string fits without clipping.
+            ("chart.v2.04_kpi_freshness", 4, 22),
         ]),
         ("ROW-STATE-priority-table", [
             ("chart.v2.06_priority_ranking", 12, 55),
@@ -2822,8 +2828,10 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
             ("chart.v2.11_upcoming_workload", 12, 55),
         ]),
         ("ROW-STATE-dropout", [
-            ("chart.v2.13_dropout_ranking", 6, 50),
-            ("chart.v2.14_dropout_bar", 6, 50),
+            ("chart.v2.13_dropout_ranking", 12, 50),
+        ]),
+        ("ROW-STATE-dropout-bar", [
+            ("chart.v2.14_dropout_bar", 12, 55),
         ]),
         ("ROW-STATE-dq", [
             ("chart.v2.15_suspicious_by_reason", 6, 55),
@@ -2843,11 +2851,12 @@ def build_dashboard_position_muni(chart_id_by_key: dict[str, int]) -> dict[str, 
     """Per-municipality client layout (single-muni grain)."""
     rows = [
         ("ROW-MUNI-kpis", [
-            ("chart.v2.01_kpi_overdue", 3, 22),
-            ("chart.v2.02_kpi_due_next_30", 3, 22),
+            ("chart.v2.01_kpi_overdue", 2, 22),
+            ("chart.v2.02_kpi_due_next_30", 2, 22),
             ("chart.v2.03_kpi_applied", 2, 22),
-            ("chart.v2.04_kpi_freshness", 2, 22),
             ("chart.v2.05_kpi_dq_issues", 2, 22),
+            # Wider (4) so the full RNDS date/time string fits without clipping.
+            ("chart.v2.04_kpi_freshness", 4, 22),
         ]),
         ("ROW-MUNI-establishment", [
             ("chart.v2.10_backlog_establishment", 12, 55),
@@ -2859,15 +2868,19 @@ def build_dashboard_position_muni(chart_id_by_key: dict[str, int]) -> dict[str, 
             ("chart.v2.11_upcoming_workload", 12, 55),
         ]),
         ("ROW-MUNI-trends", [
-            ("chart.v2.08_timeliness_trend", 6, 50),
-            ("chart.v2.14_dropout_bar", 6, 50),
+            ("chart.v2.08_timeliness_trend", 12, 50),
+        ]),
+        ("ROW-MUNI-dropout-bar", [
+            ("chart.v2.14_dropout_bar", 12, 55),
         ]),
         ("ROW-MUNI-coverage", [
             ("chart.v2.09_coverage_heatmap", 12, 55),
         ]),
-        ("ROW-MUNI-dq-mix", [
-            ("chart.v2.12_overdue_bucket_dist", 6, 50),
-            ("chart.v2.15_suspicious_by_reason", 6, 50),
+        ("ROW-MUNI-overdue-dist", [
+            ("chart.v2.12_overdue_bucket_dist", 12, 55),
+        ]),
+        ("ROW-MUNI-dq-reason", [
+            ("chart.v2.15_suspicious_by_reason", 12, 50),
         ]),
         ("ROW-MUNI-dq-table", [
             ("chart.v2.16_suspicious_by_vaccine", 12, 55),
