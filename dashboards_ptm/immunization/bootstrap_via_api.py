@@ -2027,6 +2027,8 @@ CHARTS_V2: list[dict] = [
                 **_SNAPSHOT_TIME_RANGE,
                 "force_timestamp_formatting": True,
                 "time_format": "%d/%m/%Y %H:%M",
+                # Timestamp string is long; shrink so it fits the KPI card.
+                "header_font_size": 0.18,
             },
         ),
     },
@@ -2923,6 +2925,7 @@ def ensure_scoped_dashboard(
         "published": True,
         "position_json": json.dumps(position),
         "json_metadata": json.dumps(metadata),
+        "certified_by": "Data Engineering — PTM",
     }
     existing = find_dashboard_by_uuid(c, dash_uuid)
     if existing:
