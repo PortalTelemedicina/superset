@@ -161,6 +161,13 @@ def patch_datasets(schema: str) -> dict[str, int]:
             LOG.warning("dataset %s missing — skipping", spec["table_name"])
             continue
         ids[spec["key"]] = dataset.id
+        # Re-introspect the physical table so newly added dbt columns
+        # (e.g. vaccine_name, severity_label, freshness_status_label) become
+        # available to charts. Safe: only syncs columns to the real schema.
+        try:
+            dataset.fetch_metadata()
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("fetch_metadata failed for %s: %s", spec["table_name"], exc)
         existing_metrics = {m.metric_name: m for m in dataset.metrics}
         for m_spec in spec.get("metrics", []):
             metric = existing_metrics.get(m_spec["metric_name"])
