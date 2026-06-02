@@ -116,10 +116,8 @@ async function revertPtmCharts(
 
 /**
  * PTM dashboard save hook handler.
- * Toggle between new (PTM) and original (legacy) chart versions:
- * - When "Use PTM" is on: convert charts to PTM equivalents on save.
- * - When "Use PTM" is off or unset: revert any PTM charts to legacy on save.
- * Tag PTM does not affect this; only the dashboard metadata flag does.
+ * - When "Use PTM" is on (ptm_autoconvert === true): convert legacy charts to PTM on save/copy.
+ * - Header/dashboard saves never revert PTM charts; revert is only via Properties modal.
  */
 async function ptmDashboardSaveHook(
   args: DashboardSaveHookArgs,
@@ -161,12 +159,10 @@ async function ptmDashboardSaveHook(
       });
       const charts = chartsResponse.json?.result ?? [];
       const allowedIds = new Set(charts.map((c: { id: number }) => String(c.id)));
-      if (allowedIds.size > 0) {
-        slicesForDashboard = {};
-        for (const sliceId of Object.keys(slices)) {
-          if (allowedIds.has(sliceId)) {
-            slicesForDashboard[sliceId] = slices[sliceId];
-          }
+      slicesForDashboard = {};
+      for (const sliceId of Object.keys(slices)) {
+        if (allowedIds.has(sliceId)) {
+          slicesForDashboard[sliceId] = slices[sliceId];
         }
       }
     } catch (error) {
@@ -178,30 +174,7 @@ async function ptmDashboardSaveHook(
     }
   }
 
-  // Only strict true means "use PTM". false, undefined, or any other value must never trigger conversion.
-  const usePtmVersions = metadata.ptm_autoconvert === true;
-
-  // Use legacy: revert any PTM charts to original versions (update mode only).
-  // Never revert when dashboard is locked (e.g. user clicked Lock: we must not revert even if
-  // the hook received stale metadata without ptm_locked, or Lock triggered a save).
-  if (
-    !usePtmVersions &&
-    mode === 'update' &&
-    metadata.ptm_locked !== true &&
-    Object.keys(slicesForDashboard).length > 0
-  ) {
-    const hasAnyPtmChart = Object.values(slicesForDashboard).some(slice => {
-      const vizType = getVizType(slice.form_data);
-      return !!vizType && isPtmVizType(vizType);
-    });
-    if (hasAnyPtmChart) {
-      await revertPtmCharts(slicesForDashboard);
-    }
-    return;
-  }
-
-  // Never convert unless ptm_autoconvert is explicitly true. Presence of the key with value false
-  // (e.g. after adding it to metadata) must not trigger conversion.
+  // Never convert unless ptm_autoconvert is explicitly true.
   if (metadata.ptm_autoconvert !== true) {
     return;
   }
