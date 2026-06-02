@@ -85,15 +85,19 @@ CURSOR.md
 GEMINI.md
 GPT.md
 
-# Portal Telemedicina PTM extension (non-ASF docs/scripts; code uses ASF headers)
-docs/ptm/*
-docs/portal-extension-hardening-plan.md
+# Portal Telemedicina PTM extension (RAT matches basenames, not paths)
+portal-extension-hardening-plan.md
 extension-migration-diffs.patch
-scripts/ptm/*
-superset-frontend/plugins/superset-plugin-chart-echarts-ptm/*.md
-superset-frontend/plugins/superset-plugin-chart-echarts-ptm/babel.config.js
-superset-frontend/plugins/superset-plugin-chart-echarts-ptm/jest.config.js
-superset-frontend/src/ptm/README.md
-superset-frontend/src/ptm/STYLING.md
-superset-frontend/src/ptm/components/header/styles/header-custom.css
-superset-frontend/src/assets/stylesheets/ptm-dashboard.css
+ARCHITECTURE.md
+PATCH_INDEX.md
+REFACTOR_PLAN.md
+SMOKE_TESTS.md
+SYNC_GUIDE.md
+squash-ptm-commits.sh
+sync-upstream.sh
+validate-build.sh
+verify-touchpoints.sh
+PTM_DASHBOARD_CSS.md
+ptm-dashboard.css
+header-custom.css
+STYLING.md
