@@ -137,6 +137,7 @@ const PropertiesModal = ({
   const [hasSharedCharts, setHasSharedCharts] = useState(false);
   const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
   const originalDashboardMetadata = useRef<Record<string, any>>({});
+  const initialPtmAutoconvert = useRef<boolean | null>(null);
 
   const tagsAsSelectValues = useMemo(() => {
     const selectTags = tags.map((tag: { id: number; name: string }) => ({
@@ -233,6 +234,7 @@ const PropertiesModal = ({
       setJsonMetadata(metaDataCopy ? jsonStringify(metaDataCopy) : '');
       originalDashboardMetadata.current = metadata;
       setPtmAutoconvert(ptmAutoconvertValue);
+      initialPtmAutoconvert.current = ptmAutoconvertValue;
       setPtmLocked(metadata?.ptm_locked === true);
       setHasSharedCharts(
         metadata?.has_shared_charts === true ||
@@ -467,7 +469,9 @@ const PropertiesModal = ({
       addSuccessToast(t('Dashboard properties updated'));
     } else {
       const saveDashboard = async () => {
-        if (isPtmExtensionEnabled() && !ptmAutoconvert) {
+        const turnedOffPtmAutoconvert =
+          initialPtmAutoconvert.current === true && !ptmAutoconvert;
+        if (isPtmExtensionEnabled() && turnedOffPtmAutoconvert) {
           await revertPtmChartsForDashboard(dashboardId);
         }
         return SupersetClient.put({
@@ -840,7 +844,7 @@ const PropertiesModal = ({
                     valuePropName="checked"
                     label={t('Use PTM chart versions (new UI)')}
                     extra={t(
-                      'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted when you save. You can switch between new and original at any time.',
+                      'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted only when you turn this off and save. Layout saves no longer revert charts automatically.',
                     )}
                   >
                     <Switch
