@@ -10,7 +10,7 @@
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
- * software distributed under this License is distributed on an
+ * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
@@ -22,9 +22,11 @@ import {
   type TransformConfig,
   resolveTransformConfig,
   applyTextCasingToEchartOptions,
+  safeParseJson,
 } from './transformHelpers';
-import { safeParseJson } from './transformHelpers/utils';
 import { createDefaultPluginTransform } from './defaultPluginTransform';
+import { applySparseTimeBarLayout } from '../plugin/timeseries/transformHelpers/sparseTimeBarLayout';
+import { applyBarSeriesLabelLayout } from '../plugin/timeseries/transformHelpers/barSeriesLabelLayout';
 
 export interface PtmTransformConfig {
   ptmDefaults: Record<string, unknown>;
@@ -71,12 +73,22 @@ export function wrapTransformProps<T extends ChartProps>(
     }
 
     if (transforms.userOverrides) {
-      const ptmJson = formData.ptmOptionsJson as string | undefined;
+      const ptmJson = (formData.ptm_options_json ??
+        formData.ptmOptionsJson) as string | undefined;
       const userOverrides = safeParseJson(ptmJson);
       if (Object.keys(userOverrides).length > 0) {
         finalOptions = merge({}, finalOptions, userOverrides);
       }
     }
+
+    finalOptions = applyBarSeriesLabelLayout(
+      finalOptions as Record<string, unknown>,
+    ) as EchartOptions;
+
+    finalOptions = applySparseTimeBarLayout(
+      finalOptions as Record<string, unknown>,
+      formData,
+    ) as EchartOptions;
 
     const result = {
       ...base,

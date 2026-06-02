@@ -36,7 +36,10 @@ export interface DataZoomConfig {
 export function getThemeDataZoom(
   formData: Record<string, unknown>,
 ): DataZoomConfig {
-  const enabled = (formData.ptmZoomEnabled as boolean | undefined) ?? false;
+  const enabled =
+    (formData.ptmZoomEnabled as boolean | undefined) ??
+    (formData.ptm_zoom_enabled as boolean | undefined) ??
+    false;
 
   if (!enabled) {
     return {
