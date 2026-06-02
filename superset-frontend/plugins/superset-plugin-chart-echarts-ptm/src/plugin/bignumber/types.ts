@@ -58,11 +58,12 @@ export type BigNumberTotalChartProps = ChartProps<BigNumberTotalFormData> & {
   queriesData: BigNumberTotalChartDataResponseResult[];
 };
 
-export type BigNumberWithTrendlineChartProps = ChartProps<BigNumberWithTrendlineFormData> & {
-  queriesData: any[];
-  theme: any;
-  inContextMenu?: boolean;
-};
+export type BigNumberWithTrendlineChartProps =
+  ChartProps<BigNumberWithTrendlineFormData> & {
+    queriesData: any[];
+    theme: any;
+    inContextMenu?: boolean;
+  };
 
 export type TimeSeriesDatum = [number, number | null];
 
@@ -107,4 +108,3 @@ export type BigNumberVizProps = {
   additionalTextFontSize?: number;
   autofit?: boolean;
 };
-

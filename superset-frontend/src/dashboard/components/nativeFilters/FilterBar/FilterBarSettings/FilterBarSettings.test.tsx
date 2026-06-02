@@ -279,7 +279,5 @@ test('renders custom filter bar settings when filterBarSettingsComponent provide
       },
     ),
   );
-  expect(
-    screen.getByTestId('custom-filter-bar-settings'),
-  ).toBeInTheDocument();
+  expect(screen.getByTestId('custom-filter-bar-settings')).toBeInTheDocument();
 });

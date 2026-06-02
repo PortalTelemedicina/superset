@@ -49,8 +49,11 @@ export const mixedTimeseriesBarRadiusControlRow1: ControlSetRow = [
       default: '8',
       isInt: true,
       renderTrigger: true,
-      visibility: ({ controls }: { controls?: { ptm_bar_radius_enabled?: { value?: boolean } } }) =>
-        controls?.ptm_bar_radius_enabled?.value === true,
+      visibility: ({
+        controls,
+      }: {
+        controls?: { ptm_bar_radius_enabled?: { value?: boolean } };
+      }) => controls?.ptm_bar_radius_enabled?.value === true,
     },
   },
 ];
@@ -63,8 +66,11 @@ export const mixedTimeseriesBarRadiusControlRow2: ControlSetRow = [
       label: t('Round top'),
       default: true,
       renderTrigger: true,
-      visibility: ({ controls }: { controls?: { ptm_bar_radius_enabled?: { value?: boolean } } }) =>
-        controls?.ptm_bar_radius_enabled?.value === true,
+      visibility: ({
+        controls,
+      }: {
+        controls?: { ptm_bar_radius_enabled?: { value?: boolean } };
+      }) => controls?.ptm_bar_radius_enabled?.value === true,
     },
   },
   {
@@ -74,8 +80,11 @@ export const mixedTimeseriesBarRadiusControlRow2: ControlSetRow = [
       label: t('Round bottom'),
       default: true,
       renderTrigger: true,
-      visibility: ({ controls }: { controls?: { ptm_bar_radius_enabled?: { value?: boolean } } }) =>
-        controls?.ptm_bar_radius_enabled?.value === true,
+      visibility: ({
+        controls,
+      }: {
+        controls?: { ptm_bar_radius_enabled?: { value?: boolean } };
+      }) => controls?.ptm_bar_radius_enabled?.value === true,
     },
   },
 ];

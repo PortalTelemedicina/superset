@@ -38,7 +38,8 @@ function getAxisType(axis: unknown, idx = 0): string | undefined {
   if (!axis) return undefined;
   if (Array.isArray(axis)) {
     const item = axis[idx];
-    if (item && typeof item === 'object') return (item as any).type as string | undefined;
+    if (item && typeof item === 'object')
+      return (item as any).type as string | undefined;
     return undefined;
   }
   if (typeof axis === 'object') return (axis as any).type as string | undefined;
@@ -89,7 +90,7 @@ function applyStackAwareBorderRadius(
     return series.map(s => ({
       ...s,
       itemStyle: {
-        ...(((s.itemStyle as Record<string, unknown>) || {})),
+        ...((s.itemStyle as Record<string, unknown>) || {}),
         borderRadius: [0, 0, 0, 0],
       },
     }));
@@ -116,20 +117,35 @@ function applyStackAwareBorderRadius(
     });
 
     // bottom/start segment
-    radiusByIndex[first] = getBarRadiusArray(radius, horizontal, false, roundBottom);
+    radiusByIndex[first] = getBarRadiusArray(
+      radius,
+      horizontal,
+      false,
+      roundBottom,
+    );
     // top/end segment
-    radiusByIndex[last] = getBarRadiusArray(radius, horizontal, roundTop, false);
+    radiusByIndex[last] = getBarRadiusArray(
+      radius,
+      horizontal,
+      roundTop,
+      false,
+    );
 
     // If group has a single series, it should get both ends.
     if (first === last) {
-      radiusByIndex[first] = getBarRadiusArray(radius, horizontal, roundTop, roundBottom);
+      radiusByIndex[first] = getBarRadiusArray(
+        radius,
+        horizontal,
+        roundTop,
+        roundBottom,
+      );
     }
   }
 
   return series.map((s, idx) => ({
     ...s,
     itemStyle: {
-      ...(((s.itemStyle as Record<string, unknown>) || {})),
+      ...((s.itemStyle as Record<string, unknown>) || {}),
       borderRadius: radiusByIndex[idx] ?? [0, 0, 0, 0],
     },
   }));
@@ -156,7 +172,11 @@ export function applyBarBorderRadius(
 
   if (barSeries.length === 0) return options;
 
-  const updatedBarSeries = applyStackAwareBorderRadius(options, barSeries, barBorderRadius);
+  const updatedBarSeries = applyStackAwareBorderRadius(
+    options,
+    barSeries,
+    barBorderRadius,
+  );
   const nextSeries = originalSeries.map((s, idx) => {
     const barPos = barIndexToPos.get(idx);
     return barPos === undefined ? s : updatedBarSeries[barPos];
@@ -183,7 +203,9 @@ export function applySeriesTypeOverride(
   }
 
   const typeForEcharts =
-    ptmSeriesType === 'smooth' || ptmSeriesType === 'step' ? 'line' : ptmSeriesType;
+    ptmSeriesType === 'smooth' || ptmSeriesType === 'step'
+      ? 'line'
+      : ptmSeriesType;
 
   // First, force the requested type and base bar props.
   let nextSeries = options.series.map((s: Record<string, unknown>) => {
@@ -207,7 +229,11 @@ export function applySeriesTypeOverride(
 
   // Then, apply stack-aware border radius only for bars.
   if (ptmSeriesType === 'bar') {
-    nextSeries = applyStackAwareBorderRadius(options, nextSeries, barBorderRadius);
+    nextSeries = applyStackAwareBorderRadius(
+      options,
+      nextSeries,
+      barBorderRadius,
+    );
   }
 
   return {
@@ -215,4 +241,3 @@ export function applySeriesTypeOverride(
     series: nextSeries,
   };
 }
-

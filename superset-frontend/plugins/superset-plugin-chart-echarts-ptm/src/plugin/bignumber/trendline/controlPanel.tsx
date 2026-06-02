@@ -150,9 +150,7 @@ const config: ControlPanelConfig = {
               type: 'TextControl',
               label: t('Card Title'),
               renderTrigger: true,
-              description: t(
-                'Title text to display above the number',
-              ),
+              description: t('Title text to display above the number'),
             },
           },
         ],
@@ -339,4 +337,3 @@ const config: ControlPanelConfig = {
 };
 
 export default config;
-

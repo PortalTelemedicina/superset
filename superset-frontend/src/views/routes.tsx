@@ -159,16 +159,12 @@ const Register = lazy(
 
 const ForgotPassword = lazy(
   () =>
-    import(
-      /* webpackChunkName: "ForgotPassword" */ 'src/pages/ForgotPassword'
-    ),
+    import(/* webpackChunkName: "ForgotPassword" */ 'src/pages/ForgotPassword'),
 );
 
 const ResetPassword = lazy(
   () =>
-    import(
-      /* webpackChunkName: "ResetPassword" */ 'src/pages/ResetPassword'
-    ),
+    import(/* webpackChunkName: "ResetPassword" */ 'src/pages/ResetPassword'),
 );
 
 const GroupsList: LazyExoticComponent<any> = lazy(

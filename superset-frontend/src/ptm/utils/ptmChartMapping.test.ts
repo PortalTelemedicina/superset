@@ -24,22 +24,18 @@ import {
 
 describe('ptmChartMapping PTM autoconvert helpers', () => {
   test('isPtmAutoconvertEnabled requires strict true', () => {
-    expect(isPtmAutoconvertEnabled({ metadata: { ptm_autoconvert: true } })).toBe(
-      true,
-    );
-    expect(isPtmAutoconvertEnabled({ metadata: { ptm_autoconvert: false } })).toBe(
-      false,
-    );
+    expect(
+      isPtmAutoconvertEnabled({ metadata: { ptm_autoconvert: true } }),
+    ).toBe(true);
+    expect(
+      isPtmAutoconvertEnabled({ metadata: { ptm_autoconvert: false } }),
+    ).toBe(false);
     expect(isPtmAutoconvertEnabled({ metadata: {} })).toBe(false);
   });
 
   test('inferPtmAutoconvert respects explicit false', () => {
     expect(
-      inferPtmAutoconvert(
-        { ptm_autoconvert: false },
-        [{ name: 'PTM' }],
-        {},
-      ),
+      inferPtmAutoconvert({ ptm_autoconvert: false }, [{ name: 'PTM' }], {}),
     ).toBe(false);
   });
 
@@ -49,13 +45,9 @@ describe('ptmChartMapping PTM autoconvert helpers', () => {
 
   test('inferPtmAutoconvert from PTM charts when unset', () => {
     expect(
-      inferPtmAutoconvert(
-        {},
-        [],
-        {
-          '1': { form_data: { viz_type: 'ptm_table' } },
-        },
-      ),
+      inferPtmAutoconvert({}, [], {
+        '1': { form_data: { viz_type: 'ptm_table' } },
+      }),
     ).toBe(true);
   });
 

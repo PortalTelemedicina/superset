@@ -26,20 +26,20 @@ import sys
 from typing import Any
 
 from celery.schedules import crontab
+from cost_tagging import extract_chart_context
 from flask_caching.backends.filesystemcache import FileSystemCache
 
-from cost_tagging import extract_chart_context
 from superset.utils import json
 
 LANGUAGES = {
-    'pt_BR': {'flag': 'br', 'name': 'Brazilian Portuguese'},
-    'en': {'flag': 'us', 'name': 'English'}
+    "pt_BR": {"flag": "br", "name": "Brazilian Portuguese"},
+    "en": {"flag": "us", "name": "English"},
 }
 
-BABEL_DEFAULT_LOCALE = 'pt_BR'
+BABEL_DEFAULT_LOCALE = "pt_BR"
 
 
-def override_bootstrap_locale(data):
+def override_bootstrap_locale(data: dict[str, Any]) -> dict[str, Any]:
     from flask import current_app
 
     locale = data.get("locale")
@@ -128,10 +128,12 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
-    "ALLOW_FULL_CSV_EXPORT": True,  # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    # Show full CSV/Excel export actions in chart menus
+    "ALLOW_FULL_CSV_EXPORT": True,
     "TAGGING_SYSTEM": True,
     "PTM_EXTENSION_ENABLED": True,
-    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,  # Enable Playwright for full-page screenshots
+    # Enable Playwright for full-page dashboard thumbnails
+    "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,
 }
 
 # Tiled screenshot configuration for large dashboards
@@ -139,7 +141,9 @@ FEATURE_FLAGS = {
 # and stitching them together, preventing PDF reports from being cut off
 SCREENSHOT_TILED_ENABLED = True  # Enable tiled screenshots for large dashboards
 SCREENSHOT_TILED_CHART_THRESHOLD = 20  # Minimum charts to trigger tiled screenshots
-SCREENSHOT_TILED_HEIGHT_THRESHOLD = 5000  # Minimum height (px) to trigger tiled screenshots
+SCREENSHOT_TILED_HEIGHT_THRESHOLD = (
+    5000  # Minimum height (px) to trigger tiled screenshots
+)
 SCREENSHOT_TILED_VIEWPORT_HEIGHT = 2000  # Height of each tile in pixels
 
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True

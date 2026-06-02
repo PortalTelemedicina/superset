@@ -43,7 +43,7 @@ import TableStyles from './Styles';
 
 /**
  * PTM Table Chart Component
- * 
+ *
  * Wraps the original TableChart with PTM styling.
  * The styling is applied directly here via TableStyles component.
  */
@@ -54,4 +54,3 @@ export default function TableChartPTM(props: TableChartTransformedProps) {
     </TableStyles>
   );
 }
-

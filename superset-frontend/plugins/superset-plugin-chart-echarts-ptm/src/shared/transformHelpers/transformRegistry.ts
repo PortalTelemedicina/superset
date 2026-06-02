@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 export interface TransformConfig {
   defaults?: boolean;
   seriesType?: boolean;
@@ -41,7 +40,6 @@ export const DEFAULT_TRANSFORMS: TransformConfig = {
   textCasing: false,
   dataReliability: true,
 };
-
 
 export function resolveTransformConfig(
   config?: TransformConfig,

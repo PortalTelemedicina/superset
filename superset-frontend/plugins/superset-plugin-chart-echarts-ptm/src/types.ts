@@ -16,15 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {
-  QueryFormData,
-  TimeseriesDataRecord,
-} from '@superset-ui/core';
+import { QueryFormData, TimeseriesDataRecord } from '@superset-ui/core';
 
 export interface SupersetPluginChartEchartsPtmStylesProps {
   height: number;
   width: number;
-  headerFontSize: 'fontSizeSM' | 'fontSize' | 'fontSizeLG' | 'fontSizeXL' | 'fontSizeHeading1' | 'fontSizeHeading2' | 'fontSizeHeading3' | 'fontSizeHeading4' | 'fontSizeHeading5';
+  headerFontSize:
+    | 'fontSizeSM'
+    | 'fontSize'
+    | 'fontSizeLG'
+    | 'fontSizeXL'
+    | 'fontSizeHeading1'
+    | 'fontSizeHeading2'
+    | 'fontSizeHeading3'
+    | 'fontSizeHeading4'
+    | 'fontSizeHeading5';
   boldText: boolean;
 }
 
@@ -49,7 +55,8 @@ export type SupersetPluginChartEchartsPtmQueryFormData = QueryFormData &
   SupersetPluginChartEchartsPtmCustomizeProps &
   PtmZoomControls;
 
-export type SupersetPluginChartEchartsPtmProps = SupersetPluginChartEchartsPtmStylesProps &
-  SupersetPluginChartEchartsPtmCustomizeProps & {
-    data: TimeseriesDataRecord[];
-  };
+export type SupersetPluginChartEchartsPtmProps =
+  SupersetPluginChartEchartsPtmStylesProps &
+    SupersetPluginChartEchartsPtmCustomizeProps & {
+      data: TimeseriesDataRecord[];
+    };

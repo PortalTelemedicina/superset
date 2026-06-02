@@ -19,17 +19,21 @@
 
 /**
  * ECharts Schema Definition
- * 
+ *
  * Defines the structure and merge behavior for ECharts options based on the official documentation:
  * https://echarts.apache.org/en/option.html
- * 
+ *
  * This schema eliminates the need to hardcode property names and provides
  * self-documenting configuration handling.
  */
 
-export type EChartsPropertyType = 'object' | 'array' | 'array-or-object' | 'primitive';
+export type EChartsPropertyType =
+  | 'object'
+  | 'array'
+  | 'array-or-object'
+  | 'primitive';
 
-export type MergeStrategy = 
+export type MergeStrategy =
   | 'deep-merge'
   | 'merge-into-items'
   | 'set-if-missing'
@@ -44,7 +48,7 @@ export interface EChartsPropertySchema {
 /**
  * Schema for ECharts configuration options
  * Based on: https://echarts.apache.org/en/option.html
- * 
+ *
  * Properties are categorized by their merge behavior:
  * - deep-merge: Objects that should be deeply merged (tooltip, legend, etc.)
  * - merge-into-items: Arrays where each item should receive defaults (series, axes)
@@ -54,29 +58,33 @@ export const ECHARTS_SCHEMA: Record<string, EChartsPropertySchema> = {
   // ========================================
   // COMPONENT GROUPS (merge into each item)
   // ========================================
-  
+
   series: {
     type: 'array',
     mergeStrategy: 'merge-into-items',
-    description: 'Series list. Each item is a series configuration (line, bar, pie, etc.)',
+    description:
+      'Series list. Each item is a series configuration (line, bar, pie, etc.)',
   },
 
   xAxis: {
     type: 'array-or-object',
     mergeStrategy: 'merge-into-items',
-    description: 'X-axis configuration. Can be single axis or array for multiple x-axes',
+    description:
+      'X-axis configuration. Can be single axis or array for multiple x-axes',
   },
 
   yAxis: {
     type: 'array-or-object',
     mergeStrategy: 'merge-into-items',
-    description: 'Y-axis configuration. Can be single axis or array for multiple y-axes',
+    description:
+      'Y-axis configuration. Can be single axis or array for multiple y-axes',
   },
 
   grid: {
     type: 'array-or-object',
     mergeStrategy: 'merge-into-items',
-    description: 'Grid component for drawing area. Can be array for multiple grids',
+    description:
+      'Grid component for drawing area. Can be array for multiple grids',
   },
 
   polar: {
@@ -244,7 +252,8 @@ export const ECHARTS_SCHEMA: Record<string, EChartsPropertySchema> = {
   dataZoom: {
     type: 'array',
     mergeStrategy: 'set-if-missing',
-    description: 'Data zoom component for zooming and panning. Usually user-controlled.',
+    description:
+      'Data zoom component for zooming and panning. Usually user-controlled.',
   },
 
   visualMap: {
@@ -282,18 +291,16 @@ export const ECHARTS_SCHEMA: Record<string, EChartsPropertySchema> = {
   },
 };
 
-
 export function getMergeStrategy(propertyName: string): MergeStrategy {
   return ECHARTS_SCHEMA[propertyName]?.mergeStrategy ?? 'deep-merge';
 }
-
 
 export function shouldMergeIntoItems(propertyName: string): boolean {
   return getMergeStrategy(propertyName) === 'merge-into-items';
 }
 
-
-export function getPropertyType(propertyName: string): EChartsPropertyType | undefined {
+export function getPropertyType(
+  propertyName: string,
+): EChartsPropertyType | undefined {
   return ECHARTS_SCHEMA[propertyName]?.type;
 }
-

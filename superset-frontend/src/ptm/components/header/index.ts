@@ -30,4 +30,3 @@ export { useHeaderPreview } from './hooks/useHeaderPreview';
 
 // Export adapter (will be created in Phase 2)
 export { HeaderAdapter } from './adapters/HeaderAdapter';
-

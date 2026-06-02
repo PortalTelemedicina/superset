@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 export function safeParseJson(value?: string): Record<string, unknown> {
   if (!value || typeof value !== 'string' || !value.trim()) {
     return {};
@@ -29,4 +28,3 @@ export function safeParseJson(value?: string): Record<string, unknown> {
     return {};
   }
 }
-

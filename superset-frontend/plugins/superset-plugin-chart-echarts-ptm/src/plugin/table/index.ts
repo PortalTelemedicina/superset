@@ -19,7 +19,10 @@
 import { ChartProps } from '@superset-ui/core';
 import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import { applyPillFormatting } from './pillFormat';
-import { TABLE_TRANSFORM_CONFIG, tablePillColumnsControl } from './tableTransformConfig';
+import {
+  TABLE_TRANSFORM_CONFIG,
+  tablePillColumnsControl,
+} from './tableTransformConfig';
 import thumbnail from './images/thumbnail.png';
 
 // Import from original table plugin source (same monorepo)
@@ -33,12 +36,14 @@ import TableChartPTM from './TableChartPTM';
 
 const TABLE_PTM_DEFAULTS = {};
 
-function wrapTableTransformProps(baseTransformProps: (chartProps: ChartProps) => any) {
+function wrapTableTransformProps(
+  baseTransformProps: (chartProps: ChartProps) => any,
+) {
   return (chartProps: ChartProps) => {
     const result = baseTransformProps(chartProps);
     const { formData } = chartProps;
     const tableCase =
-      (formData.ptm_table_text_case ?? formData.ptmTableTextCase) ?? 'none';
+      formData.ptm_table_text_case ?? formData.ptmTableTextCase ?? 'none';
     result.ptmTableTextCase = tableCase;
 
     if (result.data && result.columns) {
@@ -51,7 +56,8 @@ function wrapTableTransformProps(baseTransformProps: (chartProps: ChartProps) =>
 
 const PtmTableChartPlugin = createPtmPlugin({
   name: 'Table PTM',
-  description: 'Table with PTM styling. Clean, minimal design with Inter font, optional pills for categorical values.',
+  description:
+    'Table with PTM styling. Clean, minimal design with Inter font, optional pills for categorical values.',
   category: 'Table',
   tags: ['Table', 'Tabular', 'Data', 'PTM'],
   thumbnail,

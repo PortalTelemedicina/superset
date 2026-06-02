@@ -446,8 +446,7 @@ const data_reliability_message: SharedControlConfig<'TextAreaControl'> = {
   default: '',
   language: 'markdown',
   renderTrigger: true,
-  visibility: ({ controls }) =>
-    Boolean(controls?.show_data_reliability?.value),
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
 };
 
 const data_reliability_icon: SharedControlConfig<'SelectControl'> = {
@@ -462,14 +461,15 @@ const data_reliability_icon: SharedControlConfig<'SelectControl'> = {
   ],
   clearable: false,
   renderTrigger: true,
-  visibility: ({ controls }) =>
-    Boolean(controls?.show_data_reliability?.value),
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
 };
 
 const data_reliability_position: SharedControlConfig<'SelectControl'> = {
   type: 'SelectControl',
   label: t('Data Reliability Icon Position'),
-  description: t('Position of the data reliability icon overlay in the chart area.'),
+  description: t(
+    'Position of the data reliability icon overlay in the chart area.',
+  ),
   default: 'top_right',
   choices: [
     ['top_left', t('Top Left')],
@@ -479,8 +479,7 @@ const data_reliability_position: SharedControlConfig<'SelectControl'> = {
   ],
   clearable: false,
   renderTrigger: true,
-  visibility: ({ controls }) =>
-    Boolean(controls?.show_data_reliability?.value),
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
 };
 
 export default {

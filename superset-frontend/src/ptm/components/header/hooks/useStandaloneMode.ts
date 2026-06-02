@@ -22,21 +22,19 @@ import { isEmbedded as isEmbeddedInIframe } from 'src/dashboard/util/isEmbedded'
 
 /**
  * Hook to detect if dashboard is in standalone/shared mode.
- * 
+ *
  * Detects standalone mode by checking:
  * - URL parameter `standalone`
  * - If dashboard is embedded in iframe
  * - If dashboard has no userId (embedded mode)
- * 
+ *
  * @param isEmbedded - Whether dashboard is embedded (no userId)
  * @returns true if in standalone/shared mode
  */
-export const useStandaloneMode = (isEmbedded: boolean): boolean => {
-  return useMemo(() => {
+export const useStandaloneMode = (isEmbedded: boolean): boolean =>
+  useMemo(() => {
     const standaloneParam = getUrlParam(URL_PARAMS.standalone);
     const isInIframe = isEmbeddedInIframe();
     // Show custom header when: standalone param exists OR in iframe OR isEmbedded (no userId)
     return !!standaloneParam || isInIframe || isEmbedded;
   }, [isEmbedded]);
-};
-

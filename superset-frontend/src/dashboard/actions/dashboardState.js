@@ -36,7 +36,6 @@ import {
   removeChart,
   refreshChart,
 } from 'src/components/Chart/chartAction';
-import { ADD_SLICES, getDatasourceParameter } from './sliceEntities';
 import { chart as initChart } from 'src/components/Chart/chartReducer';
 import { applyDefaultFormData } from 'src/explore/store';
 import { inferPtmAutoconvert } from 'src/ptm/utils/ptmChartMapping';
@@ -368,9 +367,16 @@ export function saveDashboardRequest(data, id, saveType) {
         data.tags || dashboardInfo?.tags,
         sliceEntities?.slices,
       );
-      if (shouldEnablePtmAutoconvert && data.metadata?.ptm_autoconvert !== false) {
+      if (
+        shouldEnablePtmAutoconvert &&
+        data.metadata?.ptm_autoconvert !== false
+      ) {
+        cleanedData.metadata = {
+          ...cleanedData.metadata,
+          ptm_autoconvert: true,
+        };
+        // eslint-disable-next-line no-param-reassign
         data.metadata = { ...data.metadata, ptm_autoconvert: true };
-        cleanedData.metadata.ptm_autoconvert = true;
       }
     }
 
@@ -417,7 +423,7 @@ export function saveDashboardRequest(data, id, saveType) {
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
       }
-      
+
       // Call dashboard save extension hooks (e.g., PTM auto-convert) for copy mode
       const registry = getExtensionsRegistry();
       const hook = registry.get('dashboard.save.before');
@@ -437,7 +443,7 @@ export function saveDashboardRequest(data, id, saveType) {
           // Continue anyway - don't block dashboard creation
         }
       }
-      
+
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
       dispatch(
@@ -458,7 +464,7 @@ export function saveDashboardRequest(data, id, saveType) {
       // syncing with the backend transformations of the metadata
       if (updatedDashboard.json_metadata) {
         const metadata = JSON.parse(updatedDashboard.json_metadata);
-        
+
         // Preserve client headerLayout if server omitted it (e.g. when extension flag is off)
         const clientHeaderLayout =
           getState().dashboardInfo?.metadata?.headerLayout;
@@ -497,15 +503,18 @@ export function saveDashboardRequest(data, id, saveType) {
               // Silently fail - datasets endpoint may not exist, return 404, or dashboard may not have datasets
               // This is not critical for dashboard save functionality
               // Handle Response objects (which SupersetClient throws) and error objects
-              const status = error instanceof Response 
-                ? error.status 
-                : error?.status || error?.response?.status || error?.statusCode;
-              
+              const status =
+                error instanceof Response
+                  ? error.status
+                  : error?.status ||
+                    error?.response?.status ||
+                    error?.statusCode;
+
               // Only log non-404 errors (404 is expected if dashboard has no datasets)
               if (status !== 404 && status !== undefined) {
                 console.debug('Could not fetch dashboard datasets:', error);
               }
-              
+
               // Return a resolved promise to prevent unhandled rejection
               return Promise.resolve();
             });
@@ -581,7 +590,7 @@ export function saveDashboardRequest(data, id, saveType) {
       const updateDashboard = async () => {
         // Call dashboard save extension hooks (e.g., PTM auto-convert)
         await callDashboardSaveHooks('update');
-        
+
         return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${id}`,
           headers: { 'Content-Type': 'application/json' },

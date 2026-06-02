@@ -106,7 +106,9 @@ export default function transformProps(
   let timestamp = data.length === 0 ? null : data[0][xAxisLabel];
   let bigNumberFallback;
 
-  const metricColtypeIndex = colnames.findIndex((name: string) => name === metricName);
+  const metricColtypeIndex = colnames.findIndex(
+    (name: string) => name === metricName,
+  );
   const metricColtype =
     metricColtypeIndex > -1 ? coltypes[metricColtypeIndex] : null;
 
@@ -304,4 +306,3 @@ export default function transformProps(
     autofit,
   };
 }
-

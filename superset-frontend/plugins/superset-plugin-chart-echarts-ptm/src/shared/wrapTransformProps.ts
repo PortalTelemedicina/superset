@@ -48,17 +48,13 @@ export function wrapTransformProps<T extends ChartProps>(
   baseTransformProps: (chartProps: T) => Record<string, unknown>,
   config: PtmTransformConfig,
 ): (chartProps: T) => Record<string, unknown> {
-  const {
-    ptmDefaults,
-    transforms: transformsConfig,
-    pluginTransform,
-  } = config;
+  const { ptmDefaults, transforms: transformsConfig, pluginTransform } = config;
 
   const transforms = resolveTransformConfig(transformsConfig);
-  const transform = pluginTransform || createDefaultPluginTransform(ptmDefaults);
+  const transform =
+    pluginTransform || createDefaultPluginTransform(ptmDefaults);
 
   return (chartProps: T): Record<string, unknown> => {
-
     const base = baseTransformProps(chartProps);
     const formData = chartProps.formData as Record<string, unknown>;
 
@@ -86,7 +82,7 @@ export function wrapTransformProps<T extends ChartProps>(
       ...base,
       echartOptions: finalOptions,
     };
-    
+
     return result;
   };
 }

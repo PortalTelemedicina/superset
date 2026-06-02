@@ -46,7 +46,7 @@ export { createPtmPlugin } from './createPtmPlugin';
 export type { PtmPluginConfig } from './createPtmPlugin';
 
 export { wrapTransformProps } from './wrapTransformProps';
-export type {  PtmTransformConfig } from './wrapTransformProps';
+export type { PtmTransformConfig } from './wrapTransformProps';
 
 export { createDefaultPluginTransform } from './defaultPluginTransform';
 
@@ -56,4 +56,3 @@ export {
   ptmTextCasingControls,
   ptmTextCaseChoices,
 } from './ptmControlSection';
-

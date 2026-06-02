@@ -33,14 +33,15 @@ export interface DataZoomConfig {
   grid?: Record<string, unknown>;
 }
 
-
-export function getThemeDataZoom(formData: Record<string, unknown>): DataZoomConfig {
+export function getThemeDataZoom(
+  formData: Record<string, unknown>,
+): DataZoomConfig {
   const enabled = (formData.ptmZoomEnabled as boolean | undefined) ?? false;
-  
+
   if (!enabled) {
-    return { 
+    return {
       dataZoom: [],
-      toolbox: { show: false }
+      toolbox: { show: false },
     };
   }
 
@@ -48,7 +49,8 @@ export function getThemeDataZoom(formData: Record<string, unknown>): DataZoomCon
   const size = (formData.ptmZoomSize as PtmZoomSize | undefined) ?? 'xs';
 
   const insetRaw = formData.ptmZoomInset as string | number | undefined;
-  const inset = typeof insetRaw === 'number' ? insetRaw : Number(insetRaw ?? 24);
+  const inset =
+    typeof insetRaw === 'number' ? insetRaw : Number(insetRaw ?? 24);
 
   const make = (axisType: 'x' | 'y') => {
     const dz = PTM_THEME.echarts.dataZoom.create(axisType, size, inset);
@@ -60,7 +62,7 @@ export function getThemeDataZoom(formData: Record<string, unknown>): DataZoomCon
   // Extra bottom padding for X-axis slider so it doesn't overlap the legend
   const xAxisBottomPadding = 10;
   const yAxisRightPadding = 36;
-  
+
   if (axis === 'both') {
     result.dataZoom = [...make('x'), ...make('y')];
     result.grid = {
@@ -78,9 +80,8 @@ export function getThemeDataZoom(formData: Record<string, unknown>): DataZoomCon
       bottom: PTM_THEME.echarts.grid.bottom + xAxisBottomPadding,
     };
   }
-  
+
   result.toolbox = { show: false };
-  
+
   return result;
 }
-

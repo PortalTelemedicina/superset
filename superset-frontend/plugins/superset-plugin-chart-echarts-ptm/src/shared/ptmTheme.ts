@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 export const PTM_PRIMARY = {
   100: '#2C9FE5',
   200: '#2693E8',
@@ -78,38 +77,37 @@ export const PTM_NEUTRAL = {
   black: '#000000',
 } as const;
 
-
 export const PTM_COLOR_PALETTES = {
   blue: {
     name: 'Azul (Padrão)',
     colors: ['#2C9FE5', '#2B7ADC', '#71B6D7', '#42ACD4', '#2089D3', '#2075AC'],
     gradient: { start: '#2C9FE5', end: '#2B7ADC' },
   },
-  
+
   green: {
     name: 'Verde (Crescimento)',
     colors: ['#5AD7A5', '#258B3A', '#52D182', '#1B8B46', '#ADCCB6', '#0A8B16'],
     gradient: { start: '#5AD7A5', end: '#258B3A' },
   },
-  
+
   red: {
     name: 'Vermelho (Alerta)',
     colors: ['#EC4B60', '#C23043', '#F4A9B5', '#D44D5C', '#F8E7E7', '#B82E3F'],
     gradient: { start: '#EC4B60', end: '#C23043' },
   },
-  
+
   teal: {
     name: 'Teal (Alternativo)',
     colors: ['#33A7B5', '#41C2D0', '#51D7BF', '#3778BE', '#42ACD4', '#0D6C64'],
     gradient: { start: '#33A7B5', end: '#0D6C64' },
   },
-  
+
   yellow: {
     name: 'Amarelo (Atenção)',
     colors: ['#F5C451', '#F4D770', '#D4C670', '#A08E50', '#FFF4D7', '#E8B84A'],
     gradient: { start: '#F5C451', end: '#A08E50' },
   },
-  
+
   mixed: {
     name: 'Multicolorido',
     colors: [
@@ -244,7 +242,6 @@ export const PTM_ECHART_LEGEND = {
   itemGap: 16,
 } as const;
 
-
 type PtmZoomAxis = 'x' | 'y';
 type PtmZoomSize = 'sm' | 'xs';
 
@@ -270,7 +267,7 @@ export const ptmDataZoom = (
     fillerColor: 'rgba(0,0,0,0.10)',
 
     handleIcon: 'circle',
-      
+
     handleStyle: {
       color: 'rgba(255,255,255,0.95)',
       borderColor: 'rgba(0,0,0,0.20)',
@@ -288,7 +285,10 @@ export const ptmDataZoom = (
     },
 
     dataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
-    selectedDataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
+    selectedDataBackground: {
+      lineStyle: { opacity: 0 },
+      areaStyle: { opacity: 0 },
+    },
   };
 
   if (isX) {
@@ -338,8 +338,10 @@ export const ptmDataZoom = (
   };
 };
 
-
-export const createAreaGradient = (colorTop: string, colorBottom = 'rgba(255,255,255,0)') => ({
+export const createAreaGradient = (
+  colorTop: string,
+  colorBottom = 'rgba(255,255,255,0)',
+) => ({
   type: 'linear' as const,
   x: 0,
   y: 0,

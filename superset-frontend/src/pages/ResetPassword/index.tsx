@@ -141,9 +141,7 @@ export default function ResetPassword() {
           </Flex>
         ) : (
           <Flex vertical gap="middle">
-            {error && (
-              <Typography.Text type="danger">{error}</Typography.Text>
-            )}
+            {error && <Typography.Text type="danger">{error}</Typography.Text>}
             <Form
               layout="vertical"
               requiredMark="optional"

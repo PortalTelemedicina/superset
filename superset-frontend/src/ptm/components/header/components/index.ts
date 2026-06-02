@@ -20,4 +20,3 @@
 export { default as SlotRenderer } from './SlotRenderer';
 export { default as CustomizableHeader } from './CustomizableHeader';
 export { default as HeaderSlotEditor } from './HeaderSlotEditor';
-

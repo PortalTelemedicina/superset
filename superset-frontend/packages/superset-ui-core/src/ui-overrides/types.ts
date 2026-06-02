@@ -302,9 +302,7 @@ export interface DashboardSaveHookArgs {
   dashboardId?: number;
 }
 
-export type DashboardSaveHook = (
-  args: DashboardSaveHookArgs,
-) => Promise<void>;
+export type DashboardSaveHook = (args: DashboardSaveHookArgs) => Promise<void>;
 
 export type Extensions = Partial<{
   'alertsreports.header.icon': ComponentType;
@@ -354,7 +352,13 @@ export type Extensions = Partial<{
   'dashboard.sliceHeaderControls.decorator': ComponentType;
   'dashboard.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
   'explore.chart.dataReliabilityOverlay': ComponentType<ChartDataReliabilityOverlayProps>;
-  'dashboard.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
-  'explore.chart.loading': ComponentType<{ chartId: number; chartStatus?: string }>;
+  'dashboard.chart.loading': ComponentType<{
+    chartId: number;
+    chartStatus?: string;
+  }>;
+  'explore.chart.loading': ComponentType<{
+    chartId: number;
+    chartStatus?: string;
+  }>;
   'dashboard.save.before': DashboardSaveHook;
 }>;
