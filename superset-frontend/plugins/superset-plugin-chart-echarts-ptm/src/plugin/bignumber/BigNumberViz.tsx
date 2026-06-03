@@ -764,17 +764,17 @@ export default styled(BigNumberVis)`
       color: ${tok.colorSuccess};
       font-weight: 600;
     }
-    
+
     &.positive .subheader-line .trend-icon {
       color: ${tok.colorSuccess};
     }
-    
+
     /* PTM: Negative trend styling - red for decline */
     &.negative .subheader-line {
       color: ${tok.colorError};
       font-weight: 600;
     }
-    
+
     &.negative .subheader-line .trend-icon {
       color: ${tok.colorError};
     }

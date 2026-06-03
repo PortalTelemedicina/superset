@@ -110,7 +110,7 @@ def extract_chart_context() -> dict[str, int]:
         user_id = getattr(user, "id", None)
         if user_id is not None:
             ctx["user_id"] = int(user_id)
-    except Exception:
+    except Exception:  # noqa: S110
         pass
 
     return ctx

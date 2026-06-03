@@ -17,11 +17,8 @@
 # pylint: disable=too-many-lines
 import functools
 import logging
-import os
-import uuid
 from datetime import datetime
 from io import BytesIO
-from pathlib import Path
 from typing import Any, Callable, cast
 from zipfile import is_zipfile, ZipFile
 
@@ -2027,10 +2024,12 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         # This allows extension logic to be separated from core API
         # See: superset/extensions/portal/api/dashboard_header.py
         try:
-            from superset.extensions.portal.api.dashboard_header import upload_header_image_handler
-            
+            from superset.extensions.portal.api.dashboard_header import (
+                upload_header_image_handler,
+            )
+
             status_code, result, message = upload_header_image_handler()
-            
+
             if status_code == 200:
                 return self.response(status_code, result=result, message=message)
             elif status_code == 400:
