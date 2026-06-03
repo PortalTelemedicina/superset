@@ -45,12 +45,12 @@ def test_extension_fields_accepted_when_enabled(app_context) -> None:
 
 @with_feature_flags(PTM_EXTENSION_ENABLED=True)
 def test_roundtrip_normalizes_legacy_to_new(app_context) -> None:
-  register_dashboard_extension_fields(current_app)
-  legacy = {"portalHeaderLayout": {"enabled": True, "slots": []}}
-  loaded = DashboardJSONMetadataSchema().load(legacy)
-  dumped = DashboardJSONMetadataSchema().dump(loaded)
-  reloaded = DashboardJSONMetadataSchema().load(dumped)
-  assert "headerLayout" in reloaded
+    register_dashboard_extension_fields(current_app)
+    legacy = {"portalHeaderLayout": {"enabled": True, "slots": []}}
+    loaded = DashboardJSONMetadataSchema().load(legacy)
+    dumped = DashboardJSONMetadataSchema().dump(loaded)
+    reloaded = DashboardJSONMetadataSchema().load(dumped)
+    assert "headerLayout" in reloaded
 
 
 @with_feature_flags(PTM_EXTENSION_ENABLED=False)
