@@ -248,7 +248,7 @@ export default createPtmPlugin({
 const PIE_DEFAULTS = {
   ...PTM_ECHART_BASE,
   tooltip: { ...PTM_ECHART_TOOLTIP, trigger: 'item' },
-  series: [{ 
+  series: [{
     radius: ['45%', '70%'],
     itemStyle: { borderRadius: 8 },
   }],
@@ -434,6 +434,6 @@ Licensed under the Apache License, Version 2.0. See LICENSE for details.
 
 ---
 
-**Maintained by**: Portal Telemedicina Development Team  
-**Version**: 1.0  
+**Maintained by**: Portal Telemedicina Development Team
+**Version**: 1.0
 **Last Updated**: December 2024

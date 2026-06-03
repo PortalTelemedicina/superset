@@ -1,6 +1,6 @@
 /**
  * Portal Telemedicina - Global Dashboard Styles
- * 
+ *
  * Automatically applied to all dashboards.
  * No need to add CSS manually to each dashboard.
  */
@@ -25,7 +25,7 @@
   --ptm-success: #5AD7A5;
   --ptm-error: #EC4B60;
   --ptm-attention: #F5C451;
-  
+
   --ptm-neutral-white: #FFFFFF;
   --ptm-neutral-100: #F7F7F6;
   --ptm-neutral-200: #F1F1F1;
@@ -33,19 +33,19 @@
   --ptm-neutral-400: #979797;
   --ptm-neutral-500: #666666;
   --ptm-neutral-600: #222222;
-  
+
   --ptm-font-title: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ptm-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
+
   --ptm-radius-sm: 8px;
   --ptm-radius-md: 12px;
   --ptm-radius-lg: 16px;
-  
+
   --ptm-shadow-card: 0 1px 2px rgba(0,0,0,0.08);
   --ptm-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
-  
+
   --dash-gutter: clamp(12px, 2vw, 32px);
-  
+
   /* === FIGMA MODERN ANALYTICS THEME VARIABLES === */
   /* Based on Figma Make: Modern Analytics Dashboard Design */
   --ptm-figma-background: #f3f3f5;
@@ -437,4 +437,3 @@ div.chart-slice[data-test-viz-type='ptm_table'] {
   margin-left: auto !important;
   margin-right: 0 !important;
 }
-
