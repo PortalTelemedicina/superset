@@ -60,13 +60,9 @@ jobs:
         with:
           requirements-type: base
 
-      - name: "Set up liccheck"
-        run: |
-          python -m pip install --upgrade "setuptools>=65"
-          uv pip install --system liccheck
       - name: "Run liccheck"
         run: |
-          # run the checks
+          python -m pip install --upgrade "setuptools>=65" liccheck
           liccheck -R output.txt
           # Print the report
           cat output.txt
