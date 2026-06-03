@@ -19,7 +19,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
-import { t } from '@superset-ui/core';
+import { t, SupersetClient } from '@superset-ui/core';
 import { isEmpty } from 'lodash';
 import { URL_PARAMS } from 'src/constants';
 import { useShareMenuItems } from 'src/dashboard/components/menu/ShareMenuItems';
@@ -38,7 +38,6 @@ import { MenuKeys, RootState } from 'src/dashboard/types';
 import { HeaderDropdownProps } from 'src/dashboard/components/Header/types';
 import { updateDashboardTheme } from 'src/dashboard/actions/dashboardInfo';
 import { setDashboardMetadata } from 'src/dashboard/actions/dashboardState';
-import { SupersetClient } from '@superset-ui/core';
 import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 
 export const useHeaderActionsMenu = ({
@@ -169,9 +168,7 @@ export const useHeaderActionsMenu = ({
               );
             })
             .catch(err => {
-              addDangerToast(
-                err?.message || t('Failed to update dashboard'),
-              );
+              addDangerToast(err?.message || t('Failed to update dashboard'));
             });
           break;
         }
@@ -400,9 +397,7 @@ export const useHeaderActionsMenu = ({
       } else {
         menuItems.push({
           key: ptmLocked ? MenuKeys.PtmUnlock : MenuKeys.PtmLock,
-          label: ptmLocked
-            ? t('Unlock PTM changes')
-            : t('Lock PTM changes'),
+          label: ptmLocked ? t('Unlock PTM changes') : t('Lock PTM changes'),
         });
       }
     }

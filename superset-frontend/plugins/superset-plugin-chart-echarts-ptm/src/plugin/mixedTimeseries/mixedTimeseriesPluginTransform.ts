@@ -41,7 +41,9 @@ export function mixedTimeseriesPluginTransform(
   formData: Record<string, unknown>,
   transforms: TransformConfig,
 ): EchartOptions {
-  const defaultTransform = createDefaultPluginTransform(MIXED_TIMESERIES_PTM_DEFAULTS);
+  const defaultTransform = createDefaultPluginTransform(
+    MIXED_TIMESERIES_PTM_DEFAULTS,
+  );
   let finalOptions = defaultTransform(options, formData, transforms);
 
   const barBorderRadius: PtmBarBorderRadiusOptions | undefined = {
@@ -56,11 +58,18 @@ export function mixedTimeseriesPluginTransform(
 
   if (transforms.seriesType) {
     const ptmSeriesType = formData.ptmSeriesType as PtmSeriesType | undefined;
-    finalOptions = applySeriesTypeOverride(finalOptions, ptmSeriesType, barBorderRadius);
+    finalOptions = applySeriesTypeOverride(
+      finalOptions,
+      ptmSeriesType,
+      barBorderRadius,
+    );
   }
 
   // Even when PTM series type is "auto", bar series still get PTM bar radius
-  finalOptions = applyBarBorderRadius(finalOptions, barBorderRadius) as EchartOptions;
+  finalOptions = applyBarBorderRadius(
+    finalOptions,
+    barBorderRadius,
+  ) as EchartOptions;
 
   if (transforms.dataZoom) {
     const themeZoomOverrides = getThemeDataZoom(formData);
@@ -71,7 +80,10 @@ export function mixedTimeseriesPluginTransform(
     if (themeZoomOverrides.toolbox !== undefined) {
       finalOptions.toolbox = themeZoomOverrides.toolbox;
     }
-    if (themeZoomOverrides.grid !== undefined && themeZoomOverrides.grid !== null) {
+    if (
+      themeZoomOverrides.grid !== undefined &&
+      themeZoomOverrides.grid !== null
+    ) {
       const currentGrid =
         finalOptions.grid && typeof finalOptions.grid === 'object'
           ? (finalOptions.grid as Record<string, unknown>)

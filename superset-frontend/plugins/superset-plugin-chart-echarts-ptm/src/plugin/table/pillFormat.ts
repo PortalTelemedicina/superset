@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 const PILL_PALETTE: Array<{ bg: string; text: string }> = [
   { bg: '#DBEAFE', text: '#1E40AF' }, // Blue
   { bg: '#DEF7EC', text: '#03543F' }, // Green
@@ -41,8 +40,8 @@ const hashString = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+    hash = (hash << 5) - hash + char;
+    hash &= hash;
   }
   return Math.abs(hash);
 };
@@ -59,15 +58,18 @@ export function formatValueAsPill(value: any): string {
   if (value === null || value === undefined || value === '') {
     return `<span class="ptm-pill ptm-pill-empty">${value || '—'}</span>`;
   }
-  
-  if (typeof value === 'string' && (value.includes('<') || value.includes('&lt;'))) {
+
+  if (
+    typeof value === 'string' &&
+    (value.includes('<') || value.includes('&lt;'))
+  ) {
     return value;
   }
-  
+
   if (typeof value === 'number' || !isNaN(Number(value))) {
     return String(value);
   }
-  
+
   const { bg, text } = getPillColors(String(value));
   return `<span class="ptm-pill" style="background: ${bg}; color: ${text};">${value}</span>`;
 }
@@ -78,13 +80,15 @@ export function applyPillFormatting(
   formData: Record<string, unknown>,
 ): any[] {
   if (!data || !columns) return data;
-  
-  const specifiedColumns = (formData as any).ptmPillColumns as string[] | undefined;
-  
+
+  const specifiedColumns = (formData as any).ptmPillColumns as
+    | string[]
+    | undefined;
+
   if (!specifiedColumns || specifiedColumns.length === 0) {
     return data;
   }
-  
+
   return data.map((row: any) => {
     const newRow = { ...row };
     specifiedColumns.forEach((key: string) => {
@@ -95,5 +99,3 @@ export function applyPillFormatting(
     return newRow;
   });
 }
-
-

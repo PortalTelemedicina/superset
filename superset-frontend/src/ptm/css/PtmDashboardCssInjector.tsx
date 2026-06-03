@@ -30,9 +30,7 @@ function isPtmDashboardFromTags(
 ): boolean {
   const tags = dashboard?.tags;
   if (!Array.isArray(tags)) return false;
-  return tags.some(
-    t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME,
-  );
+  return tags.some(t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
 }
 
 /**
@@ -98,7 +96,7 @@ export default function PtmDashboardCssInjector({
     // Inject dashboard custom CSS (without @import, PTM CSS is already loaded via link)
     const finalCss = rawDashboardCss.trim();
     const cssChanged = finalCss !== lastCssRef.current;
-    
+
     if (finalCss) {
       if (cssChanged) {
         removeStyleRef.current = injectCustomCss(finalCss);
@@ -111,7 +109,7 @@ export default function PtmDashboardCssInjector({
         lastCssRef.current = '';
       }
     }
-    
+
     lastDashboardIdRef.current = dashboardId;
     // Intentionally no cleanup: avoid remove/re-add on filter apply (prevents flash/reflow)
   }, [dashboardCss, dashboard]);

@@ -27,6 +27,7 @@ import {
   type PtmSeriesType,
 } from './transformHelpers/seriesTypeOverride';
 import { getThemeDataZoom } from './transformHelpers/dataZoom';
+import { shouldDeferDailyBarZoom } from './transformHelpers/sparseTimeBarLayout';
 import TIMESERIES_PTM_DEFAULTS from './defaults';
 
 interface EchartOptions {
@@ -42,7 +43,9 @@ export function timeseriesPluginTransform(
   formData: Record<string, unknown>,
   transforms: TransformConfig,
 ): EchartOptions {
-  const defaultTransform = createDefaultPluginTransform(TIMESERIES_PTM_DEFAULTS);
+  const defaultTransform = createDefaultPluginTransform(
+    TIMESERIES_PTM_DEFAULTS,
+  );
   let finalOptions = defaultTransform(options, formData, transforms);
 
   const barBorderRadius: PtmBarBorderRadiusOptions | undefined = {
@@ -57,30 +60,43 @@ export function timeseriesPluginTransform(
 
   if (transforms.seriesType) {
     const ptmSeriesType = formData.ptmSeriesType as PtmSeriesType | undefined;
-    finalOptions = applySeriesTypeOverride(finalOptions, ptmSeriesType, barBorderRadius);
+    finalOptions = applySeriesTypeOverride(
+      finalOptions,
+      ptmSeriesType,
+      barBorderRadius,
+    );
   }
 
   // Even when PTM series type is "auto", bar charts should still get the PTM bar radius behavior.
-  finalOptions = applyBarBorderRadius(finalOptions, barBorderRadius) as EchartOptions;
+  finalOptions = applyBarBorderRadius(
+    finalOptions,
+    barBorderRadius,
+  ) as EchartOptions;
 
-  if (transforms.dataZoom) {
+  if (transforms.dataZoom && !shouldDeferDailyBarZoom(formData)) {
     const themeZoomOverrides = getThemeDataZoom(formData);
-    
+
     if (themeZoomOverrides.dataZoom !== undefined) {
       finalOptions.dataZoom = themeZoomOverrides.dataZoom;
     }
     if (themeZoomOverrides.toolbox !== undefined) {
       finalOptions.toolbox = themeZoomOverrides.toolbox;
     }
-    if (themeZoomOverrides.grid !== undefined && themeZoomOverrides.grid !== null) {
-      const currentGrid = finalOptions.grid && typeof finalOptions.grid === 'object' 
-        ? finalOptions.grid as Record<string, unknown>
-        : {};
-      finalOptions.grid = merge({}, currentGrid, themeZoomOverrides.grid as Record<string, unknown>);
+    if (
+      themeZoomOverrides.grid !== undefined &&
+      themeZoomOverrides.grid !== null
+    ) {
+      const currentGrid =
+        finalOptions.grid && typeof finalOptions.grid === 'object'
+          ? (finalOptions.grid as Record<string, unknown>)
+          : {};
+      finalOptions.grid = merge(
+        {},
+        currentGrid,
+        themeZoomOverrides.grid as Record<string, unknown>,
+      );
     }
-    
   }
 
   return finalOptions;
 }
-

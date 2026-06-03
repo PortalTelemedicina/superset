@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 export { default as PtmTimeseriesChartPlugin } from './plugin/timeseries';
 export { default as PtmEchartsTimeseriesPlugin } from './plugin/timeseries';
 
@@ -39,9 +38,6 @@ export {
   ptmJsonOverrideControl,
 } from './shared';
 
-export type {
-  PtmPluginConfig,
-  PtmTransformConfig,
-} from './shared';
+export type { PtmPluginConfig, PtmTransformConfig } from './shared';
 
 export { default as SupersetPluginChartEchartsPtm } from './plugin/timeseries';

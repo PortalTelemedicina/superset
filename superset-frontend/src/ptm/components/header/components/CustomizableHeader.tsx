@@ -18,9 +18,9 @@
  */
 import React, { useMemo } from 'react';
 import { styled } from '@superset-ui/core';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import { HeaderLayout, SlotPosition, getSlotsByPosition } from '../types';
 import SlotRenderer from './SlotRenderer';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 const HeaderContainer = styled.div<{ globalStyle?: any }>`
   display: flex;
@@ -40,7 +40,8 @@ const SlotGroup = styled.div<{ position: SlotPosition }>`
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: ${({ position }) => (position === SlotPosition.CENTER ? '1 1 auto' : '0 0 auto')};
+  flex: ${({ position }) =>
+    position === SlotPosition.CENTER ? '1 1 auto' : '0 0 auto'};
   justify-content: ${({ position }) => {
     switch (position) {
       case SlotPosition.LEFT:
@@ -91,13 +92,16 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
   }
 
   return (
-    <HeaderContainer 
+    <HeaderContainer
       globalStyle={headerLayout.globalStyle}
       className="portal-header-custom"
     >
       {/* Left Section */}
       {leftSlots.length > 0 && (
-        <SlotGroup position={SlotPosition.LEFT} className="portal-slot-group portal-slot-group-left">
+        <SlotGroup
+          position={SlotPosition.LEFT}
+          className="portal-slot-group portal-slot-group-left"
+        >
           {leftSlots.map(slot => (
             <SlotRenderer
               key={slot.id}
@@ -112,7 +116,10 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
 
       {/* Center Section */}
       {centerSlots.length > 0 && (
-        <SlotGroup position={SlotPosition.CENTER} className="portal-slot-group portal-slot-group-center">
+        <SlotGroup
+          position={SlotPosition.CENTER}
+          className="portal-slot-group portal-slot-group-center"
+        >
           {centerSlots.map(slot => (
             <SlotRenderer
               key={slot.id}
@@ -127,7 +134,10 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
 
       {/* Right Section */}
       {rightSlots.length > 0 && (
-        <SlotGroup position={SlotPosition.RIGHT} className="portal-slot-group portal-slot-group-right">
+        <SlotGroup
+          position={SlotPosition.RIGHT}
+          className="portal-slot-group portal-slot-group-right"
+        >
           {rightSlots.map(slot => (
             <SlotRenderer
               key={slot.id}
@@ -144,4 +154,3 @@ export const CustomizableHeader: React.FC<CustomizableHeaderProps> = ({
 };
 
 export default CustomizableHeader;
-

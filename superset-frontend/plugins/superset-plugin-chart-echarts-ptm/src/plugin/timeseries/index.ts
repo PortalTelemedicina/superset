@@ -16,6 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import TimeseriesTransformProps from '@superset-ui/plugin-chart-echarts/Timeseries/transformProps';
+import TimeseriesBuildQuery from '@superset-ui/plugin-chart-echarts/Timeseries/buildQuery';
+import TimeseriesControlPanel from '@superset-ui/plugin-chart-echarts/Timeseries/Regular/Bar/controlPanel';
+import EchartsTimeseries from '@superset-ui/plugin-chart-echarts/Timeseries/EchartsTimeseries';
 import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import thumbnail from './images/thumbnail.png';
 import {
@@ -23,20 +27,17 @@ import {
   timeseriesSeriesTypeControl,
   timeseriesBarRadiusControlRow1,
   timeseriesBarRadiusControlRow2,
+  timeseriesSparseBarLayoutControl,
   timeseriesZoomControl,
 } from './timeseriesTransformConfig';
 import { timeseriesPluginTransform } from './timeseriesPluginTransform';
-
-import TimeseriesTransformProps from '@superset-ui/plugin-chart-echarts/Timeseries/transformProps';
-import TimeseriesBuildQuery from '@superset-ui/plugin-chart-echarts/Timeseries/buildQuery';
-import TimeseriesControlPanel from '@superset-ui/plugin-chart-echarts/Timeseries/Regular/Bar/controlPanel';
-import EchartsTimeseries from '@superset-ui/plugin-chart-echarts/Timeseries/EchartsTimeseries';
 
 import TIMESERIES_PTM_DEFAULTS from './defaults';
 
 const PtmTimeseriesChartPlugin = createPtmPlugin({
   name: 'PTM Timeseries',
-  description: 'Time-series chart with Portal Telemedicina styling, series type override, and customization options.',
+  description:
+    'Time-series chart with Portal Telemedicina styling, series type override, and customization options.',
   category: 'Evolution',
   tags: ['ECharts', 'Timeseries', 'Line', 'Bar', 'Temporal'],
   thumbnail,
@@ -53,6 +54,7 @@ const PtmTimeseriesChartPlugin = createPtmPlugin({
     timeseriesSeriesTypeControl,
     timeseriesBarRadiusControlRow1,
     timeseriesBarRadiusControlRow2,
+    timeseriesSparseBarLayoutControl,
     timeseriesZoomControl,
     ptmTextCasingControls,
   ],

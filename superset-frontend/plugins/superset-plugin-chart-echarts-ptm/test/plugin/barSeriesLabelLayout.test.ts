@@ -16,10 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-module.exports = {
-  moduleFileExtensions: ['mock.js', 'ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  moduleNameMapper: {
-    '\\.(gif|ttf|eot|png|jpg)$': '<rootDir>/test/__mocks__/mockExportString.js',
-  },
-  testEnvironment: 'jsdom',
-};
+
+import { applyBarSeriesLabelLayout } from '../../src/plugin/timeseries/transformHelpers/barSeriesLabelLayout';
+
+describe('barSeriesLabelLayout', () => {
+  test('adds hideOverlap to visible bar labels without changing label style', () => {
+    const options = {
+      series: [{ type: 'bar', label: { show: true, position: 'top' } }],
+    };
+
+    const result = applyBarSeriesLabelLayout(options);
+    const barSeries = (result.series as Record<string, unknown>[])[0];
+
+    expect(barSeries.labelLayout).toEqual({ hideOverlap: true });
+    expect(barSeries.label).toEqual({ show: true, position: 'top' });
+  });
+});

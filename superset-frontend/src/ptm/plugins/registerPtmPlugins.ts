@@ -37,11 +37,21 @@ export function registerPtmPlugins(): void {
   new DeckGLChartPresetPTM().register();
   new MapLibreChartPluginPTM().configure({ key: 'maplibre_ptm' }).register();
 
-  new PtmTimeseriesChartPlugin().configure({ key: 'ptm_echarts_timeseries' }).register();
+  new PtmTimeseriesChartPlugin()
+    .configure({ key: 'ptm_echarts_timeseries' })
+    .register();
   new PtmPieChartPlugin().configure({ key: 'ptm_pie' }).register();
-  new PtmBigNumberTotalChartPlugin().configure({ key: 'ptm_big_number_total' }).register();
-  new PtmBigNumberWithTrendlineChartPlugin().configure({ key: 'ptm_big_number_trendline' }).register();
+  new PtmBigNumberTotalChartPlugin()
+    .configure({ key: 'ptm_big_number_total' })
+    .register();
+  new PtmBigNumberWithTrendlineChartPlugin()
+    .configure({ key: 'ptm_big_number_trendline' })
+    .register();
   new PtmTableChartPlugin().configure({ key: 'ptm_table' }).register();
-  new PtmMixedTimeseriesChartPlugin().configure({ key: 'ptm_mixed_timeseries' }).register();
-  new PtmPivotTableChartPlugin().configure({ key: 'ptm_pivot_table' }).register();
+  new PtmMixedTimeseriesChartPlugin()
+    .configure({ key: 'ptm_mixed_timeseries' })
+    .register();
+  new PtmPivotTableChartPlugin()
+    .configure({ key: 'ptm_pivot_table' })
+    .register();
 }

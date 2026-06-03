@@ -52,8 +52,15 @@ export function getCasingFromFormData(
       : key === 'legend'
         ? 'ptmLegendTextCase'
         : 'ptmTableTextCase';
-  const value = (formData[snakeKey] ?? formData[camelKey]) as string | undefined;
-  if (value === 'upper' || value === 'lower' || value === 'capitalize' || value === 'none') {
+  const value = (formData[snakeKey] ?? formData[camelKey]) as
+    | string
+    | undefined;
+  if (
+    value === 'upper' ||
+    value === 'lower' ||
+    value === 'capitalize' ||
+    value === 'none'
+  ) {
     return value;
   }
   return 'none';
@@ -73,7 +80,9 @@ function wrapAxisLabelFormatter(
   if (mode === 'none') return;
   const axisLabel = axis.axisLabel as Record<string, unknown> | undefined;
   if (!axisLabel) return;
-  const original = axisLabel.formatter as ((value: string) => string) | undefined;
+  const original = axisLabel.formatter as
+    | ((value: string) => string)
+    | undefined;
   axisLabel.formatter = (value: string) => {
     const formatted = typeof original === 'function' ? original(value) : value;
     return applyTextCasing(String(formatted), mode);
@@ -87,7 +96,8 @@ function processAxis(
   if (!axisConfig || mode === 'none') return;
   const list = Array.isArray(axisConfig) ? axisConfig : [axisConfig];
   list.forEach(axis => {
-    if (axis && typeof axis === 'object') wrapAxisLabelFormatter(axis as Record<string, unknown>, mode);
+    if (axis && typeof axis === 'object')
+      wrapAxisLabelFormatter(axis as Record<string, unknown>, mode);
   });
 }
 
@@ -104,14 +114,31 @@ export function applyTextCasingToEchartOptions(
 
   const result = { ...options };
 
-  processAxis(result.xAxis as Record<string, unknown> | Record<string, unknown>[] | undefined, axisMode);
-  processAxis(result.yAxis as Record<string, unknown> | Record<string, unknown>[] | undefined, axisMode);
+  processAxis(
+    result.xAxis as
+      | Record<string, unknown>
+      | Record<string, unknown>[]
+      | undefined,
+    axisMode,
+  );
+  processAxis(
+    result.yAxis as
+      | Record<string, unknown>
+      | Record<string, unknown>[]
+      | undefined,
+    axisMode,
+  );
 
   if (result.legend && legendMode !== 'none') {
     const legend = { ...result.legend } as Record<string, unknown>;
-    const originalFormatter = legend.formatter as ((name: string) => string) | undefined;
+    const originalFormatter = legend.formatter as
+      | ((name: string) => string)
+      | undefined;
     legend.formatter = (name: string) => {
-      const formatted = typeof originalFormatter === 'function' ? originalFormatter(name) : name;
+      const formatted =
+        typeof originalFormatter === 'function'
+          ? originalFormatter(name)
+          : name;
       return applyTextCasing(String(formatted), legendMode);
     };
     result.legend = legend;

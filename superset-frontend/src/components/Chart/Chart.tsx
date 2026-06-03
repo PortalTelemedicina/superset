@@ -378,10 +378,15 @@ class Chart extends PureComponent<ChartProps, {}> {
           {isLoading
             ? (() => {
                 const registry = getExtensionsRegistry();
-                const LoadingComponent = (dashboardId
-                  ? registry.get('dashboard.chart.loading')
-                  : registry.get('explore.chart.loading')) as
-                  | React.ComponentType<{ chartId: number; chartStatus?: string }>
+                const LoadingComponent = (
+                  dashboardId
+                    ? registry.get('dashboard.chart.loading')
+                    : registry.get('explore.chart.loading')
+                ) as
+                  | React.ComponentType<{
+                      chartId: number;
+                      chartStatus?: string;
+                    }>
                   | undefined;
                 if (LoadingComponent) {
                   return (

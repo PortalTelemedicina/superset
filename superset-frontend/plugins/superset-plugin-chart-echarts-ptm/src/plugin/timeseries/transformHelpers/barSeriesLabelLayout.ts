@@ -17,25 +17,39 @@
  * under the License.
  */
 
-import { useEffect } from 'react';
-import type { DashboardCssInjectorProps } from 'src/dashboard/components/DashboardExtensionsContext';
-import injectCustomCss from 'src/dashboard/util/injectCustomCss';
+/** Let ECharts drop bar value labels that would collide (e.g. dense monthly series). */
+export function applyBarSeriesLabelLayout(
+  options: Record<string, unknown>,
+): Record<string, unknown> {
+  const series = options.series;
+  if (!Array.isArray(series)) {
+    return options;
+  }
 
-/**
- * Default dashboard CSS injector: injects the given CSS string as-is.
- * Used when no extension provides dashboardCssInjectorComponent.
- */
-export default function DefaultDashboardCssInjector({
-  dashboardCss,
-}: DashboardCssInjectorProps) {
-  useEffect(() => {
-    const finalCss = (
-      typeof dashboardCss === 'string' ? dashboardCss : ''
-    ).trim();
-    if (finalCss) {
-      return injectCustomCss(finalCss);
+  const nextSeries = series.map(entry => {
+    if (entry.type !== 'bar') {
+      return entry;
     }
-    return () => {};
-  }, [dashboardCss]);
-  return null;
+
+    const label = entry.label as Record<string, unknown> | undefined;
+    if (!label?.show) {
+      return entry;
+    }
+
+    const existingLayout =
+      (entry.labelLayout as Record<string, unknown> | undefined) ?? {};
+
+    return {
+      ...entry,
+      labelLayout: {
+        ...existingLayout,
+        hideOverlap: existingLayout.hideOverlap ?? true,
+      },
+    };
+  });
+
+  return {
+    ...options,
+    series: nextSeries,
+  };
 }

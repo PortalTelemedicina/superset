@@ -16,15 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {
-  QueryFormData,
-  TimeseriesDataRecord,
-} from '@superset-ui/core';
+import { QueryFormData, TimeseriesDataRecord } from '@superset-ui/core';
 
 export interface SupersetPluginChartEchartsPtmStylesProps {
   height: number;
   width: number;
-  headerFontSize: 'fontSizeSM' | 'fontSize' | 'fontSizeLG' | 'fontSizeXL' | 'fontSizeHeading1' | 'fontSizeHeading2' | 'fontSizeHeading3' | 'fontSizeHeading4' | 'fontSizeHeading5';
+  headerFontSize:
+    | 'fontSizeSM'
+    | 'fontSize'
+    | 'fontSizeLG'
+    | 'fontSizeXL'
+    | 'fontSizeHeading1'
+    | 'fontSizeHeading2'
+    | 'fontSizeHeading3'
+    | 'fontSizeHeading4'
+    | 'fontSizeHeading5';
   boldText: boolean;
 }
 
@@ -41,6 +47,9 @@ interface PtmZoomControls {
   ptm_zoom_size: PtmZoomSize;
   ptm_zoom_inset: string;
   ptm_series_type?: 'auto' | 'line' | 'bar' | 'smooth' | 'step';
+  ptm_sparse_bar_layout?: boolean;
+  /** @deprecated use ptm_sparse_bar_layout */
+  ptm_sparse_bar_alignment?: 'default' | 'sparse' | 'center' | 'left' | 'right';
   ptm_options_json?: string;
 }
 
@@ -49,7 +58,8 @@ export type SupersetPluginChartEchartsPtmQueryFormData = QueryFormData &
   SupersetPluginChartEchartsPtmCustomizeProps &
   PtmZoomControls;
 
-export type SupersetPluginChartEchartsPtmProps = SupersetPluginChartEchartsPtmStylesProps &
-  SupersetPluginChartEchartsPtmCustomizeProps & {
-    data: TimeseriesDataRecord[];
-  };
+export type SupersetPluginChartEchartsPtmProps =
+  SupersetPluginChartEchartsPtmStylesProps &
+    SupersetPluginChartEchartsPtmCustomizeProps & {
+      data: TimeseriesDataRecord[];
+    };

@@ -15,6 +15,10 @@
  * License for the specific language governing permissions and
  * limitations under the License.
  */
+import MixedTimeseriesTransformProps from '@superset-ui/plugin-chart-echarts/MixedTimeseries/transformProps';
+import MixedTimeseriesBuildQuery from '@superset-ui/plugin-chart-echarts/MixedTimeseries/buildQuery';
+import MixedTimeseriesControlPanel from '@superset-ui/plugin-chart-echarts/MixedTimeseries/controlPanel';
+import EchartsMixedTimeseries from '@superset-ui/plugin-chart-echarts/MixedTimeseries/EchartsMixedTimeseries';
 import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import {
   MIXED_TIMESERIES_TRANSFORM_CONFIG,
@@ -24,11 +28,6 @@ import {
 } from './mixedTimeseriesTransformConfig';
 import { mixedTimeseriesPluginTransform } from './mixedTimeseriesPluginTransform';
 import thumbnail from './images/thumbnail.png';
-
-import MixedTimeseriesTransformProps from '@superset-ui/plugin-chart-echarts/MixedTimeseries/transformProps';
-import MixedTimeseriesBuildQuery from '@superset-ui/plugin-chart-echarts/MixedTimeseries/buildQuery';
-import MixedTimeseriesControlPanel from '@superset-ui/plugin-chart-echarts/MixedTimeseries/controlPanel';
-import EchartsMixedTimeseries from '@superset-ui/plugin-chart-echarts/MixedTimeseries/EchartsMixedTimeseries';
 
 import MIXED_TIMESERIES_PTM_DEFAULTS from './defaults';
 

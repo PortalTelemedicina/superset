@@ -90,9 +90,7 @@ export default function ForgotPassword() {
         ) : (
           <Flex vertical gap="middle">
             <Typography.Text type="secondary">
-              {t(
-                'Enter your email address to receive a password reset link:',
-              )}
+              {t('Enter your email address to receive a password reset link:')}
             </Typography.Text>
             <Form
               layout="vertical"

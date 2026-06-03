@@ -33,7 +33,12 @@ import PivotTableStyles from './Styles';
 export default function PtmPivotTableChart(
   props: PivotTableProps & { ptmTableTextCase?: PtmTextCase },
 ) {
-  const { ptmTableTextCase = 'none', verboseMap = {}, metrics = [], ...rest } = props;
+  const {
+    ptmTableTextCase = 'none',
+    verboseMap = {},
+    metrics = [],
+    ...rest
+  } = props;
 
   const casedProps = useMemo(() => {
     if (ptmTableTextCase === 'none') return props;
@@ -50,7 +55,13 @@ export default function PtmPivotTableChart(
     const casedMetrics = Array.isArray(metrics)
       ? metrics.map(m =>
           typeof m === 'object' && m !== null && 'label' in m
-            ? { ...m, label: applyTextCasing(String((m as { label?: string }).label ?? ''), mode) }
+            ? {
+                ...m,
+                label: applyTextCasing(
+                  String((m as { label?: string }).label ?? ''),
+                  mode,
+                ),
+              }
             : m,
         )
       : metrics;

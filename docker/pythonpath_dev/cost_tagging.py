@@ -56,9 +56,7 @@ def _pick_ids(form_data: dict[str, Any], root: dict[str, Any]) -> dict[str, int]
     ids: dict[str, int] = {}
     dashboard_id = form_data.get("dashboardId") or form_data.get("dashboard_id")
     slice_id = (
-        form_data.get("slice_id")
-        or form_data.get("sliceId")
-        or root.get("slice_id")
+        form_data.get("slice_id") or form_data.get("sliceId") or root.get("slice_id")
     )
     try:
         if dashboard_id is not None:
@@ -110,7 +108,7 @@ def extract_chart_context() -> dict[str, int]:
         user_id = getattr(user, "id", None)
         if user_id is not None:
             ctx["user_id"] = int(user_id)
-    except Exception:
+    except Exception:  # noqa: S110
         pass
 
     return ctx

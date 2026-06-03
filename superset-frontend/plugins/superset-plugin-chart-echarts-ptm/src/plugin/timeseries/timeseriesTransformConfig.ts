@@ -115,6 +115,23 @@ export const timeseriesBarRadiusControlRow2: ControlSetRow = [
   },
 ];
 
+export const timeseriesSparseBarLayoutControl: ControlSetRow = [
+  {
+    name: 'ptm_sparse_bar_layout',
+    config: {
+      type: 'CheckboxControl',
+      label: t('Compact sparse daily bars'),
+      description: t(
+        'When fewer than 7 days of data are shown, center bars in a fixed 7-day window. ' +
+          'Zoom is available only when 7 or more days are present.',
+      ),
+      default: false,
+      renderTrigger: true,
+      visibility: ({ controls }: any) => controls?.ptm_series_type?.value === 'bar',
+    },
+  },
+];
+
 export const zoomAxisChoices: [string, string][] = [
   ['x', t('X axis (horizontal)')],
   ['y', t('Y axis (vertical)')],
@@ -166,8 +183,9 @@ export const timeseriesZoomControl: ControlSetRow = [
       default: '24',
       isInt: true,
       renderTrigger: true,
-      description: t('Adds padding inside the grid so the zoom bar does not span full width.'),
+      description: t(
+        'Adds padding inside the grid so the zoom bar does not span full width.',
+      ),
     },
   },
 ];
-

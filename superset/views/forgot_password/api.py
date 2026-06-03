@@ -55,9 +55,7 @@ class ForgotPasswordRestApi(BaseSupersetApi):
         """Create a timed serializer using app secret and a dedicated salt."""
         return URLSafeTimedSerializer(
             app.config["SECRET_KEY"],
-            salt=app.config.get(
-                "FORGOT_PASSWORD_TOKEN_SALT", "forgot-password-salt"
-            ),
+            salt=app.config.get("FORGOT_PASSWORD_TOKEN_SALT", "forgot-password-salt"),
         )
 
     def _get_reset_url(self, token: str) -> str:
@@ -66,9 +64,7 @@ class ForgotPasswordRestApi(BaseSupersetApi):
             base_url = request.host_url.rstrip("/")
         return f"{base_url}/reset-password/?token={token}"
 
-    def _send_reset_email(
-        self, email: str, reset_url: str, first_name: str
-    ) -> None:
+    def _send_reset_email(self, email: str, reset_url: str, first_name: str) -> None:
         subject = "Superset – Redefinição de Senha"
         html_content = f"""
         <html>
@@ -161,9 +157,7 @@ class ForgotPasswordRestApi(BaseSupersetApi):
 
         user = self.appbuilder.sm.find_user(email=email)
         if not user or not user.is_active:
-            logger.info(
-                "Password reset requested for unknown/inactive email"
-            )
+            logger.info("Password reset requested for unknown/inactive email")
             return generic_response
 
         # itsdangerous: gera token URL-safe com timestamp
@@ -240,15 +234,11 @@ class ForgotPasswordRestApi(BaseSupersetApi):
             )
         except BadSignature:
             logger.warning("Invalid password reset token used")
-            return self.response_400(
-                message="Link de redefinição inválido."
-            )
+            return self.response_400(message="Link de redefinição inválido.")
 
         user = self.appbuilder.sm.find_user(email=email)
         if not user or not user.is_active:
-            return self.response_400(
-                message="Usuário não encontrado ou inativo."
-            )
+            return self.response_400(message="Usuário não encontrado ou inativo.")
 
         # Mesmo padrão de hash usado em views/users/api.py
         user.password = generate_password_hash(

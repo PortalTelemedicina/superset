@@ -19,7 +19,7 @@
 
 /**
  * Header Slots System
- * 
+ *
  * Flexible system for customizing dashboard headers with drag-and-drop elements
  */
 
@@ -159,7 +159,10 @@ export interface HeaderSlotConfig {
 }
 
 // Helper functions
-export const createDefaultSlot = (type: SlotType, position: SlotPosition = SlotPosition.LEFT): HeaderSlot => {
+export const createDefaultSlot = (
+  type: SlotType,
+  position: SlotPosition = SlotPosition.LEFT,
+): HeaderSlot => {
   const baseSlot: BaseSlot = {
     id: `slot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     type,
@@ -240,11 +243,13 @@ export const createDefaultSlot = (type: SlotType, position: SlotPosition = SlotP
   }
 };
 
-export const getSlotsByPosition = (slots: HeaderSlot[], position: SlotPosition): HeaderSlot[] => {
-  return slots
+export const getSlotsByPosition = (
+  slots: HeaderSlot[],
+  position: SlotPosition,
+): HeaderSlot[] =>
+  slots
     .filter(slot => slot.position === position && slot.visible !== false)
     .sort((a, b) => a.order - b.order);
-};
 
 export const getDefaultHeaderLayout = (): HeaderLayout => ({
   enabled: false,
@@ -256,4 +261,3 @@ export const getDefaultHeaderLayout = (): HeaderLayout => ({
     borderBottom: '1px solid #f0f0f0',
   },
 });
-

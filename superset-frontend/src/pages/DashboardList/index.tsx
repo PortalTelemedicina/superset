@@ -458,7 +458,7 @@ function DashboardList(props: DashboardListProps) {
           const handleExport = () => handleBulkDashboardExport([original]);
 
           const handlePtmAction = (key: string) => {
-            const id = original.id;
+            const { id } = original;
             const isLockedBySharedCharts =
               ptmMetadata?.ptm_locked_reason === 'shared_charts';
             if (key === 'ptm_lock' || key === 'ptm_unlock') {
@@ -480,7 +480,9 @@ function DashboardList(props: DashboardListProps) {
                       dashboard_title: dash.dashboard_title,
                       slug: dash.slug,
                       json_metadata: JSON.stringify(merged),
-                      owners: (dash.owners ?? []).map((o: { id: number }) => o.id),
+                      owners: (dash.owners ?? []).map(
+                        (o: { id: number }) => o.id,
+                      ),
                       certified_by: dash.certified_by,
                       certification_details: dash.certification_details,
                     }),
@@ -495,7 +497,9 @@ function DashboardList(props: DashboardListProps) {
                   );
                 })
                 .catch(err =>
-                  addDangerToast(err?.message || t('Failed to update dashboard')),
+                  addDangerToast(
+                    err?.message || t('Failed to update dashboard'),
+                  ),
                 );
             }
           };
@@ -556,7 +560,9 @@ function DashboardList(props: DashboardListProps) {
                   padding: '5px 12px',
                   cursor: ptmLocked ? 'not-allowed' : 'pointer',
                   opacity: ptmLocked ? 0.5 : 1,
-                  '&:hover': ptmLocked ? {} : { background: 'var(--ant-color-item-hover-bg)' },
+                  '&:hover': ptmLocked
+                    ? {}
+                    : { background: 'var(--ant-color-item-hover-bg)' },
                 }}
               >
                 {t('Lock PTM changes')}
@@ -585,8 +591,7 @@ function DashboardList(props: DashboardListProps) {
                     !ptmLocked || isLockedBySharedCharts
                       ? 'not-allowed'
                       : 'pointer',
-                  opacity:
-                    !ptmLocked || isLockedBySharedCharts ? 0.5 : 1,
+                  opacity: !ptmLocked || isLockedBySharedCharts ? 0.5 : 1,
                   '&:hover':
                     !ptmLocked || isLockedBySharedCharts
                       ? {}

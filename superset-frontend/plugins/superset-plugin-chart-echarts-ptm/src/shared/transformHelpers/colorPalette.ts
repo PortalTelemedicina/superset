@@ -20,7 +20,6 @@ import { PTM_COLOR_PALETTES, PtmColorPalette } from '../ptmTheme';
 
 type PtmColorOrder = 'normal' | 'reverse' | 'light-to-dark' | 'dark-to-light';
 
-
 function calculateLuminance(color: string): number {
   const hex = color.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16);
@@ -29,33 +28,37 @@ function calculateLuminance(color: string): number {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-
 function sortColorsByLuminance(colors: string[], ascending: boolean): string[] {
   const withLuminance = colors.map(color => ({
     color,
     luminance: calculateLuminance(color),
   }));
-  
-  withLuminance.sort((a, b) => 
-    ascending ? a.luminance - b.luminance : b.luminance - a.luminance
+
+  withLuminance.sort((a, b) =>
+    ascending ? a.luminance - b.luminance : b.luminance - a.luminance,
   );
-  
+
   return withLuminance.map(item => item.color);
 }
 
-
-export function getColorPalette(formData: Record<string, unknown>): { color: string[] } {
-  const paletteName = (formData.ptmColorPalette as PtmColorPalette | undefined) ?? 'blue';
-  const colorOrder = (formData.ptmColorOrder as PtmColorOrder | undefined) ?? 'normal';
+export function getColorPalette(formData: Record<string, unknown>): {
+  color: string[];
+} {
+  const paletteName =
+    (formData.ptmColorPalette as PtmColorPalette | undefined) ?? 'blue';
+  const colorOrder =
+    (formData.ptmColorOrder as PtmColorOrder | undefined) ?? 'normal';
   const palette = PTM_COLOR_PALETTES[paletteName];
-  
+
   if (!palette) {
-    console.warn(`[PTM] Unknown color palette: ${paletteName}, falling back to blue`);
+    console.warn(
+      `[PTM] Unknown color palette: ${paletteName}, falling back to blue`,
+    );
     return { color: [...PTM_COLOR_PALETTES.blue.colors] };
   }
-  
+
   let colors: string[] = [...palette.colors];
-  
+
   switch (colorOrder) {
     case 'reverse':
       colors = colors.reverse();
@@ -69,7 +72,7 @@ export function getColorPalette(formData: Record<string, unknown>): { color: str
     default:
       break;
   }
-  
+
   return { color: colors };
 }
 
@@ -78,25 +81,27 @@ export function cleanSeriesColors(
 ): Record<string, unknown>[] {
   return series.map((s: any) => {
     const cleanedSeries = { ...s };
-    
+
     if (cleanedSeries.itemStyle?.color) {
       const { color, ...restItemStyle } = cleanedSeries.itemStyle;
-      cleanedSeries.itemStyle = Object.keys(restItemStyle).length > 0 ? restItemStyle : undefined;
+      cleanedSeries.itemStyle =
+        Object.keys(restItemStyle).length > 0 ? restItemStyle : undefined;
     }
-    
+
     if (Array.isArray(cleanedSeries.data)) {
       cleanedSeries.data = cleanedSeries.data.map((dataItem: any) => {
         if (dataItem?.itemStyle?.color) {
           const { color, ...restItemStyle } = dataItem.itemStyle;
           return {
             ...dataItem,
-            itemStyle: Object.keys(restItemStyle).length > 0 ? restItemStyle : undefined,
+            itemStyle:
+              Object.keys(restItemStyle).length > 0 ? restItemStyle : undefined,
           };
         }
         return dataItem;
       });
     }
-    
+
     return cleanedSeries;
   });
 }
@@ -112,18 +117,20 @@ export function applyColorPalette(
   formData: Record<string, unknown>,
 ): EchartOptions {
   const colorPaletteOverrides = getColorPalette(formData);
-  
-  if (!colorPaletteOverrides.color || colorPaletteOverrides.color.length === 0) {
+
+  if (
+    !colorPaletteOverrides.color ||
+    colorPaletteOverrides.color.length === 0
+  ) {
     return options;
   }
-  
+
   const result = { ...options };
   result.color = colorPaletteOverrides.color;
-  
+
   if (Array.isArray(result.series)) {
     result.series = cleanSeriesColors(result.series);
   }
 
   return result;
 }
-

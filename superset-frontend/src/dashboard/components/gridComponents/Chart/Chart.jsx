@@ -39,9 +39,9 @@ import { URL_PARAMS } from 'src/constants';
 import { enforceSharedLabelsColorsArray } from 'src/utils/colorScheme';
 import exportPivotExcel from 'src/utils/downloadAsPivotExcel';
 
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import SliceHeader from '../../SliceHeader';
 import MissingChart from '../../MissingChart';
-import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { DefaultChartDataReliabilityOverlay } from './DefaultChartDataReliabilityOverlay';
 import {
   addDangerToast,

@@ -19,14 +19,17 @@
 import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
-import { getExtensionsRegistry, SupersetClient, t, useTheme } from '@superset-ui/core';
+import {
+  getExtensionsRegistry,
+  SupersetClient,
+  t,
+  useTheme,
+} from '@superset-ui/core';
 import {
   DashboardExtensionsContext,
   type DashboardExtensionsValue,
 } from 'src/dashboard/components/DashboardExtensionsContext';
-import {
-  DefaultDashboardCssInjector,
-} from 'src/dashboard/components/DashboardCssInjector';
+import { DefaultDashboardCssInjector } from 'src/dashboard/components/DashboardCssInjector';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
@@ -55,6 +58,7 @@ import DashboardContainer from 'src/dashboard/containers/Dashboard';
 import CrudThemeProvider from 'src/components/CrudThemeProvider';
 
 import { nanoid } from 'nanoid';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 import { RootState } from '../types';
 import {
   chartContextMenuStyles,
@@ -67,7 +71,6 @@ import SyncDashboardState, {
   getDashboardContextLocalStorage,
 } from '../components/SyncDashboardState';
 import OverwriteConfirm from '../components/OverwriteConfirm';
-import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 
 export const DashboardPageIdContext = createContext('');
 
@@ -216,7 +219,8 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
             const { json } = await SupersetClient.get({
               endpoint: `/api/v1/dashboard/${idOrSlug}/has_shared_charts`,
             });
-            const hasSharedCharts = (json as { result?: boolean })?.result === true;
+            const hasSharedCharts =
+              (json as { result?: boolean })?.result === true;
             dashboardToHydrate = {
               ...dashboard,
               metadata: {

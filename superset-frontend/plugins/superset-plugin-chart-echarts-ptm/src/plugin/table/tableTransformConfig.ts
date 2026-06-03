@@ -37,7 +37,7 @@ export const tablePillColumnsControl: ControlSetRow = [
       type: 'SelectControl',
       label: t('Pill Columns'),
       description: t(
-        'Select columns to style as colorful pills. Useful for categorical text values.'
+        'Select columns to style as colorful pills. Useful for categorical text values.',
       ),
       multi: true,
       freeForm: true,
@@ -48,27 +48,26 @@ export const tablePillColumnsControl: ControlSetRow = [
       },
       mapStateToProps: (explore: any, controlState: any, chart: any) => {
         const { colnames } = chart?.queriesResponse?.[0] ?? {};
-        
+
         if (colnames && colnames.length > 0) {
           const choices = colnames.map((col: string) => [col, col]);
           return { choices };
         }
-        
+
         const groupby = explore.controls?.groupby?.value || [];
         const metrics = explore.controls?.metrics?.value || [];
         const percentMetrics = explore.controls?.percent_metrics?.value || [];
-        
+
         const columnNames = [
           ...groupby.map((col: any) => col.column_name || col.label || col),
           ...metrics.map((m: any) => m.label || m),
           ...percentMetrics.map((m: any) => m.label || m),
         ].filter(Boolean);
-        
+
         const choices = columnNames.map((col: string) => [col, col]);
-        
+
         return { choices };
       },
     },
   },
 ];
-

@@ -60,12 +60,10 @@ jobs:
         with:
           requirements-type: base
 
-      - name: "Set up liccheck"
-        run: |
-          uv pip install --system liccheck
       - name: "Run liccheck"
         run: |
-          # run the checks
+          # setuptools 82+ no longer exposes pkg_resources, which liccheck still imports
+          python -m pip install --upgrade "setuptools>=65,<82" liccheck
           liccheck -R output.txt
           # Print the report
           cat output.txt

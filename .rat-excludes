@@ -84,3 +84,20 @@ CLAUDE.md
 CURSOR.md
 GEMINI.md
 GPT.md
+
+# Portal Telemedicina PTM extension (RAT matches basenames, not paths)
+portal-extension-hardening-plan.md
+extension-migration-diffs.patch
+ARCHITECTURE.md
+PATCH_INDEX.md
+REFACTOR_PLAN.md
+SMOKE_TESTS.md
+SYNC_GUIDE.md
+squash-ptm-commits.sh
+sync-upstream.sh
+validate-build.sh
+verify-touchpoints.sh
+PTM_DASHBOARD_CSS.md
+ptm-dashboard.css
+header-custom.css
+STYLING.md
