@@ -206,7 +206,7 @@ def _build_result(
 
 def compute_dashboard_freshness(dashboard: Dashboard) -> dict[str, Any]:
     cache_key = f"dashboard_freshness:{dashboard.id}"
-    if (cached := cache_manager.cache.get(cache_key)):
+    if cached := cache_manager.cache.get(cache_key):
         return cached
 
     skipped = {

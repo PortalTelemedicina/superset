@@ -86,12 +86,11 @@ class ImageRehostService:
 
         # Determine which backend to use
 
-        if (gcp_bucket := current_app.config.get("DASHBOARD_LOGO_GCP_BUCKET")):
+        if gcp_bucket := current_app.config.get("DASHBOARD_LOGO_GCP_BUCKET"):
             return ImageRehostService._upload_to_gcp(
                 file, filename, subfolder, gcp_bucket
             )
-        else:
-            return ImageRehostService._upload_to_local(file, filename, subfolder)
+        return ImageRehostService._upload_to_local(file, filename, subfolder)
 
     @staticmethod
     def _upload_to_gcp(
@@ -108,7 +107,7 @@ class ImageRehostService:
 
         # Initialize GCP client
 
-        if (credentials_path := os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")):
+        if credentials_path := os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
             client = storage.Client.from_service_account_json(credentials_path)
         else:
             client = storage.Client()  # fallback para ADC
