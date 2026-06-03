@@ -62,9 +62,8 @@ jobs:
 
       - name: "Set up liccheck"
         run: |
-          uv pip install --system "setuptools>=65"
+          python -m pip install --upgrade "setuptools>=65"
           uv pip install --system liccheck
-          python -c "import pkg_resources"
       - name: "Run liccheck"
         run: |
           # run the checks
