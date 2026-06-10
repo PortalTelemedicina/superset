@@ -27,6 +27,26 @@ class MachineAuthProviderTests(SupersetTestCase):
         auth_cookies = machine_auth_provider_factory.instance.get_auth_cookies(user)
         assert auth_cookies["session"] is not None
 
+    @patch("superset.utils.machine_auth.generate_csrf")
+    def test_get_auth_cookies_initializes_csrf_when_enabled(
+        self, mock_generate_csrf
+    ):
+        user = self.get_user("admin")
+        with self.app.app_context():
+            self.app.config["WTF_CSRF_ENABLED"] = True
+            auth_cookies = machine_auth_provider_factory.instance.get_auth_cookies(user)
+            mock_generate_csrf.assert_called_once()
+            assert auth_cookies["session"] is not None
+
+    @patch("superset.utils.machine_auth.generate_csrf")
+    def test_get_auth_cookies_skips_csrf_when_disabled(self, mock_generate_csrf):
+        user = self.get_user("admin")
+        with self.app.app_context():
+            self.app.config["WTF_CSRF_ENABLED"] = False
+            auth_cookies = machine_auth_provider_factory.instance.get_auth_cookies(user)
+            mock_generate_csrf.assert_not_called()
+            assert auth_cookies["session"] is not None
+
     @patch("superset.utils.machine_auth.MachineAuthProvider.get_auth_cookies")
     def test_auth_driver_user(self, get_auth_cookies):
         user = self.get_user("admin")

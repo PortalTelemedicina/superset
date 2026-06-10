@@ -65,6 +65,7 @@ import ActionButtons from './ActionButtons';
 import Horizontal from './Horizontal';
 import Vertical from './Vertical';
 import { useSelectFiltersInScope } from '../state';
+import { DashboardStandaloneMode } from 'src/dashboard/util/constants';
 
 // FilterBar is just being hidden as it must still
 // render fully due to encapsulated logics
@@ -170,6 +171,10 @@ const FilterBar: FC<FiltersBarProps> = ({
     UserWithPermissionsAndRoles
   >(state => state.user);
 
+  const isReportMode =
+    Number(getUrlParam(URL_PARAMS.standalone)) ===
+    DashboardStandaloneMode.Report;
+
   const [filtersInScope] = useSelectFiltersInScope(nativeFilterValues);
   const [clearAllTriggers, setClearAllTriggers] = useState<
     Record<string, boolean>
@@ -269,12 +274,13 @@ const FilterBar: FC<FiltersBarProps> = ({
   }, [dataMaskAppliedText, setDataMaskSelected]);
 
   useEffect(() => {
-    // embedded users can't persist filter combinations
-    if (user?.userId) {
+    // Skip persisting filter state in report mode (standalone=3); reports do
+    // not need native_filters_key URL updates.
+    if (user?.userId && !isReportMode) {
       publishDataMask(history, dashboardId, updateKey, dataMaskApplied, tabId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
+  }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId, isReportMode]);
 
   const handleApply = useCallback(() => {
     dispatch(logEvent(LOG_ACTIONS_CHANGE_DASHBOARD_FILTER, {}));
