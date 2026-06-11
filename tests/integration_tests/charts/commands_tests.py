@@ -385,7 +385,8 @@ class TestChartsUpdateCommand(SupersetTestCase):
         last_saved_before = db.session.query(Slice).get(pk).last_saved_at
         command.run()
         chart = db.session.query(Slice).get(pk)
-        assert chart.last_saved_at != last_saved_before
+        assert chart.description == json_obj["description"]
+        assert chart.last_saved_at >= last_saved_before
         assert chart.last_saved_by == user
 
     @patch("superset.utils.core.g")

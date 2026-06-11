@@ -145,6 +145,12 @@ fetchMock.get('glob:*/api/v1/dashboard/26', {
   },
 });
 
+fetchMock.get('glob:*/api/v1/dashboard/26/has_shared_charts', {
+  body: {
+    result: false,
+  },
+});
+
 const createProps = () => ({
   certified_by: 'John Doe',
   certification_details: 'Sample certification',
@@ -325,6 +331,7 @@ describe('PropertiesModal', () => {
         id: 26,
         jsonMetadata: expect.anything(),
         owners: [],
+        persisted: true,
         slug: '',
         title: 'COVID Vaccine Dashboard',
       });

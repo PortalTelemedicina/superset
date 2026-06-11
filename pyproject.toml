@@ -426,12 +426,10 @@ polyline = "2"
 # Apache 2.0 https://github.com/hkwi/python-geohash
 python-geohash = "0"
 # Apache 2.0 https://github.com/googleapis/python-crc32c/blob/main/LICENSE
-google-crc32c = "1"
-# --------------------------------------------------------------
-
 # google-cloud-storage stack (uv-pip-compile)
 google-crc32c = "1"  # Apache 2.0; liccheck reports UNKNOWN
 protobuf = "7"  # 3-Clause BSD (google-cloud-storage transitive)
+# --------------------------------------------------------------
 
 # TODO REMOVE THESE DEPS FROM CODEBASE
 paramiko = "3"  # GPL
