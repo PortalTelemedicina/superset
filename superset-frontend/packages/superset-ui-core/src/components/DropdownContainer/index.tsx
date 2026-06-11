@@ -18,4 +18,8 @@
  */
 
 export { DropdownContainer } from './DropdownContainer';
-export type * from './types';
+export type {
+  DropdownContainerProps,
+  DropdownItem,
+  DropdownRef,
+} from './types';

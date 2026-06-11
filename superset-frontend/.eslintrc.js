@@ -300,6 +300,64 @@ module.exports = {
         ],
       },
     },
+    // Portal PTM chart plugin: peer-style imports from workspace packages; palette hex literals;
+    // deep @superset-ui paths; lucide-react namespace import.
+    {
+      files: [
+        'plugins/superset-plugin-chart-echarts-ptm/**/*.ts',
+        'plugins/superset-plugin-chart-echarts-ptm/**/*.tsx',
+      ],
+      rules: {
+        'import/no-extraneous-dependencies': 'off',
+        'import/no-unresolved': 'off',
+        'import/no-self-import': 'off',
+        'theme-colors/no-literal-colors': 'off',
+        'lodash/import-scope': 'off',
+        'no-plusplus': 'off',
+        'no-restricted-globals': 'off',
+        'no-param-reassign': [
+          'error',
+          { props: true, ignorePropertyModificationsFor: ['refs'] },
+        ],
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector:
+              "ImportDeclaration[source.value='react'] :matches(ImportDefaultSpecifier, ImportNamespaceSpecifier)",
+            message:
+              'Default React import is not required due to automatic JSX runtime in React 16.4',
+          },
+          {
+            selector:
+              'ImportNamespaceSpecifier[parent.source.value!=/^(\\.|src|lucide-react)/]',
+            message: 'Wildcard imports are not allowed',
+          },
+        ],
+      },
+    },
+    // Portal PTM app extensions (header builder, etc.)
+    {
+      files: ['src/ptm/**/*.ts', 'src/ptm/**/*.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': 'off',
+        'no-restricted-imports': 'off',
+        'theme-colors/no-literal-colors': 'off',
+        'i18n-strings/sentence-case-buttons': 'off',
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'enum',
+            format: ['PascalCase'],
+          },
+          {
+            selector: 'enumMember',
+            format: ['PascalCase', 'UPPER_CASE'],
+          },
+        ],
+        'default-case': 'off',
+        'no-case-declarations': 'off',
+      },
+    },
     {
       files: ['src/components/**', 'src/theme/**'],
       rules: {

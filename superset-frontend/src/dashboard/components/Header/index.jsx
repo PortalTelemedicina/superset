@@ -544,7 +544,9 @@ const Header = () => {
         roles: updates.roles,
         tags: updates.tags,
       });
-      boundActionCreators.setUnsavedChanges(true);
+      if (updates.persisted !== true) {
+        boundActionCreators.setUnsavedChanges(true);
+      }
 
       if (updates.title && dashboardTitle !== updates.title) {
         boundActionCreators.updateDashboardTitle(updates.title);

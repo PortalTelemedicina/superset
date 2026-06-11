@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { styled } from '@superset-ui/core';
 import { Badge, Divider } from 'antd';
 import moment from 'moment';
@@ -100,7 +100,7 @@ interface SlotRendererProps {
   dashboardId?: number;
 }
 
-export const SlotRenderer: React.FC<SlotRendererProps> = ({
+export const SlotRenderer: FC<SlotRendererProps> = ({
   slot,
   dashboardTitle,
   onTitleChange,

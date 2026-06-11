@@ -63,7 +63,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import { isEmpty } from 'lodash';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
+import { getThemeTokens } from '../../shared/themeTokens';
 import {
   ColorSchemeEnum,
   DataColumnMeta,

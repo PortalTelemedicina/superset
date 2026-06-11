@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Image rehosting service.
+"""Image rehosting service.
 
 Provides a clean interface for uploading images to different storage backends
 (GCP Cloud Storage, local filesystem, etc.) with automatic backend selection.
@@ -62,8 +60,8 @@ class ImageRehostService:
 
         Args:
             file: The file to upload (file uploads only, no URLs)
-            filename: Optional custom filename (UUID-based if omitted)
-            subfolder: Optional subfolder (defaults to config uploads root)
+            filename: Optional custom filename (UUID-based name if omitted)
+            subfolder: Optional subfolder (defaults to config or uploads root)
 
         Returns:
             Tuple of (public_url, storage_path)
@@ -90,7 +88,8 @@ class ImageRehostService:
             return ImageRehostService._upload_to_gcp(
                 file, filename, subfolder, gcp_bucket
             )
-        return ImageRehostService._upload_to_local(file, filename, subfolder)
+        else:
+            return ImageRehostService._upload_to_local(file, filename, subfolder)
 
     @staticmethod
     def _upload_to_gcp(

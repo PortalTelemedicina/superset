@@ -111,7 +111,15 @@ export function startOfMonthUtc(ms: number): number {
 
 export function endOfMonthUtc(ms: number): number {
   const date = new Date(ms);
-  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999);
+  return Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
 }
 
 function startOfYearUtc(ms: number): number {
@@ -180,13 +188,8 @@ export function resolveSparseBarLayoutEnabled(
   );
 }
 
-function getMaxRight(
-  maxTs: number,
-  periodEnd: number,
-  nowMs: number,
-): number {
-  const isCurrentMonth =
-    startOfMonthUtc(maxTs) === startOfMonthUtc(nowMs);
+function getMaxRight(maxTs: number, periodEnd: number, nowMs: number): number {
+  const isCurrentMonth = startOfMonthUtc(maxTs) === startOfMonthUtc(nowMs);
   if (!isCurrentMonth) {
     return periodEnd;
   }
@@ -245,7 +248,9 @@ function withVirtualPaddingAxisLabels(
   periodStart: number,
 ): AxisConfig {
   const axisLabel = (timeAxis.axisLabel as Record<string, unknown>) || {};
-  const existingFormatter = axisLabel.formatter as AxisLabelFormatter | undefined;
+  const existingFormatter = axisLabel.formatter as
+    | AxisLabelFormatter
+    | undefined;
 
   return {
     ...timeAxis,
@@ -279,7 +284,9 @@ function isDailyGrain(formData: Record<string, unknown>): boolean {
   return grain === 'P1D';
 }
 
-function applyBarSizing(series: Record<string, unknown>[]): Record<string, unknown>[] {
+function applyBarSizing(
+  series: Record<string, unknown>[],
+): Record<string, unknown>[] {
   return series.map(entry =>
     entry.type === 'bar'
       ? {
@@ -354,10 +361,12 @@ export function applySparseTimeBarLayout(
     return options;
   }
 
-  const orientation = formData.orientation;
+  const { orientation } = formData;
   const isHorizontal = orientation === 'horizontal';
   const timeAxisKey = isHorizontal ? 'yAxis' : 'xAxis';
-  const timeAxis = getAxisConfig(options[timeAxisKey] as AxisConfig | AxisConfig[]);
+  const timeAxis = getAxisConfig(
+    options[timeAxisKey] as AxisConfig | AxisConfig[],
+  );
 
   if (!timeAxis || timeAxis.type !== 'time') {
     return options;
@@ -382,8 +391,9 @@ export function applySparseTimeBarLayout(
 
   const minTs = Math.min(...timestamps);
   const maxTs = Math.max(...timestamps);
-  const timeGrainSqla = (formData.timeGrainSqla ??
-    formData.time_grain_sqla) as string | undefined;
+  const timeGrainSqla = (formData.timeGrainSqla ?? formData.time_grain_sqla) as
+    | string
+    | undefined;
   const { periodStart, periodEnd } = getCalendarPeriodBounds(
     minTs,
     maxTs,

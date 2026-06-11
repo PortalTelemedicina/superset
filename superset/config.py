@@ -618,8 +618,6 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     # Enable support for date range timeshifts (e.g., "2015-01-03 : 2015-01-04")
     # in addition to relative timeshifts (e.g., "1 day ago")
     "DATE_RANGE_TIMESHIFTS_ENABLED": False,
-    # Enable self-service password reset via email for DB/LDAP auth
-    "ENABLE_FORGOT_PASSWORD": False,
 }
 
 # ------------------------------
@@ -899,9 +897,8 @@ DASHBOARD_LOGO_GCP_BUCKET = os.environ.get("DASHBOARD_LOGO_GCP_BUCKET", None)
 # If empty string or not set, images are stored directly in uploads root
 # If set (e.g., "dashboard_logos"), images are stored in uploads/dashboard_logos/
 # Applies to both GCP bucket and local filesystem storage
-# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # Store in uploads root
-# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"
-# Store in uploads/dashboard_logos/
+# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # uploads root
+# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"  # uploads/dashboard_logos/
 DASHBOARD_LOGO_SUBFOLDER = ""
 
 # ---------------------------------------------------
@@ -1386,15 +1383,6 @@ SMTP_MAIL_FROM = "superset@superset.com"
 # If True creates a default SSL context with ssl.Purpose.CLIENT_AUTH using the
 # default system root CA certificates.
 SMTP_SSL_SERVER_AUTH = False
-
-# Forgot password configuration
-# Token expiration time in seconds (default: 1 hour)
-FORGOT_PASSWORD_TOKEN_EXPIRATION = 3600
-# Secret salt for token generation (must be unique per deployment)
-FORGOT_PASSWORD_TOKEN_SALT = "forgot-password-salt"  # noqa: S105
-# Base URL for reset links in emails. If None, auto-detected from request
-FORGOT_PASSWORD_BASE_URL: str | None = None
-
 ENABLE_CHUNK_ENCODING = False
 
 # Whether to bump the logging level to ERROR on the flask_appbuilder package

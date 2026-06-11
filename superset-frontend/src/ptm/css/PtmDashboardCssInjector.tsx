@@ -21,17 +21,8 @@ import { useEffect, useRef } from 'react';
 import type { DashboardCssInjectorProps } from 'src/dashboard/components/DashboardExtensionsContext';
 import injectCustomCss from 'src/dashboard/util/injectCustomCss';
 
-const PTM_TAG_NAME = 'PTM';
 const PTM_CSS_URL = '/static/assets/stylesheets/ptm-dashboard.css';
 const PTM_LINK_ID = 'ptm-dashboard-css-link';
-
-function isPtmDashboardFromTags(
-  dashboard: DashboardCssInjectorProps['dashboard'],
-): boolean {
-  const tags = dashboard?.tags;
-  if (!Array.isArray(tags)) return false;
-  return tags.some(t => String(t?.name || '').toUpperCase() === PTM_TAG_NAME);
-}
 
 /**
  * Ensures PTM CSS link is loaded synchronously in the document head.
@@ -61,7 +52,7 @@ function ensurePtmCssLink(): () => void {
 
 /**
  * PTM dashboard CSS injector: loads ptm-dashboard.css synchronously via <link>
- * when the dashboard has the PTM tag, then injects the dashboard custom CSS.
+ * when ptm_autoconvert is enabled, then injects the dashboard custom CSS.
  */
 export default function PtmDashboardCssInjector({
   dashboardCss,
@@ -78,19 +69,17 @@ export default function PtmDashboardCssInjector({
     const sameDashboard = dashboardId === lastDashboardIdRef.current;
     const rawDashboardCss =
       typeof dashboardCss === 'string' ? dashboardCss : '';
-    const enablePtmTheme = isPtmDashboardFromTags(dashboard);
+    const enablePtmTheme = dashboard?.metadata?.ptm_autoconvert === true;
 
     if (enablePtmTheme) {
       // Ensure PTM CSS link is loaded synchronously
       if (!removeLinkRef.current) {
         removeLinkRef.current = ensurePtmCssLink();
       }
-    } else {
+    } else if (removeLinkRef.current) {
       // Remove PTM CSS link if dashboard doesn't have PTM tag
-      if (removeLinkRef.current) {
-        removeLinkRef.current();
-        removeLinkRef.current = null;
-      }
+      removeLinkRef.current();
+      removeLinkRef.current = null;
     }
 
     // Inject dashboard custom CSS (without @import, PTM CSS is already loaded via link)
@@ -102,12 +91,10 @@ export default function PtmDashboardCssInjector({
         removeStyleRef.current = injectCustomCss(finalCss);
         lastCssRef.current = finalCss;
       }
-    } else {
-      if (!sameDashboard) {
-        removeStyleRef.current?.();
-        removeStyleRef.current = null;
-        lastCssRef.current = '';
-      }
+    } else if (!sameDashboard) {
+      removeStyleRef.current?.();
+      removeStyleRef.current = null;
+      lastCssRef.current = '';
     }
 
     lastDashboardIdRef.current = dashboardId;

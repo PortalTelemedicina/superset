@@ -475,8 +475,8 @@ describe('ThemeController', () => {
 
       jest.clearAllMocks();
 
-      // Try to change to the same mode (DEFAULT)
-      controller.setThemeMode(ThemeMode.SYSTEM);
+      const currentMode = controller.getCurrentMode();
+      controller.setThemeMode(currentMode);
 
       // Should not call setItem since mode didn't change
       expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
@@ -650,7 +650,7 @@ describe('ThemeController', () => {
     });
 
     it('should handle theme without algorithm property', () => {
-      // Clear the call from controller initialization
+      controller.setThemeMode(ThemeMode.DARK);
       jest.clearAllMocks();
 
       controller.setThemeMode(ThemeMode.DEFAULT);

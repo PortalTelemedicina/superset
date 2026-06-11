@@ -18,7 +18,7 @@
  */
 import { useEffect, createRef } from 'react';
 import { styled } from '@superset-ui/core';
-import { getThemeTokens } from 'src/ptm/shared/themeTokens';
+import { getThemeTokens } from './shared/themeTokens';
 import {
   SupersetPluginChartEchartsPtmProps,
   SupersetPluginChartEchartsPtmStylesProps,

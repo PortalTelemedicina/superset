@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal dashboard header API endpoints.
+"""Portal dashboard header API endpoints.
 
 Isolated endpoint logic for dashboard header customization.
 This allows the logic to be separated from core API while still

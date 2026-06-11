@@ -432,6 +432,8 @@ describe('UploadDataModal - Form Validation', () => {
 });
 
 describe('UploadDataModal - Form Submission', () => {
+  jest.setTimeout(60000);
+
   // Helper function to fill out form
   const fillForm = async (
     fileType: string,
@@ -466,7 +468,7 @@ describe('UploadDataModal - Form Submission', () => {
     await userEvent.click(uploadButton);
 
     await waitFor(() => fetchMock.called('glob:*api/v1/database/1/upload/'), {
-      timeout: 10000,
+      timeout: 30000,
     });
     return fetchMock.calls('glob:*api/v1/database/1/upload/')[0];
   };

@@ -15,8 +15,9 @@
   "include": [
     "src/**/*",
     "types/**/*",
-    "../../types/**/*",
-    "../plugin-chart-table/src/**/*"
+    "../plugin-chart-table/src/**/*",
+    "../plugin-chart-table/types/**/*",
+    "../plugin-chart-pivot-table/src/**/*"
   ],
   "references": [
     {
@@ -24,6 +25,12 @@
     },
     {
       "path": "../../packages/superset-ui-core"
+    },
+    {
+      "path": "../plugin-chart-table"
+    },
+    {
+      "path": "../plugin-chart-pivot-table"
     }
   ]
 }

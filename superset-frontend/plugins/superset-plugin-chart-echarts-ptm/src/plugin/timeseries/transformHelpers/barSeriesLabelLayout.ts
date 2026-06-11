@@ -21,7 +21,7 @@
 export function applyBarSeriesLabelLayout(
   options: Record<string, unknown>,
 ): Record<string, unknown> {
-  const series = options.series;
+  const { series } = options;
   if (!Array.isArray(series)) {
     return options;
   }

@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
+
 # Superset Plugin Chart ECharts PTM
 
 **Portal Telemedicina Custom Chart Plugin System for Apache Superset**
@@ -434,6 +435,6 @@ Licensed under the Apache License, Version 2.0. See LICENSE for details.
 
 ---
 
-**Maintained by**: Portal Telemedicina Development Team
-**Version**: 1.0
+**Maintained by**: Portal Telemedicina Development Team  
+**Version**: 1.0  
 **Last Updated**: December 2024

@@ -85,9 +85,10 @@ CURSOR.md
 GEMINI.md
 GPT.md
 
+# Local migration / diff artifacts (not source files)
+extension-migration-diffs.patch
 # Portal Telemedicina PTM extension (RAT matches basenames, not paths)
 portal-extension-hardening-plan.md
-extension-migration-diffs.patch
 ARCHITECTURE.md
 PATCH_INDEX.md
 REFACTOR_PLAN.md

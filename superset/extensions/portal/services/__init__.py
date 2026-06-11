@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal extension services.
+"""Portal extension services.
 
 Services provide reusable business logic that can be used
 across different parts of the portal extension.

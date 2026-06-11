@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal-specific extensions to dashboard metadata schema.
+"""Portal-specific extensions to dashboard metadata schema.
 
 This module provides extension fields that can be merged into
 the base dashboard metadata schema without modifying core code.
@@ -186,7 +184,7 @@ class PortalDashboardMetadataExtension:
         }
 
     @classmethod
-    def merge_into_base_schema(cls, base_schema_class: type) -> None:
+    def merge_into_base_schema(cls, base_schema_class: type[Schema]) -> None:
         """
         Dynamically merges extension fields into the base schema class.
 
@@ -211,7 +209,7 @@ class PortalDashboardMetadataExtension:
                     not hasattr(base_schema_class, "_declared_fields")
                     or getattr(base_schema_class, "_declared_fields", None) is None
                 ):
-                    base_schema_class._declared_fields = {}  # type: ignore[attr-defined]
-                cast(dict[str, Any], base_schema_class._declared_fields)[  # type: ignore[attr-defined]
-                    field_name
-                ] = field_instance
+                    base_schema_class._declared_fields = {}
+                cast(dict[str, Any], base_schema_class._declared_fields)[field_name] = (
+                    field_instance
+                )

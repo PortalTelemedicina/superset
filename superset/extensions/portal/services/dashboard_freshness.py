@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal dashboard freshness service.
+"""Portal dashboard freshness service.
 
 Computes dashboard data freshness based on physical tables used
 by charts in the dashboard. Currently supports BigQuery only.
@@ -117,6 +115,7 @@ def _query_bigquery_metadata(
     if not escaped_table_ids:
         return []
 
+    # Table IDs are single-quoted literals from _escape_table_id (not user SQL).
     query = (
         "SELECT table_id, last_modified_time, type "
         f"FROM `{catalog}.{schema}.__TABLES__` "

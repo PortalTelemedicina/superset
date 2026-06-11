@@ -127,7 +127,8 @@ export const timeseriesSparseBarLayoutControl: ControlSetRow = [
       ),
       default: false,
       renderTrigger: true,
-      visibility: ({ controls }: any) => controls?.ptm_series_type?.value === 'bar',
+      visibility: ({ controls }: any) =>
+        controls?.ptm_series_type?.value === 'bar',
     },
   },
 ];

@@ -65,6 +65,7 @@ from superset.superset_typing import FlaskResponse
 from superset.themes.utils import (
     is_valid_theme,
 )
+from superset.translations.utils import get_language_pack
 from superset.utils import core as utils, json
 from superset.utils.filters import get_dataset_access_filters
 from superset.views.error_handling import json_error_response
@@ -433,6 +434,7 @@ def cached_common_bootstrap_data(  # pylint: disable=unused-argument
         "static_assets_prefix": app.config["STATIC_ASSETS_PREFIX"],
         "conf": frontend_config,
         "locale": language,
+        "language_pack": get_language_pack(language) or {},
         "d3_format": app.config.get("D3_FORMAT"),
         "d3_time_format": app.config.get("D3_TIME_FORMAT"),
         "currencies": app.config.get("CURRENCIES"),

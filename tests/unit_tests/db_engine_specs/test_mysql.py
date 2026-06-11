@@ -255,6 +255,10 @@ def test_column_type_mutator(
     description: list[Any],
     expected_result: list[tuple[Any, ...]],
 ):
+    pytest.importorskip(
+        "MySQLdb",
+        reason="mysqlclient (MySQLdb) is optional; install to run MySQL engine tests",
+    )
     from superset.db_engine_specs.mysql import MySQLEngineSpec as spec  # noqa: N813
 
     mock_cursor = Mock()

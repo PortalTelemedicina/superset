@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal extensions for Superset.
+"""Portal extensions for Superset.
 
 This package contains all portal-specific extensions that can be
 loaded without modifying Superset core code.

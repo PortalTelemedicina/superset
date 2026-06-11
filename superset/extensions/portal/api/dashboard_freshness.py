@@ -14,9 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-"""
-Portal dashboard freshness API handler.
+"""Portal dashboard freshness API handler.
 
 Isolated endpoint logic for dashboard freshness metadata.
 """

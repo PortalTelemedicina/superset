@@ -61,6 +61,5 @@ const PtmTimeseriesChartPlugin = createPtmPlugin({
 });
 
 export default PtmTimeseriesChartPlugin;
-
-export { default as PtmEchartsTimeseriesPlugin } from './index';
-export { default as EchartsTimeseriesPtmChartPlugin } from './index';
+export { PtmTimeseriesChartPlugin as PtmEchartsTimeseriesPlugin };
+export { PtmTimeseriesChartPlugin as EchartsTimeseriesPtmChartPlugin };
