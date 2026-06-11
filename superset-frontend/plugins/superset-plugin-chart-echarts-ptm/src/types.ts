@@ -47,6 +47,9 @@ interface PtmZoomControls {
   ptm_zoom_size: PtmZoomSize;
   ptm_zoom_inset: string;
   ptm_series_type?: 'auto' | 'line' | 'bar' | 'smooth' | 'step';
+  ptm_sparse_bar_layout?: boolean;
+  /** @deprecated use ptm_sparse_bar_layout */
+  ptm_sparse_bar_alignment?: 'default' | 'sparse' | 'center' | 'left' | 'right';
   ptm_options_json?: string;
 }
 

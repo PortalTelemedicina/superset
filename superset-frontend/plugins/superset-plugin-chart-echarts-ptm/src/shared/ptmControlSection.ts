@@ -126,9 +126,9 @@ export const ptmJsonOverrideControl: ControlSetRow = [
       type: 'TextAreaControl',
       label: t('PTM ECharts JSON Overrides'),
       description: t(
-        'Advanced: JSON object to deep-merge into final ECharts options. ' +
+        'Advanced: JSON object to deep-merge into final ECharts options (applied before sparse bar layout). ' +
           'Allows fine-grained control over any ECharts property. ' +
-          'Example: {"series": [{"itemStyle": {"borderRadius": 4}}]}',
+          'Prefer "Compact sparse daily bars" for early-month daily bars instead of manual xAxis min/max.',
       ),
       default: '',
       language: 'json',

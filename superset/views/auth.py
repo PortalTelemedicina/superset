@@ -89,3 +89,21 @@ class SupersetRegisterUserView(BaseSupersetView):
                     "last_name": reg.last_name,
                 },
             )
+
+
+class SupersetForgotPasswordView(BaseSupersetView):
+    route_base = "/forgot-password"
+
+    @expose("/")
+    @no_cache
+    def forgot_password(self) -> WerkzeugResponse:
+        return super().render_app_template()
+
+
+class SupersetResetPasswordView(BaseSupersetView):
+    route_base = "/reset-password"
+
+    @expose("/")
+    @no_cache
+    def reset_password(self) -> WerkzeugResponse:
+        return super().render_app_template()

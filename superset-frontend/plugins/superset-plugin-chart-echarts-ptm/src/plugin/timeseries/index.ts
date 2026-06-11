@@ -27,6 +27,7 @@ import {
   timeseriesSeriesTypeControl,
   timeseriesBarRadiusControlRow1,
   timeseriesBarRadiusControlRow2,
+  timeseriesSparseBarLayoutControl,
   timeseriesZoomControl,
 } from './timeseriesTransformConfig';
 import { timeseriesPluginTransform } from './timeseriesPluginTransform';
@@ -53,6 +54,7 @@ const PtmTimeseriesChartPlugin = createPtmPlugin({
     timeseriesSeriesTypeControl,
     timeseriesBarRadiusControlRow1,
     timeseriesBarRadiusControlRow2,
+    timeseriesSparseBarLayoutControl,
     timeseriesZoomControl,
     ptmTextCasingControls,
   ],

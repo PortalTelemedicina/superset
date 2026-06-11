@@ -22,6 +22,8 @@
  * Used by charts with series (timeseries, bar, etc.)
  */
 
+import { PTM_BAR_MAX_WIDTH } from './sparseTimeBarLayout';
+
 export type PtmSeriesType = 'auto' | 'line' | 'bar' | 'smooth' | 'step';
 
 export type PtmBarBorderRadiusOptions = {
@@ -221,7 +223,7 @@ export function applySeriesTypeOverride(
     if (ptmSeriesType === 'bar') {
       delete next.smooth;
       delete next.step;
-      next.barMaxWidth = 48;
+      next.barMaxWidth = PTM_BAR_MAX_WIDTH;
     }
 
     return next;

@@ -497,7 +497,26 @@ export default typedMemo(function DataTable<D extends object>({
           ) : null}
         </div>
       ) : null}
-      {wrapStickyTable ? wrapStickyTable(renderTable) : renderTable()}
+      {wrapStickyTable ? (
+        wrapStickyTable(renderTable)
+      ) : (
+        <div
+          className="ptm-dt-scroll"
+          style={{
+            maxHeight:
+              typeof initialHeight === 'number'
+                ? Math.max(
+                    0,
+                    initialHeight -
+                      (globalControlRef.current?.clientHeight || 0) -
+                      (paginationRef.current?.clientHeight || 0),
+                  )
+                : undefined,
+          }}
+        >
+          {renderTable()}
+        </div>
+      )}
       {hasPagination
         ? (() => {
             const total = resultsSize;

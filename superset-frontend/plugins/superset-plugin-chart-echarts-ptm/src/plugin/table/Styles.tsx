@@ -18,7 +18,7 @@
  */
 
 import { css, styled } from '@superset-ui/core';
-import { getThemeTokens } from '../../shared/themeTokens';
+import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 
 export default styled.div`
   ${({ theme }) => {
@@ -42,24 +42,33 @@ export default styled.div`
         max-width: none !important;
       }
 
-      /* Sticky table: add side padding and avoid forcing full width */
-      & div[role='table'] > div[role='presentation'] {
-        width: auto !important;
-        max-width: 100% !important;
+      /* Scroll wrapper added by PtmDataTable when sticky=false.
+       Provides the scroll context for the position: sticky thead. */
+      .ptm-dt-scroll {
+        overflow: auto !important;
+        width: 100% !important;
         padding: 0 16px !important;
         box-sizing: border-box !important;
       }
 
       /* ========================================
        TABLE BASE STYLES
-       ======================================== */
+       Auto layout + width:100% means columns share the container width and
+       each column gets at least its min-content, which equals the unwrapped
+       header title (because of min-width:max-content on the title div).
+       Body cells use overflow-wrap:anywhere + word-break:break-word so their
+       min-content is ~1 character; this prevents long unbroken text in cells
+       from inflating the column past the title width. The whole row stays
+       inside the container; only when the sum of titles exceeds the
+       container does horizontal scroll kick in (handled by .ptm-dt-scroll). */
       table.table {
-        width: auto !important;
-        max-width: 100% !important;
+        width: 100% !important;
+        max-width: none !important;
         margin: 0 !important;
         border-collapse: collapse !important;
         border-spacing: 0 !important;
         background: #ffffff !important;
+        table-layout: auto !important;
       }
 
       /* ========================================
@@ -68,7 +77,9 @@ export default styled.div`
       table.table > thead > tr > th,
       table.table thead th {
         padding: 12px 16px !important;
-        background: transparent !important;
+        /* Solid background so rows do NOT show through when the header is
+         pinned via position: sticky during scroll. */
+        background: #ffffff !important;
         font-weight: 600 !important;
         font-size: 12px !important;
         color: #6b7280 !important;
@@ -76,8 +87,37 @@ export default styled.div`
         letter-spacing: 0.05em !important;
         border: none !important;
         border-bottom: 1px solid #e5e7eb !important;
-        text-align: left !important;
-        white-space: nowrap !important;
+        text-align: left;
+        /* Sticky header: reimplements what useSticky used to do, but lets the
+         table keep table-layout: auto so column widths are driven by the
+         header text (see comments in PtmTableChart.tsx and on table.table). */
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 2 !important;
+      }
+
+      table.table thead th > div[data-column-name] {
+        width: 100% !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+      }
+
+      /* Default minimum width = header's natural (unwrapped) text width.
+     This rule only applies when there is NO columnWidth configured for the
+     column, because in that case the data-column-name div is the th's first
+     (and only) child. When the user sets columnWidth in "Customize columns",
+     PtmTableChart renders a width-hint div BEFORE the data-column-name div,
+     so this :first-child selector no longer matches and the user-configured
+     columnWidth wins - the title wraps to fit and the whole column follows. */
+      table.table thead th > div[data-column-name]:first-child {
+        min-width: max-content !important;
+      }
+
+      table.table thead th span[data-column-name] {
+        min-width: 0 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
       }
 
       /* Sort icons - subtle */
@@ -100,7 +140,10 @@ export default styled.div`
 
       /* ========================================
        BODY / DATA CELLS - Clean
-       ======================================== */
+       Use overflow-wrap: anywhere + word-break: break-word so the cell's
+       MIN content width is ~1 character. This is what lets the column lower
+       bound come from the header (min-width:max-content on the title) instead
+       of from the longest word in the data. */
       table.table > tbody > tr > td,
       table.table tbody td {
         padding: 8px 16px !important;
@@ -114,6 +157,8 @@ export default styled.div`
         vertical-align: middle !important;
         white-space: normal !important;
         word-wrap: break-word !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
       }
 
       /* Row styling - NO alternating colors */
@@ -488,6 +533,13 @@ export default styled.div`
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
+        /* Block-level so it fills the column width set by the colgroup,
+         and inline-size containment so the nowrap content does NOT
+         propagate its natural width back to the column sizer.
+         This makes truncate-enabled cells default to the header's
+         natural width instead of expanding the column to fit the value. */
+        display: block !important;
+        contain: inline-size !important;
       }
 
       .dt-truncate-cell:hover {

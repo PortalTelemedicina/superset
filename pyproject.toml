@@ -342,7 +342,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "superset/extensions/__init__.py" = ["TID251"]
 "superset/utils/json.py" = ["TID251"]
 # Marshmallow fields use frontend JSON camelCase names
-"superset/extensions/portal/schemas/dashboard_metadata.py" = ["N815"]
+"superset/extensions/portal/schemas/*.py" = ["N815"]
 # BigQuery __TABLES__ metadata query uses escaped table_id literals (not user SQL)
 "superset/extensions/portal/services/dashboard_freshness.py" = ["S608"]
 
@@ -403,6 +403,7 @@ authorized_licenses = [
     "bsd",
     "3-clause bsd",
     "bsd-3-clause",
+    "3-clause bsd",
     "isc license (iscl)",
     "isc license",
     "mit",
@@ -427,6 +428,10 @@ python-geohash = "0"
 # Apache 2.0 https://github.com/googleapis/python-crc32c/blob/main/LICENSE
 google-crc32c = "1"
 # --------------------------------------------------------------
+
+# google-cloud-storage stack (uv-pip-compile)
+google-crc32c = "1"  # Apache 2.0; liccheck reports UNKNOWN
+protobuf = "7"  # 3-Clause BSD (google-cloud-storage transitive)
 
 # TODO REMOVE THESE DEPS FROM CODEBASE
 paramiko = "3"  # GPL

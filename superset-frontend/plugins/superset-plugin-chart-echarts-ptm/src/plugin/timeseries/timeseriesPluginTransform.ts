@@ -27,6 +27,7 @@ import {
   type PtmSeriesType,
 } from './transformHelpers/seriesTypeOverride';
 import { getThemeDataZoom } from './transformHelpers/dataZoom';
+import { shouldDeferDailyBarZoom } from './transformHelpers/sparseTimeBarLayout';
 import TIMESERIES_PTM_DEFAULTS from './defaults';
 
 interface EchartOptions {
@@ -72,7 +73,7 @@ export function timeseriesPluginTransform(
     barBorderRadius,
   ) as EchartOptions;
 
-  if (transforms.dataZoom) {
+  if (transforms.dataZoom && !shouldDeferDailyBarZoom(formData)) {
     const themeZoomOverrides = getThemeDataZoom(formData);
 
     if (themeZoomOverrides.dataZoom !== undefined) {

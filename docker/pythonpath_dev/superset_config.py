@@ -26,9 +26,11 @@ import sys
 from typing import Any, MutableMapping
 
 from celery.schedules import crontab
+from cost_tagging import extract_chart_context
 from flask_caching.backends.filesystemcache import FileSystemCache
 
 from superset.translations.utils import get_language_pack
+from superset.utils import json
 
 LANGUAGES = {
     "pt_BR": {"flag": "br", "name": "Brazilian Portuguese"},
@@ -125,11 +127,11 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
-    # Show "Export to full .CSV" and "Export to full Excel" in chart menus
+    # Show full CSV/Excel export actions in chart menus
     "ALLOW_FULL_CSV_EXPORT": True,
     "TAGGING_SYSTEM": True,
     "PTM_EXTENSION_ENABLED": True,
-    # Enable Playwright for full-page screenshots
+    # Enable Playwright for full-page dashboard thumbnails
     "PLAYWRIGHT_REPORTS_AND_THUMBNAILS": True,
 }
 
@@ -151,6 +153,27 @@ SQLLAB_CTAS_NO_LIMIT = True
 
 log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
 LOG_LEVEL = getattr(logging, log_level_text.upper(), logging.INFO)
+
+
+def SQL_QUERY_MUTATOR(  # pylint: disable=invalid-name,unused-argument  # noqa: N802
+    sql: str, **kwargs: Any
+) -> str:
+    """Prefix the query with a JSON tag so BQ cost can be attributed per
+    dashboard / chart / user. Returns ``sql`` unchanged when no chart context
+    is available (e.g. SQL Lab), to avoid polluting INFORMATION_SCHEMA.JOBS.
+    """
+    try:
+        ctx = extract_chart_context()
+    except Exception:
+        logger.exception("SQL_QUERY_MUTATOR: failed to build context")
+        return sql
+
+    if not ctx:
+        return sql
+
+    tag = json.dumps(ctx, separators=(",", ":"), sort_keys=True)
+    return f"/* superset: {tag} */\n{sql}"
+
 
 if os.getenv("CYPRESS_CONFIG") == "true":
     # When running the service as a cypress backend, we need to import the config

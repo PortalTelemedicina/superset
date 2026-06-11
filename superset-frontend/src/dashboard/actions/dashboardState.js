@@ -38,6 +38,7 @@ import {
 } from 'src/components/Chart/chartAction';
 import { chart as initChart } from 'src/components/Chart/chartReducer';
 import { applyDefaultFormData } from 'src/explore/store';
+import { inferPtmAutoconvert } from 'src/ptm/utils/ptmChartMapping';
 import {
   SAVE_TYPE_OVERWRITE,
   SAVE_TYPE_OVERWRITE_CONFIRMED,
@@ -347,8 +348,37 @@ export function saveDashboardRequest(data, id, saveType) {
         ...(data.metadata?.headerLayout != null && {
           headerLayout: data.metadata.headerLayout,
         }),
+        ...(data.metadata?.ptm_autoconvert != null && {
+          ptm_autoconvert: data.metadata.ptm_autoconvert,
+        }),
+        ...(data.metadata?.ptm_locked != null && {
+          ptm_locked: data.metadata.ptm_locked,
+        }),
+        ...(data.metadata?.ptm_locked_reason != null && {
+          ptm_locked_reason: data.metadata.ptm_locked_reason,
+        }),
       },
     };
+
+    if (getState().common?.feature_flags?.PTM_EXTENSION_ENABLED === true) {
+      const { sliceEntities, dashboardInfo } = getState();
+      const shouldEnablePtmAutoconvert = inferPtmAutoconvert(
+        data.metadata,
+        data.tags || dashboardInfo?.tags,
+        sliceEntities?.slices,
+      );
+      if (
+        shouldEnablePtmAutoconvert &&
+        data.metadata?.ptm_autoconvert !== false
+      ) {
+        cleanedData.metadata = {
+          ...cleanedData.metadata,
+          ptm_autoconvert: true,
+        };
+        // eslint-disable-next-line no-param-reassign
+        data.metadata = { ...data.metadata, ptm_autoconvert: true };
+      }
+    }
 
     const handleChartConfiguration = () => {
       const {

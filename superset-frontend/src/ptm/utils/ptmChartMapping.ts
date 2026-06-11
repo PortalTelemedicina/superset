@@ -24,6 +24,8 @@
  * to their PTM equivalents, including special handling for timeseries variants.
  */
 
+const PTM_TAG_NAME = 'PTM';
+
 /**
  * Whether PTM auto-convert is explicitly enabled for this dashboard.
  * Only the metadata flag is used; the PTM tag does not trigger conversion.
@@ -33,6 +35,41 @@ export function isPtmAutoconvertEnabled(
   dashboard: { metadata?: { ptm_autoconvert?: boolean } } | null | undefined,
 ): boolean {
   return dashboard?.metadata?.ptm_autoconvert === true;
+}
+
+const PTM_TAG_UPPER = PTM_TAG_NAME.toUpperCase();
+
+function dashboardHasPtmTag(tags?: Array<{ name?: string }>): boolean {
+  if (!Array.isArray(tags)) return false;
+  return tags.some(t => String(t?.name || '').toUpperCase() === PTM_TAG_UPPER);
+}
+
+function slicesHavePtmCharts(
+  slices?: Record<string, { form_data?: Record<string, unknown> }>,
+): boolean {
+  if (!slices) return false;
+  return Object.values(slices).some(slice => {
+    const vizType =
+      slice.form_data && typeof slice.form_data.viz_type === 'string'
+        ? slice.form_data.viz_type
+        : undefined;
+    return !!vizType && isPtmVizType(vizType);
+  });
+}
+
+/**
+ * Infer ptm_autoconvert for dashboards that predate the flag but already use PTM.
+ * Returns true when the dashboard has the PTM tag or any PTM chart and autoconvert
+ * was never explicitly set to false.
+ */
+export function inferPtmAutoconvert(
+  metadata: { ptm_autoconvert?: boolean } | null | undefined,
+  tags: Array<{ name?: string }> | undefined,
+  slices: Record<string, { form_data?: Record<string, unknown> }> | undefined,
+): boolean {
+  if (metadata?.ptm_autoconvert === true) return true;
+  if (metadata?.ptm_autoconvert === false) return false;
+  return dashboardHasPtmTag(tags) || slicesHavePtmCharts(slices);
 }
 
 /**

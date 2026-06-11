@@ -87,3 +87,18 @@ GPT.md
 
 # Local migration / diff artifacts (not source files)
 extension-migration-diffs.patch
+# Portal Telemedicina PTM extension (RAT matches basenames, not paths)
+portal-extension-hardening-plan.md
+ARCHITECTURE.md
+PATCH_INDEX.md
+REFACTOR_PLAN.md
+SMOKE_TESTS.md
+SYNC_GUIDE.md
+squash-ptm-commits.sh
+sync-upstream.sh
+validate-build.sh
+verify-touchpoints.sh
+PTM_DASHBOARD_CSS.md
+ptm-dashboard.css
+header-custom.css
+STYLING.md

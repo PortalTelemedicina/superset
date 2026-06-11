@@ -215,7 +215,7 @@ class DashboardJSONMetadataSchema(Schema):
     ptm_autoconvert = fields.Boolean(allow_none=True)
     ptm_locked = fields.Boolean(allow_none=True)
     ptm_locked_reason = fields.Str(allow_none=True)
-    # Frontend-only: from GET has_shared_charts; not persisted
+    # Frontend-only: set from GET has_shared_charts; not persisted
     # (not in EXTENSION_METADATA_KEYS)
     has_shared_charts = fields.Boolean(allow_none=True)
 

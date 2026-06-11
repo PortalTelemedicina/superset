@@ -148,7 +148,7 @@ geographiclib==2.0
     # via geopy
 geopy==2.4.1
     # via apache-superset (pyproject.toml)
-google-api-core==2.30.0
+google-api-core==2.30.3
     # via
     #   google-cloud-core
     #   google-cloud-storage
@@ -158,7 +158,7 @@ google-auth==2.40.3
     #   google-cloud-core
     #   google-cloud-storage
     #   shillelagh
-google-cloud-core==2.5.0
+google-cloud-core==2.6.0
     # via google-cloud-storage
 google-cloud-storage==3.10.1
     # via -r requirements/base.in
@@ -166,9 +166,9 @@ google-crc32c==1.8.0
     # via
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.8.0
+google-resumable-media==2.9.0
     # via google-cloud-storage
-googleapis-common-protos==1.73.0
+googleapis-common-protos==1.75.0
     # via google-api-core
 greenlet==3.1.1
     # via
@@ -297,9 +297,9 @@ prison==0.2.1
     # via flask-appbuilder
 prompt-toolkit==3.0.51
     # via click-repl
-proto-plus==1.27.1
+proto-plus==1.28.0
     # via google-api-core
-protobuf==6.33.6
+protobuf==7.35.0
     # via
     #   google-api-core
     #   googleapis-common-protos

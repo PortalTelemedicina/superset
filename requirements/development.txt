@@ -268,7 +268,7 @@ geopy==2.4.1
     #   apache-superset
 gevent==24.2.1
     # via apache-superset
-google-api-core==2.30.0
+google-api-core==2.30.3
     # via
     #   -c requirements/base.txt
     #   google-cloud-bigquery
@@ -297,9 +297,9 @@ google-cloud-bigquery==3.27.0
     #   apache-superset
     #   pandas-gbq
     #   sqlalchemy-bigquery
-google-cloud-bigquery-storage==2.36.2
+google-cloud-bigquery-storage==2.38.0
     # via pandas-gbq
-google-cloud-core==2.5.0
+google-cloud-core==2.6.0
     # via
     #   -c requirements/base.txt
     #   google-cloud-bigquery
@@ -307,11 +307,11 @@ google-crc32c==1.8.0
     # via
     #   -c requirements/base.txt
     #   google-resumable-media
-google-resumable-media==2.8.0
+google-resumable-media==2.9.0
     # via
     #   -c requirements/base.txt
     #   google-cloud-bigquery
-googleapis-common-protos==1.73.0
+googleapis-common-protos==1.75.0
     # via
     #   -c requirements/base.txt
     #   google-api-core
@@ -581,12 +581,12 @@ prompt-toolkit==3.0.51
     #   click-repl
 prophet==1.2.0
     # via apache-superset
-proto-plus==1.27.1
+proto-plus==1.28.0
     # via
     #   -c requirements/base.txt
     #   google-api-core
     #   google-cloud-bigquery-storage
-protobuf==6.33.6
+protobuf==7.35.0
     # via
     #   -c requirements/base.txt
     #   google-api-core
