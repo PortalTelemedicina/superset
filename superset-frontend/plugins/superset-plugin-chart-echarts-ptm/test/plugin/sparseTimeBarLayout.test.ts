@@ -199,7 +199,10 @@ describe('sparseTimeBarLayout', () => {
   });
 
   test('applySparseTimeBarLayout skips non-daily grain', () => {
-    const options = { xAxis: { type: 'time' }, series: [{ type: 'bar', data: [] }] };
+    const options = {
+      xAxis: { type: 'time' },
+      series: [{ type: 'bar', data: [] }],
+    };
     const result = applySparseTimeBarLayout(options, {
       ptmSeriesType: 'bar',
       timeGrainSqla: 'P1M',

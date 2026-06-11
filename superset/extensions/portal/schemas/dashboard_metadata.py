@@ -209,7 +209,7 @@ class PortalDashboardMetadataExtension:
                     not hasattr(base_schema_class, "_declared_fields")
                     or getattr(base_schema_class, "_declared_fields", None) is None
                 ):
-                    base_schema_class._declared_fields = {}  # type: ignore[attr-defined]
-                cast(dict[str, Any], base_schema_class._declared_fields)[  # type: ignore[attr-defined]
-                    field_name
-                ] = field_instance
+                    base_schema_class._declared_fields = {}
+                cast(dict[str, Any], base_schema_class._declared_fields)[field_name] = (
+                    field_instance
+                )

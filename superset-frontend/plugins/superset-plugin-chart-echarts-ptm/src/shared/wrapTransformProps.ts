@@ -73,8 +73,9 @@ export function wrapTransformProps<T extends ChartProps>(
     }
 
     if (transforms.userOverrides) {
-      const ptmJson = (formData.ptm_options_json ??
-        formData.ptmOptionsJson) as string | undefined;
+      const ptmJson = (formData.ptm_options_json ?? formData.ptmOptionsJson) as
+        | string
+        | undefined;
       const userOverrides = safeParseJson(ptmJson);
       if (Object.keys(userOverrides).length > 0) {
         finalOptions = merge({}, finalOptions, userOverrides);
