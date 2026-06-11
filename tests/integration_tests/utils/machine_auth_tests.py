@@ -28,9 +28,7 @@ class MachineAuthProviderTests(SupersetTestCase):
         assert auth_cookies["session"] is not None
 
     @patch("superset.utils.machine_auth.generate_csrf")
-    def test_get_auth_cookies_initializes_csrf_when_enabled(
-        self, mock_generate_csrf
-    ):
+    def test_get_auth_cookies_initializes_csrf_when_enabled(self, mock_generate_csrf):
         user = self.get_user("admin")
         with self.app.app_context():
             self.app.config["WTF_CSRF_ENABLED"] = True
