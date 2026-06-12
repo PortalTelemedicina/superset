@@ -14,35 +14,36 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+slice_name: Carga de trabalho prevista (próximas doses)
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_table
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
   metrics:
-  - label: Registros
+  - label: Devidas Hoje
     expressionType: SIMPLE
     aggregate: SUM
     column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
+      column_name: due_count
+  - label: A Vencer
     expressionType: SIMPLE
-  order_desc: true
+    aggregate: SUM
+    column:
+      column_name: upcoming_count
+  groupby:
+  - vaccine_name
+  adhoc_filters: []
+  time_range: No filter
+  row_limit: 10000
+  page_length: 25
+  include_search: true
+  show_cell_bars: true
+  order_by_cols:
+  - '["Devidas Hoje", false]'
   viz_type: ptm_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 23ac19c9-d789-557b-834a-c1aeabf130c6
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

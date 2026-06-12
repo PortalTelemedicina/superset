@@ -14,32 +14,34 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Cobertura média (D1)
+slice_name: Cobertura D1 — média no recorte
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_big_number_trendline
 params:
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: Doses D1 aplicadas ÷ crianças elegíveis no recorte
   metric: coverage_pct_d1
   x_axis: ref_date
   time_grain_sqla: P1D
-  adhoc_filters:
-  - clause: WHERE
-    subject: ref_date
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
+  adhoc_filters: []
+  time_range: No filter
   show_trend_line: true
   start_y_axis_at_zero: true
   y_axis_format: .1%
-  header_font_size: 0.4
-  subheader_font_size: 0.15
   time_format: smart_date
   rolling_type: None
   color_picker:
     r: 0
-    g: 122
-    b: 135
+    g: 121
+    b: 107
     a: 1
   viz_type: ptm_big_number_trendline
   datasource: '{dataset_id}__table'

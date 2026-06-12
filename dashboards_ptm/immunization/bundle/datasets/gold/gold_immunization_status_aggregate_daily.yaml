@@ -69,17 +69,51 @@ metrics:
   d3format: ','
   extra: null
   warning_text: null
-columns:
-- column_name: coverage_pct_d1
+- metric_name: coverage_pct_d1
   verbose_name: Cobertura (%)
+  metric_type: null
+  expression: SAFE_DIVIDE(SUM(applied_count), NULLIF(SUM(child_rule_pairs), 0))
+  description: Razão doses aplicadas / crianças elegíveis no recorte.
+  d3format: .1%
+  extra: null
+  warning_text: null
+columns:
+- column_name: vaccine_name
+  verbose_name: Vacina
   is_dttm: false
   is_active: true
-  type: FLOAT
+  type: STRING
   groupby: false
   filterable: true
-  expression: SAFE_DIVIDE(SUM(applied_count), NULLIF(SUM(child_rule_pairs), 0))
-  description: Razão doses aplicadas / crianças elegíveis no recorte. Usado nos KPIs
-    do dashboard de imunização.
+  expression: "CASE CAST(vaccine_code AS STRING)\n  WHEN '15' THEN 'BCG'\n  WHEN '9'\
+    \ THEN 'Hepatite B'\n  WHEN '42' THEN 'Pentavalente'\n  WHEN '22' THEN 'VIP'\n\
+    \  WHEN '45' THEN 'Rotavírus'\n  WHEN '26' THEN 'Pneumo 10'\n  WHEN '41' THEN\
+    \ 'MenC'\n  WHEN '33' THEN 'Influenza'\n  WHEN '102' THEN 'COVID-19'\n  WHEN '14'\
+    \ THEN 'Febre Amarela'\n  WHEN '74' THEN 'MenACWY'\n  WHEN '24' THEN 'SCR'\n \
+    \ WHEN '34' THEN 'Varicela'\n  WHEN '46' THEN 'DTP'\n  WHEN '35' THEN 'Hepatite\
+    \ A'\n  WHEN '21' THEN 'Pneumo 23'\n  WHEN '25' THEN 'dT'\n  WHEN '67' THEN 'HPV4'\n\
+    \  WHEN '104' THEN 'Dengue'\n  WHEN '57' THEN 'dTpa'\n  WHEN '28' THEN 'VOP'\n\
+    \  WHEN '55' THEN 'HepAinf'\n  WHEN '56' THEN 'SCRV'\n  WHEN '59' THEN 'VPC13'\n\
+    \  WHEN '23' THEN 'IGHR'\n  WHEN '108' THEN 'VVSR-Rec'\n  WHEN '37' THEN 'Vero'\n\
+    \  WHEN '87' THEN 'COVID-19 Pfizer'\n  WHEN '97' THEN 'COVID-19 Moderna'\n  WHEN\
+    \ '112' THEN 'COVID-19 Serum'\n  ELSE CONCAT('Cód. ', CAST(vaccine_code AS STRING))\n\
+    END"
+  description: Nome humano da vacina, traduzido do código RNDS via CASE WHEN. Substitua
+    por JOIN com vaccine_schedule no dbt quando possível.
+  python_date_format: null
+- column_name: dose_label
+  verbose_name: Tipo de dose
+  is_dttm: false
+  is_active: true
+  type: STRING
+  groupby: false
+  filterable: true
+  expression: "CASE\n  WHEN dose_sequence = 1 THEN 'D1 / Única'\n  WHEN dose_sequence\
+    \ = 2 THEN 'D2'\n  WHEN dose_sequence = 3 THEN 'D3'\n  WHEN dose_sequence = 4\
+    \ THEN 'D4 / Reforço'\n  WHEN dose_sequence = 5 THEN 'R2'\n  WHEN dose_sequence\
+    \ = -1 THEN 'Sem dose'\n  ELSE CONCAT('Dose ', CAST(dose_sequence AS STRING))\n\
+    END"
+  description: Rótulo SUS (D1/D2/Reforço) inferido de dose_sequence.
   python_date_format: null
 version: 1.0.0
 database_uuid: 99a083e8-1c2c-5fd4-8a6e-5130c8de2466

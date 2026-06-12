@@ -14,49 +14,38 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Mapa de alerta — prioridade por estado/município
+slice_name: Doses em atraso por vacina e dose
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_pivot_table
 params:
   groupbyRows:
-  - municipality_code
-  groupbyColumns: []
+  - vaccine_name
+  groupbyColumns:
+  - dose_label
   metrics:
-  - label: Score (max)
+  - label: Doses em atraso
     expressionType: SIMPLE
-    aggregate: MAX
+    aggregate: SUM
     column:
-      column_name: priority_score
+      column_name: overdue_count
   metricsLayout: COLUMNS
-  adhoc_filters:
-  - clause: WHERE
-    subject: ref_date
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  row_limit: 200
-  valueFormat: .2f
+  adhoc_filters: []
+  time_range: No filter
+  row_limit: 50000
+  valueFormat: ','
   rowOrder: value_z_to_a
   colOrder: key_a_to_z
-  aggregateFunction: Max
+  aggregateFunction: Sum
   conditional_formatting:
-  - operator: '>='
-    targetValue: 0.7
+  - operator: '>'
+    targetValue: 0
     colorScheme: '#d32f2f'
-    column: MAX(priority_score)
-  - operator: <
-    targetValue: 0.7
-    colorScheme: '#fbc02d'
-    column: MAX(priority_score)
-  - operator: <
-    targetValue: 0.3
-    colorScheme: '#388e3c'
-    column: MAX(priority_score)
+    column: SUM(overdue_count)
   viz_type: ptm_pivot_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 18a56f57-4800-5afc-a76c-a3adbbde7d7e
+uuid: ea64f5bb-ce41-553e-af3a-5c609beeb451
 version: 1.0.0
-dataset_uuid: bfd66565-9ebe-50fc-8fbc-7654419b3ae9
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

@@ -14,58 +14,45 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Pontualidade (no prazo vs atrasadas)
+slice_name: Origem das crianças de fora (por município e qualidade do cadastro)
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_mixed_timeseries
+viz_type: ptm_echarts_timeseries
 params:
-  x_axis: reference_month
-  time_grain_sqla: P1M
+  x_axis: residence_municipality_name
   metrics:
-  - label: No prazo
+  - label: Crianças
     expressionType: SIMPLE
     aggregate: SUM
     column:
-      column_name: on_time_count
-  metrics_b:
-  - label: Atrasadas
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: late_count
-  groupby: []
-  groupby_b: []
+      column_name: children
+  groupby:
+  - origin_quality
   adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  adhoc_filters_b:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  seriesType: echarts_timeseries_bar
-  seriesTypeB: echarts_timeseries_line
+  - expressionType: SIMPLE
+    subject: is_cross_jurisdiction
+    operator: ==
+    comparator: true
+    clause: WHERE
+    filterOptionName: filter_cross_jurisdiction
+  time_range: No filter
+  row_limit: 15
   show_legend: true
   y_axis_format: ','
-  x_axis_time_format: smart_date
-  show_value: true
-  show_valueB: true
+  ptm_series_type: bar
+  orientation: horizontal
+  stack: Stack
+  x_axis_sort: Crianças
+  x_axis_sort_asc: true
   ptm_bar_radius_enabled: true
   ptm_bar_radius_size: '8'
   ptm_bar_radius_round_top: true
   ptm_bar_radius_round_bottom: true
-  ptm_zoom_enabled: true
-  ptm_zoom_axis: x
-  ptm_zoom_size: xs
-  ptm_zoom_inset: '24'
-  viz_type: ptm_mixed_timeseries
+  show_value: true
+  viz_type: ptm_echarts_timeseries
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+uuid: ec77204a-24b0-5deb-88ec-d2ff359eadef
 version: 1.0.0
-dataset_uuid: f3a5e35c-c2a1-5efd-bf2f-ec3b7ce49f13
+dataset_uuid: a0dbd56c-5cca-5768-9887-e63376ffb4d0

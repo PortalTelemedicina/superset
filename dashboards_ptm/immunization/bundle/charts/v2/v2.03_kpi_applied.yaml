@@ -14,37 +14,28 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Ranking de municípios por prioridade
-description: null
+slice_name: Doses Aplicadas (Calendário)
+description: Itens do calendário já vacinados — não é número de crianças nem doses
+  físicas.
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_big_number_total
 params:
-  query_mode: raw
-  all_columns:
-  - ref_date
-  - municipality_code
-  - applied_total
-  - due_total
-  - overdue_total
-  - overdue_share
-  - overdue_share_trend_7d
-  - priority_score
-  order_by_cols:
-  - '["priority_score",false]'
-  row_limit: 100
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: ref_date
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  color_pn: true
-  show_cell_bars: true
-  viz_type: ptm_table
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: ''
+  metric: applied_count_v2
+  adhoc_filters: []
+  time_range: No filter
+  y_axis_format: ','
+  viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: f69796b6-fd9a-5fd2-817a-87fd103d0bdf
+uuid: fa6ef972-b04e-5b9e-b7ce-c6e3fe66d023
 version: 1.0.0
-dataset_uuid: bfd66565-9ebe-50fc-8fbc-7654419b3ae9
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

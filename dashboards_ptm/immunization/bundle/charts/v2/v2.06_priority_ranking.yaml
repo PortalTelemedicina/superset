@@ -14,35 +14,42 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+slice_name: Ranking de prioridade por município
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_table
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
   metrics:
-  - label: Registros
+  - label: Pontuação
+    expressionType: SIMPLE
+    aggregate: MAX
+    column:
+      column_name: priority_score
+  - label: Em atraso
     expressionType: SIMPLE
     aggregate: SUM
     column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
+      column_name: overdue_total
+  - label: '% Atraso'
     expressionType: SIMPLE
-  order_desc: true
+    aggregate: MAX
+    column:
+      column_name: overdue_share
+  groupby:
+  - municipality_name
+  - priority_category
+  - recommended_action
+  adhoc_filters: []
+  time_range: No filter
+  row_limit: 50
+  page_length: 20
+  include_search: true
+  show_cell_bars: true
+  table_timestamp_format: smart_date
   viz_type: ptm_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 375b7687-566f-5734-b0df-ca943db444b8
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: b99a365e-f8e1-5e6c-a476-c749e23c341a

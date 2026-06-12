@@ -14,19 +14,23 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Última ingestão (BigQuery)
+slice_name: Defasagem do enriquecimento (min)
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_big_number_total
 params:
-  metric: max_enriched_ingestion
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: Minutos desde a última carga em s3_fact_immunization_enriched
+  metric: minutes_since_last_ingestion
   adhoc_filters: []
-  y_axis_format: smart_date
-  time_format: smart_date
-  header_font_size: 0.3
-  subheader_font_size: 0.13
-  subheader: s3_enriched_max_ingestion_ts
+  y_axis_format: ',d'
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null

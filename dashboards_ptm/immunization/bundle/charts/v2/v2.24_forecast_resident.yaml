@@ -14,58 +14,50 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Pontualidade (no prazo vs atrasadas)
+slice_name: Volumes da demanda programada — população residente
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_mixed_timeseries
+viz_type: ptm_pivot_table
 params:
-  x_axis: reference_month
-  time_grain_sqla: P1M
+  groupbyRows:
+  - vaccine_name
+  groupbyColumns:
+  - forecast_month
   metrics:
-  - label: No prazo
+  - label: Doses previstas
     expressionType: SIMPLE
     aggregate: SUM
     column:
-      column_name: on_time_count
-  metrics_b:
-  - label: Atrasadas
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: late_count
-  groupby: []
-  groupby_b: []
+      column_name: expected_doses
+  metricsLayout: COLUMNS
   adhoc_filters:
   - clause: WHERE
-    subject: reference_month
+    subject: forecast_month
     operator: TEMPORAL_RANGE
-    comparator: Last year
+    comparator: 'DATEADD(DATETIME(''now''), -1, month) : DATEADD(DATETIME(''now''),
+      12, month)'
     expressionType: SIMPLE
-  adhoc_filters_b:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  seriesType: echarts_timeseries_bar
-  seriesTypeB: echarts_timeseries_line
-  show_legend: true
-  y_axis_format: ','
-  x_axis_time_format: smart_date
-  show_value: true
-  show_valueB: true
-  ptm_bar_radius_enabled: true
-  ptm_bar_radius_size: '8'
-  ptm_bar_radius_round_top: true
-  ptm_bar_radius_round_bottom: true
-  ptm_zoom_enabled: true
-  ptm_zoom_axis: x
-  ptm_zoom_size: xs
-  ptm_zoom_inset: '24'
-  viz_type: ptm_mixed_timeseries
+  - expressionType: SIMPLE
+    subject: status_bucket
+    operator: NOT IN
+    comparator:
+    - overdue
+    clause: WHERE
+    filterOptionName: filter_programmed_only
+  row_limit: 10000
+  valueFormat: ','
+  rowOrder: value_z_to_a
+  colOrder: key_a_to_z
+  aggregateFunction: Sum
+  conditional_formatting:
+  - operator: '>'
+    targetValue: 0
+    colorScheme: '#1565c0'
+    column: SUM(expected_doses)
+  viz_type: ptm_pivot_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+uuid: db686497-f91f-56d6-a152-4fdb262d056d
 version: 1.0.0
-dataset_uuid: f3a5e35c-c2a1-5efd-bf2f-ec3b7ce49f13
+dataset_uuid: 333b127d-0086-520d-a550-5d9b030a8091

@@ -102,21 +102,9 @@ position:
     - GRID_ID
     - ROW-trend
     meta:
-      width: 4
+      width: 6
       height: 60
       uuid: 79b14e51-4742-5c87-be18-51266bcf8f01
-  CHART-05_mapa_alerta:
-    type: CHART
-    id: CHART-05_mapa_alerta
-    children: []
-    parents:
-    - ROOT_ID
-    - GRID_ID
-    - ROW-trend
-    meta:
-      width: 4
-      height: 60
-      uuid: 18a56f57-4800-5afc-a76c-a3adbbde7d7e
   CHART-07_timeliness:
     type: CHART
     id: CHART-07_timeliness
@@ -126,7 +114,7 @@ position:
     - GRID_ID
     - ROW-trend
     meta:
-      width: 4
+      width: 6
       height: 60
       uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
   ROW-trend:
@@ -134,7 +122,6 @@ position:
     id: ROW-trend
     children:
     - CHART-04_timeline_doses
-    - CHART-05_mapa_alerta
     - CHART-07_timeliness
     parents:
     - ROOT_ID
@@ -150,27 +137,14 @@ position:
     - GRID_ID
     - ROW-detail
     meta:
-      width: 6
+      width: 12
       height: 70
       uuid: d6491d0d-da03-5cc6-9816-74e24d72b317
-  CHART-09_ranking_municipios:
-    type: CHART
-    id: CHART-09_ranking_municipios
-    children: []
-    parents:
-    - ROOT_ID
-    - GRID_ID
-    - ROW-detail
-    meta:
-      width: 6
-      height: 70
-      uuid: f69796b6-fd9a-5fd2-817a-87fd103d0bdf
   ROW-detail:
     type: ROW
     id: ROW-detail
     children:
     - CHART-06_heatmap_atraso
-    - CHART-09_ranking_municipios
     parents:
     - ROOT_ID
     - GRID_ID
@@ -228,52 +202,7 @@ metadata:
   color_scheme: supersetColors
   refresh_frequency: 300
   cross_filters_enabled: true
-  native_filter_configuration:
-  - id: NATIVE_FILTER-municipality
-    name: Município (IBGE)
-    filterType: filter_select
-    targets:
-    - column:
-        name: municipality_code
-    defaultDataMask:
-      filterState:
-        value:
-        - '220850'
-    controlValues:
-      multiSelect: true
-      enableEmptyFilter: false
-      inverseSelection: false
-      searchAllOptions: true
-    type: NATIVE_FILTER
-  - id: NATIVE_FILTER-vaccine
-    name: Vacina
-    filterType: filter_select
-    targets:
-    - column:
-        name: vaccine_code
-    controlValues:
-      multiSelect: true
-      enableEmptyFilter: false
-    type: NATIVE_FILTER
-  - id: NATIVE_FILTER-dose
-    name: Dose
-    filterType: filter_select
-    targets:
-    - column:
-        name: dose_sequence
-    controlValues:
-      multiSelect: true
-      enableEmptyFilter: false
-    type: NATIVE_FILTER
-  - id: NATIVE_FILTER-ref-date
-    name: Período
-    filterType: filter_time
-    targets:
-    - {}
-    defaultDataMask:
-      filterState:
-        value: Last year
-    type: NATIVE_FILTER
+  native_filter_configuration: []
   chart_configuration: {}
   global_chart_configuration:
     scope:

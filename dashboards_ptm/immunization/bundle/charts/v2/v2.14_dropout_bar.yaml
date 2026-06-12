@@ -14,35 +14,41 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+slice_name: Taxa de abandono por vacina
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_pivot_table
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
+  groupbyRows:
   - vaccine_name
-  - dose_label
+  groupbyColumns:
+  - dose_from_label
   metrics:
-  - label: Registros
+  - label: Taxa de abandono
     expressionType: SIMPLE
-    aggregate: SUM
+    aggregate: AVG
     column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+      column_name: effective_dropout_rate
+  metricsLayout: COLUMNS
+  adhoc_filters: []
+  row_limit: 200
+  valueFormat: .1%
+  rowOrder: value_z_to_a
+  colOrder: key_a_to_z
+  aggregateFunction: Average
+  conditional_formatting:
+  - operator: '>'
+    targetValue: 0.15
+    colorScheme: '#d32f2f'
+    column: AVG(effective_dropout_rate)
+  - operator: '>'
+    targetValue: 0.05
+    colorScheme: '#ef6c00'
+    column: AVG(effective_dropout_rate)
+  viz_type: ptm_pivot_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 8a19c83f-d0a8-50c8-9efb-4623924ef9cf
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: 15ae4d74-0279-5cce-8881-6ac568181912

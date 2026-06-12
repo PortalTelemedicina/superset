@@ -14,12 +14,12 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-table_name: gold_immunization_data_freshness
-main_dttm_col: checked_at
+table_name: gold_immunization_data_quality_daily
+main_dttm_col: reference_month
 description: null
 default_endpoint: null
 offset: 0
-cache_timeout: 300
+cache_timeout: 1800
 schema: gold
 sql: ''
 params: null
@@ -27,32 +27,22 @@ template_params: null
 filter_select_enabled: true
 fetch_values_predicate: null
 extra: null
-uuid: 6aed5921-2842-562b-b50a-93d6059545eb
+uuid: 6be5f4f6-1ab1-5362-bc63-ba98e4dfd35f
 metrics:
-- metric_name: seconds_since_last_ingestion
-  verbose_name: Segundos desde a última ingestão
+- metric_name: issue_count_total
+  verbose_name: Total de inconsistências
   metric_type: null
-  expression: TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), MAX(s3_enriched_max_ingestion_ts),
-    SECOND)
+  expression: SUM(issue_count)
   description: null
-  d3format: ',d'
+  d3format: ','
   extra: null
   warning_text: null
-- metric_name: minutes_since_last_ingestion
-  verbose_name: Minutos desde a última ingestão
+- metric_name: critical_issue_count
+  verbose_name: Inconsistências críticas
   metric_type: null
-  expression: TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), MAX(s3_enriched_max_ingestion_ts),
-    MINUTE)
+  expression: SUM(CASE WHEN severity = 'critical' THEN issue_count ELSE 0 END)
   description: null
-  d3format: ',d'
-  extra: null
-  warning_text: null
-- metric_name: last_rnds_ingestion_ts
-  verbose_name: Última atualização da RNDS
-  metric_type: null
-  expression: MAX(s3_enriched_max_ingestion_ts)
-  description: null
-  d3format: '%d/%m/%Y %H:%M'
+  d3format: ','
   extra: null
   warning_text: null
 columns: []

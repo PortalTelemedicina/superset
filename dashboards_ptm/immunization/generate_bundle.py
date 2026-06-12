@@ -111,82 +111,103 @@ def write_database() -> None:
 
 
 def write_datasets() -> None:
-    for spec in boot.DATASETS:
-        dataset_uuid = boot.UUIDS[spec["key"]]
-        columns = [
-            {
-                "column_name": col["column_name"],
-                "verbose_name": col.get("verbose_name"),
-                "is_dttm": False,
-                "is_active": True,
-                "type": col.get("type", "FLOAT"),
-                "groupby": False,
-                "filterable": True,
-                "expression": col.get("expression"),
-                "description": col.get("description"),
-                "python_date_format": None,
-            }
-            for col in spec.get("calculated_columns", [])
-        ]
-        metrics = [
-            {
-                "metric_name": m["metric_name"],
-                "verbose_name": m.get("verbose_name"),
-                "metric_type": None,
-                "expression": m["expression"],
-                "description": m.get("description"),
-                "d3format": m.get("d3format"),
-                "extra": None,
-                "warning_text": None,
-            }
-            for m in spec.get("metrics", [])
-        ]
-        payload = {
-            "table_name": spec["table_name"],
-            "main_dttm_col": spec.get("main_dttm_col"),
-            "description": spec.get("description"),
-            "default_endpoint": None,
-            "offset": 0,
-            "cache_timeout": spec.get("cache_timeout"),
-            "schema": SCHEMA,
-            "sql": "",
-            "params": None,
-            "template_params": None,
-            "filter_select_enabled": True,
-            "fetch_values_predicate": None,
-            "extra": None,
-            "uuid": dataset_uuid,
-            "metrics": metrics,
-            "columns": columns,
-            "version": "1.0.0",
-            "database_uuid": boot.UUIDS["database.ptm_data_prod"],
+    all_specs = list(boot.DATASETS) + list(boot.DATASETS_V2)
+    seen: set[str] = set()
+    for spec in all_specs:
+        if spec["key"] in seen:
+            continue
+        seen.add(spec["key"])
+        _write_dataset_spec(spec)
+
+
+def _write_dataset_spec(spec: dict) -> None:
+    dataset_uuid = boot.UUIDS[spec["key"]]
+    columns = [
+        {
+            "column_name": col["column_name"],
+            "verbose_name": col.get("verbose_name"),
+            "is_dttm": False,
+            "is_active": True,
+            "type": col.get("type", "FLOAT"),
+            "groupby": False,
+            "filterable": True,
+            "expression": col.get("expression"),
+            "description": col.get("description"),
+            "python_date_format": None,
         }
-        _write(
-            BUNDLE_DIR / "datasets" / SCHEMA / f"{spec['table_name']}.yaml",
-            payload,
-        )
+        for col in spec.get("calculated_columns", [])
+    ]
+    metrics = [
+        {
+            "metric_name": m["metric_name"],
+            "verbose_name": m.get("verbose_name"),
+            "metric_type": None,
+            "expression": m["expression"],
+            "description": m.get("description"),
+            "d3format": m.get("d3format"),
+            "extra": None,
+            "warning_text": None,
+        }
+        for m in spec.get("metrics", [])
+    ]
+    payload = {
+        "table_name": spec["table_name"],
+        "main_dttm_col": spec.get("main_dttm_col"),
+        "description": spec.get("description"),
+        "default_endpoint": None,
+        "offset": 0,
+        "cache_timeout": spec.get("cache_timeout"),
+        "schema": SCHEMA,
+        "sql": "",
+        "params": None,
+        "template_params": None,
+        "filter_select_enabled": True,
+        "fetch_values_predicate": None,
+        "extra": None,
+        "uuid": dataset_uuid,
+        "metrics": metrics,
+        "columns": columns,
+        "version": "1.0.0",
+        "database_uuid": boot.UUIDS["database.ptm_data_prod"],
+    }
+    _write(
+        BUNDLE_DIR / "datasets" / SCHEMA / f"{spec['table_name']}.yaml",
+        payload,
+    )
 
 
 def write_charts() -> None:
     for spec in boot.CHARTS:
-        dataset_uuid = boot.UUIDS[spec["dataset_key"]]
-        params = dict(spec["params"])
-        params["viz_type"] = spec["viz_type"]
-        params["datasource"] = "{dataset_id}__table"
-        payload = {
-            "slice_name": spec["slice_name"],
-            "description": spec.get("description"),
-            "certified_by": None,
-            "certification_details": None,
-            "viz_type": spec["viz_type"],
-            "params": params,
-            "cache_timeout": None,
-            "uuid": boot.UUIDS[spec["key"]],
-            "version": "1.0.0",
-            "dataset_uuid": dataset_uuid,
-        }
+        _write_chart_spec(spec, BUNDLE_DIR / "charts")
+
+
+def write_charts_v2() -> None:
+    """Export CHARTS_V2 specs (operational dashboard) alongside v1 bundle."""
+    v2_dir = BUNDLE_DIR / "charts" / "v2"
+    for spec in boot.CHARTS_V2:
         slug = spec["key"].split(".", 1)[1]
-        _write(BUNDLE_DIR / "charts" / f"{slug}.yaml", payload)
+        _write_chart_spec(spec, v2_dir, filename=f"{slug}.yaml")
+
+
+def _write_chart_spec(spec: dict, out_dir: Path, filename: str | None = None) -> None:
+    dataset_uuid = boot.UUIDS[spec["dataset_key"]]
+    params = dict(spec["params"])
+    params["viz_type"] = spec["viz_type"]
+    params["datasource"] = "{dataset_id}__table"
+    payload = {
+        "slice_name": spec["slice_name"],
+        "description": spec.get("description"),
+        "certified_by": None,
+        "certification_details": None,
+        "viz_type": spec["viz_type"],
+        "params": params,
+        "cache_timeout": None,
+        "uuid": boot.UUIDS[spec["key"]],
+        "version": "1.0.0",
+        "dataset_uuid": dataset_uuid,
+    }
+    slug = filename or f"{spec['key'].split('.', 1)[1]}.yaml"
+    _write(out_dir / slug, payload)
 
 
 def write_dashboard() -> None:
@@ -213,13 +234,11 @@ def write_dashboard() -> None:
             ("chart.03_kpi_proximas_30_dias", 4, 50),
         ]),
         ("ROW-trend", [
-            ("chart.04_timeline_doses", 4, 60),
-            ("chart.05_mapa_alerta", 4, 60),
-            ("chart.07_timeliness", 4, 60),
+            ("chart.04_timeline_doses", 6, 60),
+            ("chart.07_timeliness", 6, 60),
         ]),
         ("ROW-detail", [
-            ("chart.06_heatmap_atraso", 6, 70),
-            ("chart.09_ranking_municipios", 6, 70),
+            ("chart.06_heatmap_atraso", 12, 70),
         ]),
         ("ROW-aux", [
             ("chart.08_dropout_serie", 4, 60),
@@ -255,7 +274,7 @@ def write_dashboard() -> None:
         "color_scheme": "supersetColors",
         "refresh_frequency": 300,
         "cross_filters_enabled": True,
-        "native_filter_configuration": boot.NATIVE_FILTERS,
+        "native_filter_configuration": [],
         "chart_configuration": {},
         "global_chart_configuration": {
             "scope": {"rootPath": ["ROOT_ID"], "excluded": []},
@@ -299,6 +318,7 @@ def main() -> None:
     write_database()
     write_datasets()
     write_charts()
+    write_charts_v2()
     write_dashboard()
     print(f"Bundle generated at {BUNDLE_DIR}")
     for p in sorted(BUNDLE_DIR.rglob("*.yaml")):

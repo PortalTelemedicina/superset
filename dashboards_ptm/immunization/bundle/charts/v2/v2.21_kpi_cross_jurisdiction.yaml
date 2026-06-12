@@ -14,35 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
-description: null
+slice_name: Vacinados de Outros Municípios
+description: Crianças (distintas) residentes em outro município, vacinadas em unidades
+  deste município.
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_big_number_total
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
-  metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: ''
+  metric: cross_jurisdiction_children
+  time_range: No filter
+  y_axis_format: ','
+  viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 7762dc63-395e-52cd-a3dc-741f9190bd1c
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: a0dbd56c-5cca-5768-9887-e63376ffb4d0

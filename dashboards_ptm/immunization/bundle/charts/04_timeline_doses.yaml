@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Timeline de doses aplicadas
+slice_name: Doses aplicadas por mês × vacina
 description: null
 certified_by: null
 certification_details: null
@@ -29,7 +29,7 @@ params:
     column:
       column_name: dose_count
   groupby:
-  - vaccine_code
+  - vaccine_name
   adhoc_filters:
   - clause: WHERE
     subject: reference_month

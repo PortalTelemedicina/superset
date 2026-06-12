@@ -14,16 +14,16 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Abandono entre doses
+slice_name: Abandono entre doses por vacina
 description: null
 certified_by: null
 certification_details: null
 viz_type: ptm_pie
 params:
   groupby:
-  - vaccine_code
+  - vaccine_name
   metric:
-    label: Dropout médio
+    label: Taxa média de abandono
     expressionType: SIMPLE
     aggregate: AVG
     column:

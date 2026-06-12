@@ -14,35 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
-description: null
+slice_name: Doses a Vencer (Até 30 dias)
+description: Doses com vencimento em até 30 dias a partir de hoje.
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_big_number_total
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
-  metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: ''
+  metric: upcoming_count_v2
+  adhoc_filters: []
+  time_range: No filter
+  y_axis_format: ','
+  viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 853f9835-d8ea-5f1b-b520-321fc6686ea0
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

@@ -14,47 +14,33 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Pontualidade (no prazo vs atrasadas)
+slice_name: Inconsistências por tipo de problema
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_mixed_timeseries
+viz_type: ptm_echarts_timeseries
 params:
   x_axis: reference_month
   time_grain_sqla: P1M
   metrics:
-  - label: No prazo
+  - label: Inconsistências
     expressionType: SIMPLE
     aggregate: SUM
     column:
-      column_name: on_time_count
-  metrics_b:
-  - label: Atrasadas
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: late_count
-  groupby: []
-  groupby_b: []
+      column_name: issue_count
+  groupby:
+  - reason_label
   adhoc_filters:
   - clause: WHERE
     subject: reference_month
     operator: TEMPORAL_RANGE
     comparator: Last year
     expressionType: SIMPLE
-  adhoc_filters_b:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  seriesType: echarts_timeseries_bar
-  seriesTypeB: echarts_timeseries_line
+  row_limit: 50000
   show_legend: true
-  y_axis_format: ','
   x_axis_time_format: smart_date
-  show_value: true
-  show_valueB: true
+  y_axis_format: ','
+  ptm_series_type: bar
   ptm_bar_radius_enabled: true
   ptm_bar_radius_size: '8'
   ptm_bar_radius_round_top: true
@@ -63,9 +49,10 @@ params:
   ptm_zoom_axis: x
   ptm_zoom_size: xs
   ptm_zoom_inset: '24'
-  viz_type: ptm_mixed_timeseries
+  show_value: true
+  viz_type: ptm_echarts_timeseries
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+uuid: b6c0a6cf-c9a4-59ac-825c-4d9506f3db9c
 version: 1.0.0
-dataset_uuid: f3a5e35c-c2a1-5efd-bf2f-ec3b7ce49f13
+dataset_uuid: 6be5f4f6-1ab1-5362-bc63-ba98e4dfd35f

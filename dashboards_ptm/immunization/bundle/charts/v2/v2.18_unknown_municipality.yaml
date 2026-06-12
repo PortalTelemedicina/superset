@@ -14,35 +14,33 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+slice_name: Registros com município desconhecido
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_big_number_total
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
-  metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: Crianças com código IBGE de residência não resolvido (UNKNOWN)
+  metric: total_pairs_v2
   adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+  - expressionType: SIMPLE
+    subject: municipality_code
+    operator: ==
+    comparator: UNKNOWN
+    clause: WHERE
+    filterOptionName: filter_unknown_mun
+  time_range: No filter
+  y_axis_format: ','
+  viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 9f1cdb5c-037a-547c-980a-b22304af43c8
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

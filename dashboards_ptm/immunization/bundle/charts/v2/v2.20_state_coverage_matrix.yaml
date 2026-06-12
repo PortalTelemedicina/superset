@@ -14,35 +14,33 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+slice_name: Matriz de cobertura — Estado × Vacina
 description: null
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_pivot_table
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
+  groupbyRows:
+  - state_name
+  groupbyColumns:
   - vaccine_name
-  - dose_label
   metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+  - expressionType: SQL
+    label: '% Cobertura'
+    sqlExpression: SAFE_DIVIDE(SUM(applied_count), NULLIF(SUM(child_rule_pairs), 0))
+    hasCustomLabel: true
+    optionName: metric_coverage_state_v2
+  metricsLayout: COLUMNS
+  adhoc_filters: []
+  time_range: No filter
+  row_limit: 10000
+  valueFormat: .1%
+  rowOrder: value_z_to_a
+  colOrder: key_a_to_z
+  aggregateFunction: Sum
+  viz_type: ptm_pivot_table
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: ac850a06-17fe-51e9-920d-796abb07c82a
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: 757fa6f8-faf6-58a9-8c2b-b8b9f6675111

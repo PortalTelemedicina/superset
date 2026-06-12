@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Pontualidade (no prazo vs atrasadas)
+slice_name: Pontualidade — doses no prazo vs atrasadas
 description: null
 certified_by: null
 certification_details: null
@@ -51,21 +51,13 @@ params:
   seriesType: echarts_timeseries_bar
   seriesTypeB: echarts_timeseries_line
   show_legend: true
-  y_axis_format: ','
+  y_axis_format: ',d'
   x_axis_time_format: smart_date
   show_value: true
   show_valueB: true
-  ptm_bar_radius_enabled: true
-  ptm_bar_radius_size: '8'
-  ptm_bar_radius_round_top: true
-  ptm_bar_radius_round_bottom: true
-  ptm_zoom_enabled: true
-  ptm_zoom_axis: x
-  ptm_zoom_size: xs
-  ptm_zoom_inset: '24'
   viz_type: ptm_mixed_timeseries
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 03917422-9f34-5982-9b49-2294b4b2b9e6
+uuid: 1cf4f077-76a0-5a0b-a8c5-11e491142e39
 version: 1.0.0
 dataset_uuid: f3a5e35c-c2a1-5efd-bf2f-ec3b7ce49f13

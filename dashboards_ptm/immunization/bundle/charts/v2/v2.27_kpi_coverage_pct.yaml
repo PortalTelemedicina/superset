@@ -14,35 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
-description: null
+slice_name: Cobertura Global Estimada
+description: Crianças sem nenhuma dose atrasada ÷ total de crianças (cobertura global
+  aproximada).
 certified_by: null
 certification_details: null
-viz_type: ptm_table
+viz_type: ptm_big_number_total
 params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
-  metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
+  layout_mode: ptm
+  autofit: true
+  show_icon: false
+  icon_size: 20
+  header_font_size: 0.5
+  additional_text_font_size: 20
+  subheader: ''
+  additional_text: ''
+  metric: coverage_up_to_date_pct
+  time_range: No filter
+  y_axis_format: .1%
+  viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
 cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+uuid: 0cae552c-1203-595f-820f-972a3e15f8e6
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+dataset_uuid: a0dbd56c-5cca-5768-9887-e63376ffb4d0

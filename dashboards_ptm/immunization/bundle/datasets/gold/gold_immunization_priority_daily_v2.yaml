@@ -14,35 +14,37 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-slice_name: Registros com inconsistências
+table_name: gold_immunization_priority_daily_v2
+main_dttm_col: ref_date
 description: null
-certified_by: null
-certification_details: null
-viz_type: ptm_table
-params:
-  query_mode: aggregate
-  groupby:
-  - reason_description
-  - vaccine_name
-  - dose_label
-  metrics:
-  - label: Registros
-    expressionType: SIMPLE
-    aggregate: SUM
-    column:
-      column_name: row_count
-  row_limit: 1000
-  server_page_length: 25
-  adhoc_filters:
-  - clause: WHERE
-    subject: reference_month
-    operator: TEMPORAL_RANGE
-    comparator: Last year
-    expressionType: SIMPLE
-  order_desc: true
-  viz_type: ptm_table
-  datasource: '{dataset_id}__table'
-cache_timeout: null
-uuid: 5d577678-84ce-53d2-957b-bb61e9b3d1ff
+default_endpoint: null
+offset: 0
+cache_timeout: 900
+schema: gold
+sql: ''
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+uuid: b99a365e-f8e1-5e6c-a476-c749e23c341a
+metrics:
+- metric_name: max_priority_score
+  verbose_name: Score máx. de prioridade
+  metric_type: null
+  expression: MAX(priority_score)
+  description: null
+  d3format: .2f
+  extra: null
+  warning_text: null
+- metric_name: overdue_total_prio
+  verbose_name: Doses em atraso (priorit.)
+  metric_type: null
+  expression: SUM(overdue_total)
+  description: null
+  d3format: ','
+  extra: null
+  warning_text: null
+columns: []
 version: 1.0.0
-dataset_uuid: b6365dc5-ad8c-51b1-8bb8-b9a6b8516710
+database_uuid: 99a083e8-1c2c-5fd4-8a6e-5130c8de2466
