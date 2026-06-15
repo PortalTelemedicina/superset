@@ -37,6 +37,7 @@ import {
   iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
+  infoText,
   autofit,
 } from '../sharedControls';
 
@@ -159,6 +160,7 @@ export default {
         [iconBackgroundColor],
         [additionalText],
         [additionalTextFontSize],
+        [infoText],
       ],
     },
     sections.dataReliabilitySection,
