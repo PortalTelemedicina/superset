@@ -23,7 +23,7 @@ Usage::
         --base-url https://superset.example.com \\
         --username admin --password secret \\
         --database-name ptm-data-prod \\
-        --schema gold
+        --schema dbt_gold
 
 The script is idempotent: it looks objects up by their stable UUID first and
 only creates them if missing. Re-running updates existing objects in place.
@@ -71,11 +71,11 @@ def scope_dashboard_uuid(kind: Literal["state", "muni"], scope_id: str) -> str:
 
 # Active immunization pilot municipality. Used as the default value for
 # the dashboard's Município native filter so the operational view loads
-# scoped to the right IBGE on first paint. Verified unique against
-# seeds/brazil_city_details.csv — only Porto/PI (IBGE 220850) carries
-# this name, so a name-based default doesn't collide with other states.
-_PILOT_MUNICIPALITY_NAME = "Porto"
-_PILOT_MUNICIPALITY_CODE = "220850"
+# scoped to the right IBGE on first paint. Canonical pilot is Cocal/PI
+# (IBGE 220270) per governance.municipality_activation — Porto/220850 was
+# a mislabel corrected in child-immunization migration 0005.
+_PILOT_MUNICIPALITY_NAME = "Cocal"
+_PILOT_MUNICIPALITY_CODE = "220270"
 
 
 UUIDS: dict[str, str] = {
@@ -2226,6 +2226,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": _ptm_kpi(
+            additional_text="Total de Doses Atrasadas",
             extra={
                 "metric": "overdue_count_v2",
                 "adhoc_filters": [],
@@ -2241,6 +2242,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": _ptm_kpi(
+            additional_text="Doses a Vencer (Até 30 dias)",
             extra={
                 "metric": "upcoming_count_v2",
                 "adhoc_filters": [],
@@ -2259,6 +2261,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": _ptm_kpi(
+            additional_text="Doses Aplicadas (Calendário)",
             extra={
                 "metric": "applied_count_v2",
                 "adhoc_filters": [],
@@ -2270,13 +2273,11 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.04_kpi_freshness",
         "slice_name": "Última atualização da RNDS",
+        "description": "Data e hora da última carga de dados do RNDS.",
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.data_freshness",
         "params": _ptm_kpi(
-            icon_name="RefreshCw",
-            icon_color="#0288D1",
-            icon_background_color="#E1F5FE",
-            additional_text="Data e hora da última carga de dados do RNDS",
+            additional_text="Última atualização da RNDS",
             extra={
                 "metric": "last_rnds_ingestion_ts",
                 "adhoc_filters": [],
@@ -2291,13 +2292,11 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.05_kpi_dq_issues",
         "slice_name": "Inconsistências de dados (90d)",
+        "description": "Total de registros suspeitos nos últimos 90 dias.",
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.data_quality_daily_v2",
         "params": _ptm_kpi(
-            icon_name="ShieldAlert",
-            icon_color="#6A1B9A",
-            icon_background_color="#F3E5F5",
-            additional_text="Total de registros suspeitos nos últimos 90 dias",
+            additional_text="Inconsistências de Dados (90d)",
             extra={
                 "metric": "issue_count_total",
                 "adhoc_filters": [_filter_temporal("reference_month")],
@@ -2606,13 +2605,13 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.18_unknown_municipality",
         "slice_name": "Registros com município desconhecido",
+        "description": (
+            "Crianças com código IBGE de residência não resolvido (UNKNOWN)."
+        ),
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": _ptm_kpi(
-            icon_name="MapPin",
-            icon_color="#795548",
-            icon_background_color="#EFEBE9",
-            additional_text="Crianças com código IBGE de residência não resolvido (UNKNOWN)",
+            additional_text="Município Desconhecido",
             extra={
                 "metric": "total_pairs_v2",
                 "adhoc_filters": [
@@ -2704,6 +2703,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Vacinados de Outros Municípios",
             extra={
                 "metric": "cross_jurisdiction_children",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2745,6 +2745,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Total de Crianças Atendidas",
             extra={
                 "metric": "children_total",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2761,6 +2762,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Crianças com Doses em Atraso",
             extra={
                 "metric": "children_overdue_total",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2778,6 +2780,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Cobertura Global Estimada",
             extra={
                 "metric": "coverage_up_to_date_pct",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2793,6 +2796,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Moradores do Município",
             extra={
                 "metric": "own_municipality_children",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2809,6 +2813,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Atendimentos Regionais",
             extra={
                 "metric": "regional_children",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2829,6 +2834,7 @@ CHARTS_V2: list[dict] = [
             icon_name="AlertTriangle",
             icon_color="#EF6C00",
             icon_background_color="#FFF3E0",
+            additional_text="Residentes Fora do Estado",
             extra={
                 "metric": "out_of_state_children",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2845,6 +2851,7 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
+            additional_text="Erros de Correspondência",
             extra={
                 "metric": "unmapped_children",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2855,6 +2862,11 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.23_forecast_attended",
         "slice_name": "Tendência da demanda programada — unidades do município",
+        "description": (
+            "Mostra as 5 vacinas de maior volume previsto. Use o filtro "
+            "Vacina para comparar a projeção de uma ou duas vacinas "
+            "específicas; os volumes exatos estão na matriz abaixo."
+        ),
         "viz_type": "ptm_echarts_timeseries",
         "dataset_key": "dataset.dose_forecast_monthly",
         "params": {
@@ -2863,13 +2875,16 @@ CHARTS_V2: list[dict] = [
             "metrics": [_metric("Doses previstas", "SUM", "expected_doses")],
             "groupby": ["vaccine_name"],
             "adhoc_filters": [_FORECAST_FORWARD_RANGE, _PROGRAMMED_ONLY_FILTER],
+            # BI feedback: all ~20 vaccines on one line chart is unreadable.
+            # Default to the top-5 series; the Vacina native filter narrows
+            # further. Exact volumes live in the v2.24 pivot below.
+            "limit": 5,
             "row_limit": 10000,
             "show_legend": True,
             "y_axis_format": ",d",
             "ptm_series_type": "line",
             "x_axis_time_format": "smart_date",
             **_PTM_ZOOM,
-            **_PTM_SHOW_VALUE,
         },
     },
     {
@@ -4072,7 +4087,7 @@ def parse_args() -> argparse.Namespace:
         default="ptm-data-prod",
         help="GCP project id for activation-registry BigQuery queries.",
     )
-    p.add_argument("--schema", default="gold")
+    p.add_argument("--schema", default="dbt_gold")
     p.add_argument(
         "--export",
         action="store_true",
@@ -4105,7 +4120,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Limit per-state/per-muni factory to one UF or IBGE "
-            "(e.g. PI, 220850, Porto)."
+            "(e.g. PI, 220270, Cocal)."
         ),
     )
     p.add_argument(
