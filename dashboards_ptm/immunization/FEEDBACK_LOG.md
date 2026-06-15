@@ -17,3 +17,21 @@ Source: stakeholder UX review (less-is-more KPI cards, dense charts → tables).
 | 8 | Dropout → matrix with color scale | `ptm_pivot_table` + conditional formatting | v2.14 |
 
 Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
+
+## 2026-06-12 — Follow-up round (visual validation)
+
+| # | Issue | Change | Charts affected |
+|---|-------|--------|-----------------|
+| 1 | KPI cards rendered with no visible title (additional_text was emptied) | Short PT title now set in `additional_text` (PTM card caption); long explanation stays in `description` tooltip | all v2 big numbers (v2.01–v2.05, v2.18, v2.21, v2.25–v2.31) |
+| 2 | One warning icon remained (ShieldAlert on DQ card) | Icon removed; only the sanctioned AlertTriangle on "Residentes Fora do Estado" remains. Also removed generic RefreshCw/MapPin icons | v2.05, v2.04, v2.18 |
+| 3 | "Tendência da demanda programada" unreadable with ~20 vaccine lines | Series limit = 5 (top vaccines by volume), data labels removed; Vacina native filter narrows further; exact volumes in v2.24 pivot | v2.23 |
+
+## 2026-06-15 — Follow-up (info tooltips on KPI cards)
+
+| # | Issue | Change | Charts affected |
+|---|-------|--------|-----------------|
+| 1 | KPI explanations existed in `description` but were invisible (PTM cards hide native header) | Added `info_text` param + info (i) icon tooltip in PTM big-number plugin; auto-wired from `description` in bootstrap | all PTM big-number cards (v2.01–v2.05, v2.18, v2.21, v2.25–v2.31, chart.01) |
+| 2 | Out-of-state card keeps sanctioned AlertTriangle | No change to `show_icon=True` on v2.30; info icon added alongside | v2.30 |
+
+Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
+

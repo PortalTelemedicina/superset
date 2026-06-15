@@ -61,6 +61,7 @@ export default function transformProps(
     iconBackgroundColor = '#F5F5F5',
     additionalText = '',
     additionalTextFontSize = 12,
+    infoText = '',
     autofit = true,
   } = formData;
   const refs: Record<string, any> = {};
@@ -128,6 +129,7 @@ export default function transformProps(
     iconBackgroundColor,
     additionalText,
     additionalTextFontSize,
+    infoText,
     autofit,
   };
 }

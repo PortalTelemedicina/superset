@@ -1670,6 +1670,12 @@ def ensure_chart(
     params = dict(chart_spec["params"])
     params["datasource"] = f"{dataset_id}__table"
     params["viz_type"] = chart_spec["viz_type"]
+    if (
+        chart_spec["viz_type"] in ("ptm_big_number_total", "ptm_big_number_trendline")
+        and chart_spec.get("description")
+        and "info_text" not in params
+    ):
+        params["info_text"] = chart_spec["description"]
     payload = {
         "slice_name": chart_spec["slice_name"],
         "viz_type": chart_spec["viz_type"],

@@ -27,12 +27,13 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Crianças com Doses em Atraso
   metric: children_overdue_total
   time_range: No filter
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Crianças (distintas) com ao menos uma dose atrasada no calendário.
 cache_timeout: null
 uuid: 845642ad-7354-5ea3-95df-03b6cc2b6edf
 version: 1.0.0

@@ -175,6 +175,19 @@ export const additionalTextFontSize: CustomControlItem = {
   },
 };
 
+export const infoText: CustomControlItem = {
+  name: 'info_text',
+  config: {
+    type: 'TextAreaControl',
+    label: t('Info Tooltip Text'),
+    renderTrigger: true,
+    default: '',
+    description: t(
+      'Explanatory text shown in the info icon tooltip (PTM layout only)',
+    ),
+  },
+};
+
 export const autofit: CustomControlItem = {
   name: 'autofit',
   config: {

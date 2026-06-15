@@ -37,6 +37,7 @@ import {
   iconBackgroundColor,
   additionalText,
   additionalTextFontSize,
+  infoText,
   autofit,
 } from '../sharedControls';
 
@@ -209,6 +210,7 @@ const config: ControlPanelConfig = {
         [iconBackgroundColor],
         [additionalText],
         [additionalTextFontSize],
+        [infoText],
       ],
     },
     {

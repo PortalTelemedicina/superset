@@ -194,6 +194,12 @@ def _write_chart_spec(spec: dict, out_dir: Path, filename: str | None = None) ->
     params = dict(spec["params"])
     params["viz_type"] = spec["viz_type"]
     params["datasource"] = "{dataset_id}__table"
+    if (
+        spec["viz_type"] in ("ptm_big_number_total", "ptm_big_number_trendline")
+        and spec.get("description")
+        and "info_text" not in params
+    ):
+        params["info_text"] = spec["description"]
     payload = {
         "slice_name": spec["slice_name"],
         "description": spec.get("description"),

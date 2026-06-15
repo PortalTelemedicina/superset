@@ -29,6 +29,7 @@ import {
 } from '@superset-ui/core';
 import * as LucideIcons from 'lucide-react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { InfoTooltip } from '@superset-ui/core/components';
 import { getThemeTokens } from '../../shared/themeTokens';
 import Echart from './EchartWrapper';
 import { BigNumberVizProps } from './types';
@@ -297,6 +298,18 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
   }
 
+  renderInfoIcon() {
+    const { infoText } = this.props;
+
+    if (!infoText || infoText.trim() === '') return null;
+
+    return (
+      <div className="ptm-info-icon">
+        <InfoTooltip tooltip={infoText} placement="top" iconSize="s" />
+      </div>
+    );
+  }
+
   renderIcon() {
     const { showIcon, iconName, iconSize, iconColor, iconBackgroundColor } =
       this.props;
@@ -397,6 +410,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       titleFontSize,
       showIcon,
       additionalText,
+      infoText,
       autofit = true,
     } = this.props;
     const className = this.getClassName();
@@ -422,8 +436,9 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
     // Calculate fixed element heights (not scaled)
     const padding = responsivePad * 2;
+    const hasInfoText = Boolean(infoText && infoText.trim() !== '');
     const headerRowHeight =
-      showIcon || this.props.subheader ? 40 + responsiveGap : 0;
+      showIcon || this.props.subheader || hasInfoText ? 40 + responsiveGap : 0;
     const trendlineHeight = showTrendLine ? 60 + responsiveGap : 0;
     const totalGaps =
       (title ? 1 : 0) +
@@ -549,6 +564,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         <div className="ptm-header-row">
           {this.renderIcon()}
           {this.renderTrendBadge(badgeFontSize)}
+          {this.renderInfoIcon()}
         </div>
 
         {title && (
@@ -802,6 +818,13 @@ export default styled(BigNumberVis)`
         margin-bottom: 0;
         flex-shrink: 0;
         min-width: 0;
+      }
+
+      .ptm-info-icon {
+        margin-left: auto;
+        flex-shrink: 0;
+        cursor: help;
+        line-height: 1;
       }
 
       .ptm-icon-container {

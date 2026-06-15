@@ -28,12 +28,14 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Vacinados de Outros Municípios
   metric: cross_jurisdiction_children
   time_range: No filter
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Crianças (distintas) residentes em outro município, vacinadas em unidades
+    deste município.
 cache_timeout: null
 uuid: 7762dc63-395e-52cd-a3dc-741f9190bd1c
 version: 1.0.0

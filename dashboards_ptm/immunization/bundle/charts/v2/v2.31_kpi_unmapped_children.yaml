@@ -27,12 +27,13 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Erros de Correspondência
   metric: unmapped_children
   time_range: No filter
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Município de residência sem correspondência — verificar cadastro.
 cache_timeout: null
 uuid: cc308011-eba5-5f00-96d0-35c7567a6126
 version: 1.0.0

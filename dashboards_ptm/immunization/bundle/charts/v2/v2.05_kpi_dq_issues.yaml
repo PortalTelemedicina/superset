@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 slice_name: Inconsistências de dados (90d)
-description: null
+description: Total de registros suspeitos nos últimos 90 dias.
 certified_by: null
 certification_details: null
 viz_type: ptm_big_number_total
@@ -27,7 +27,7 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: Total de registros suspeitos nos últimos 90 dias
+  additional_text: Inconsistências de Dados (90d)
   metric: issue_count_total
   adhoc_filters:
   - clause: WHERE
@@ -39,6 +39,7 @@ params:
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Total de registros suspeitos nos últimos 90 dias.
 cache_timeout: null
 uuid: 256cc1a7-20a8-57de-b4b3-bc2d60443e39
 version: 1.0.0

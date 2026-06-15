@@ -27,12 +27,13 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Moradores do Município
   metric: own_municipality_children
   time_range: No filter
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Residentes no próprio município da unidade.
 cache_timeout: null
 uuid: 5764ce40-5ca0-54b7-84ec-6df5b6e5f3db
 version: 1.0.0

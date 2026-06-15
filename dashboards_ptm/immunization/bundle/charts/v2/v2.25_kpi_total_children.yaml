@@ -28,12 +28,14 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Total de Crianças Atendidas
   metric: children_total
   time_range: No filter
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Crianças (distintas) atendidas em unidades deste município, base para
+    a cobertura.
 cache_timeout: null
 uuid: 58eaadff-ddd7-5fe9-8505-d7882c57cfd4
 version: 1.0.0

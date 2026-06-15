@@ -28,12 +28,14 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: ''
+  additional_text: Cobertura Global Estimada
   metric: coverage_up_to_date_pct
   time_range: No filter
   y_axis_format: .1%
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Crianças sem nenhuma dose atrasada ÷ total de crianças (cobertura global
+    aproximada).
 cache_timeout: null
 uuid: 0cae552c-1203-595f-820f-972a3e15f8e6
 version: 1.0.0

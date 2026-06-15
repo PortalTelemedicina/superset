@@ -15,7 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 slice_name: Tendência da demanda programada — unidades do município
-description: null
+description: Mostra as 5 vacinas de maior volume previsto. Use o filtro Vacina para
+  comparar a projeção de uma ou duas vacinas específicas; os volumes exatos estão
+  na matriz abaixo.
 certified_by: null
 certification_details: null
 viz_type: ptm_echarts_timeseries
@@ -44,6 +46,7 @@ params:
     - overdue
     clause: WHERE
     filterOptionName: filter_programmed_only
+  limit: 5
   row_limit: 10000
   show_legend: true
   y_axis_format: ',d'
@@ -53,7 +56,6 @@ params:
   ptm_zoom_axis: x
   ptm_zoom_size: xs
   ptm_zoom_inset: '24'
-  show_value: true
   viz_type: ptm_echarts_timeseries
   datasource: '{dataset_id}__table'
 cache_timeout: null

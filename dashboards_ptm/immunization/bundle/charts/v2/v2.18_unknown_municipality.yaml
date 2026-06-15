@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 slice_name: Registros com município desconhecido
-description: null
+description: Crianças com código IBGE de residência não resolvido (UNKNOWN).
 certified_by: null
 certification_details: null
 viz_type: ptm_big_number_total
@@ -27,7 +27,7 @@ params:
   header_font_size: 0.5
   additional_text_font_size: 20
   subheader: ''
-  additional_text: Crianças com código IBGE de residência não resolvido (UNKNOWN)
+  additional_text: Município Desconhecido
   metric: total_pairs_v2
   adhoc_filters:
   - expressionType: SIMPLE
@@ -40,6 +40,7 @@ params:
   y_axis_format: ','
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Crianças com código IBGE de residência não resolvido (UNKNOWN).
 cache_timeout: null
 uuid: 9f1cdb5c-037a-547c-980a-b22304af43c8
 version: 1.0.0

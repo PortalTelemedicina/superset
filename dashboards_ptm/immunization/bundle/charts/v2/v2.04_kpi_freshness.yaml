@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 slice_name: Última atualização da RNDS
-description: null
+description: Data e hora da última carga de dados do RNDS.
 certified_by: null
 certification_details: null
 viz_type: ptm_big_number_total
@@ -27,7 +27,7 @@ params:
   header_font_size: 0.18
   additional_text_font_size: 20
   subheader: ''
-  additional_text: Data e hora da última carga de dados do RNDS
+  additional_text: Última atualização da RNDS
   metric: last_rnds_ingestion_ts
   adhoc_filters: []
   time_range: No filter
@@ -35,6 +35,7 @@ params:
   time_format: '%d/%m/%Y %H:%M'
   viz_type: ptm_big_number_total
   datasource: '{dataset_id}__table'
+  info_text: Data e hora da última carga de dados do RNDS.
 cache_timeout: null
 uuid: c0f4fe86-1074-550e-8ddc-3ad95d48639b
 version: 1.0.0
