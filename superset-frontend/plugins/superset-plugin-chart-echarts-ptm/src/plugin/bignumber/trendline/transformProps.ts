@@ -37,6 +37,7 @@ import {
   TimeSeriesDatum,
 } from '../types';
 import { getDateFormatter, parseMetricValue } from '../utils';
+import { resolvePtmCaption } from '../utils/ptmCaption';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,
@@ -269,6 +270,7 @@ export default function transformProps(
     : {};
 
   const { onContextMenu } = hooks;
+  const caption = resolvePtmCaption(layoutMode, subheader, additionalText);
 
   return {
     width,
@@ -287,8 +289,7 @@ export default function transformProps(
     showTrendLine,
     startYAxisAtZero,
     subheader: formattedSubheader,
-    // PTM: Pass original subheader as title to show above number
-    title: subheader,
+    title: layoutMode === 'ptm' ? caption.title : subheader,
     titleFontSize,
     timestamp,
     trendLineData,
@@ -302,7 +303,7 @@ export default function transformProps(
     iconSize,
     iconColor,
     iconBackgroundColor,
-    additionalText,
+    additionalText: layoutMode === 'ptm' ? caption.additionalText : additionalText,
     additionalTextFontSize,
     infoText,
     autofit,

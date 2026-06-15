@@ -27,6 +27,7 @@ import {
 import { getColorFormatters } from '@superset-ui/chart-controls';
 import type { ColorFormatters } from '@superset-ui/chart-controls';
 import { parseMetricValue, getDateFormatter } from '../utils';
+import { resolvePtmCaption } from '../utils/ptmCaption';
 import { BigNumberTotalChartProps, BigNumberVizProps } from '../types';
 
 export default function transformProps(
@@ -68,7 +69,7 @@ export default function transformProps(
   const { data = [], coltypes = [] } = queriesData[0];
   const granularity = extractTimegrain(rawFormData as QueryFormData);
   const metricName = getMetricLabel(metric);
-  const formattedSubheader = subheader;
+  const caption = resolvePtmCaption(layoutMode, subheader, additionalText);
   const bigNumber =
     data.length === 0 ? null : parseMetricValue(data[0][metricName]);
 
@@ -115,8 +116,8 @@ export default function transformProps(
     headerFormatter,
     headerFontSize,
     subheaderFontSize,
-    subheader: formattedSubheader,
-    title: subheader,
+    subheader: caption.subheader,
+    title: caption.title,
     titleFontSize,
     onContextMenu,
     refs,
@@ -127,7 +128,7 @@ export default function transformProps(
     iconSize,
     iconColor,
     iconBackgroundColor,
-    additionalText,
+    additionalText: caption.additionalText,
     additionalTextFontSize,
     infoText,
     autofit,
