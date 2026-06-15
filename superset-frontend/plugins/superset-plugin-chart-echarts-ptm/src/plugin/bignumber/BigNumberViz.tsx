@@ -310,7 +310,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
   }
 
-  renderIcon() {
+  renderIcon(compact = false) {
     const { showIcon, iconName, iconSize, iconColor, iconBackgroundColor } =
       this.props;
 
@@ -325,12 +325,12 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
         return null;
       }
 
-      const size = iconSize || 24;
-      const padding = size / 2; // Padding is half the icon size
+      const size = compact ? Math.min(iconSize || 24, 14) : iconSize || 24;
+      const padding = compact ? 4 : size / 2;
 
       return (
         <div
-          className="ptm-icon-container"
+          className={`ptm-icon-container${compact ? ' ptm-status-icon' : ''}`}
           style={{
             padding,
             backgroundColor: iconBackgroundColor || '#F5F5F5',
@@ -437,8 +437,12 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     // Calculate fixed element heights (not scaled)
     const padding = responsivePad * 2;
     const hasInfoText = Boolean(infoText && infoText.trim() !== '');
-    const headerRowHeight =
-      showIcon || this.props.subheader || hasInfoText ? 40 + responsiveGap : 0;
+    const hasTrendBadge = Boolean(
+      this.props.subheader &&
+        (className.includes('positive') || className.includes('negative')),
+    );
+    const needsHeaderRow = hasInfoText || hasTrendBadge;
+    const headerRowHeight = needsHeaderRow ? 20 + responsiveGap : 0;
     const trendlineHeight = showTrendLine ? 60 + responsiveGap : 0;
     const totalGaps =
       (title ? 1 : 0) +
@@ -561,8 +565,10 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
           } as React.CSSProperties
         }
       >
+        {showIcon && (
+          <div className="ptm-status-icon-overlay">{this.renderIcon(true)}</div>
+        )}
         <div className="ptm-header-row">
-          {this.renderIcon()}
           {this.renderTrendBadge(badgeFontSize)}
           {this.renderInfoIcon()}
         </div>
@@ -797,6 +803,7 @@ export default styled(BigNumberVis)`
 
     /* PTM Layout Specific Styles */
     &.ptm-layout {
+      position: relative;
       /* Responsive padding and gap using CSS custom properties with clamp() */
       --pad: clamp(${tok.sizeUnit * 1.5}px, ${tok.sizeUnit * 2.5}px, ${tok.sizeUnit * 3}px);
       --gap: clamp(${tok.sizeUnit * 1}px, ${tok.sizeUnit * 1.5}px, ${tok.sizeUnit * 2}px);
@@ -810,11 +817,26 @@ export default styled(BigNumberVis)`
       display: flex;
       flex-direction: column;
 
+      .ptm-status-icon-overlay {
+        position: absolute;
+        top: var(--pad);
+        left: var(--pad);
+        z-index: 1;
+        line-height: 0;
+        pointer-events: none;
+
+        .ptm-status-icon {
+          border-radius: ${tok.sizeUnit}px;
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+        }
+      }
+
       .ptm-header-row {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        justify-content: flex-end;
+        align-items: center;
         width: 100%;
+        min-height: 20px;
         margin-bottom: 0;
         flex-shrink: 0;
         min-width: 0;
