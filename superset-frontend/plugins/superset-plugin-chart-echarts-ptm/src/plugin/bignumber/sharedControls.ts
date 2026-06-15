@@ -150,7 +150,9 @@ export const iconBackgroundColor: CustomControlItem = {
 export const additionalText: CustomControlItem = {
   name: 'additional_text',
   config: {
-    type: 'TextAreaControl',
+    // TextControl (not TextAreaControl): Superset TextArea only sets defaultValue
+    // on mount, so saved captions appear in the chart but the field stays blank.
+    type: 'TextControl',
     label: t('Additional Text'),
     renderTrigger: true,
     default: '',
@@ -178,7 +180,7 @@ export const additionalTextFontSize: CustomControlItem = {
 export const infoText: CustomControlItem = {
   name: 'info_text',
   config: {
-    type: 'TextAreaControl',
+    type: 'TextControl',
     label: t('Info Tooltip Text'),
     renderTrigger: true,
     default: '',
