@@ -179,16 +179,17 @@ msgstr " za vizualizacijo podatkov."
 msgid "!= (Is not equal)"
 msgstr "!= (ni enako)"
 
-#. Babel gettext check requires msgstr placeholders to match msgid byte-for-byte;
-#. a normal Slovenian word after "% " breaks compilation. Falls back to English msgid.
+#, python-format
 msgid "% calculation"
-msgstr ""
+msgstr "% cizračun"
 
+#, python-format
 msgid "% of parent"
-msgstr ""
+msgstr "% nadrejenega"
 
+#, python-format
 msgid "% of total"
-msgstr ""
+msgstr "% celote"
 
 #, python-format
 msgid "%(dialect)s cannot be used as a data source for security reasons."
@@ -196,9 +197,9 @@ msgstr ""
 "%(dialect)s ni mogoče uporabiti kot podatkovni vir zaradi varnostnih "
 "razlogov."
 
-#, python-format
+#, fuzzy, python-format
 msgid "%(label)s file"
-msgstr "Datoteka %(label)s"
+msgstr "%(type)s datoteka"
 
 #, python-format
 msgid "%(name)s.csv"
@@ -1227,9 +1228,9 @@ msgstr "Poravnaj +/-"
 msgid "All"
 msgstr "Vse"
 
-#, python-format
+#, fuzzy, python-format
 msgid "All %s hidden columns"
-msgstr "Vsi %s skriti stolpci"
+msgstr "Stolpci tabele"
 
 msgid "All Text"
 msgstr "Celotno besedilo"
@@ -4514,9 +4515,9 @@ msgstr "Dupliciraj podatkovni set"
 msgid "Duplicate role"
 msgstr "Dupliciraj"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Duplicate role %(name)s"
-msgstr "Podvojena vloga %(name)s"
+msgstr "Podvojena imena stolpcev: %(columns)s"
 
 msgid "Duplicate tab"
 msgstr "Podvoji zavihek"

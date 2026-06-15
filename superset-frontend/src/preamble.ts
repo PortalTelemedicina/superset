@@ -34,21 +34,15 @@ import { User } from './types/bootstrapTypes';
 import getBootstrapData, { applicationRoot } from './utils/getBootstrapData';
 import './hooks/useLocale';
 
-// Grab initial bootstrap data
-const bootstrapData = getBootstrapData();
-
-// Use the language pack embedded in bootstrap data for instant translations
-const embeddedLanguagePack = bootstrapData.common.language_pack;
-const hasEmbeddedPack =
-  embeddedLanguagePack &&
-  Object.keys(embeddedLanguagePack.locale_data?.superset || {}).length > 1;
-
-configure(hasEmbeddedPack ? { languagePack: embeddedLanguagePack } : undefined);
+configure();
 
 // Set hot reloader config
 if (process.env.WEBPACK_MODE === 'development') {
   setHotLoaderConfig({ logLevel: 'debug', trackTailUpdates: false });
 }
+
+// Grab initial bootstrap data
+const bootstrapData = getBootstrapData();
 
 setupFormatters(
   bootstrapData.common.d3_format,
@@ -58,11 +52,12 @@ setupFormatters(
 // Setup SupersetClient early so we can fetch language pack
 setupClient({ appRoot: applicationRoot() });
 
-// Refresh language pack from server (the embedded one is usually sufficient)
+// Load language pack before anything else
 (async () => {
   const lang = bootstrapData.common.locale || 'en';
-  if (lang !== 'en' && !hasEmbeddedPack) {
+  if (lang !== 'en') {
     try {
+      // Second call to configure to set the language pack
       const { json } = await SupersetClient.get({
         endpoint: `/superset/language_pack/${lang}/`,
       });
@@ -76,8 +71,6 @@ setupClient({ appRoot: applicationRoot() });
       configure();
       dayjs.locale('en');
     }
-  } else if (lang !== 'en') {
-    dayjs.locale(lang);
   }
 
   // Continue with rest of setup

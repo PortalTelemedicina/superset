@@ -23,13 +23,12 @@
 import logging
 import os
 import sys
-from typing import Any, MutableMapping
+from typing import Any
 
 from celery.schedules import crontab
 from cost_tagging import extract_chart_context
 from flask_caching.backends.filesystemcache import FileSystemCache
 
-from superset.translations.utils import get_language_pack
 from superset.utils import json
 
 LANGUAGES = {
@@ -40,13 +39,15 @@ LANGUAGES = {
 BABEL_DEFAULT_LOCALE = "pt_BR"
 
 
-def override_bootstrap_locale(
-    data: MutableMapping[str, Any],
-) -> MutableMapping[str, Any]:
+def override_bootstrap_locale(data: dict[str, Any]) -> dict[str, Any]:
+    from flask import current_app
+
     locale = data.get("locale")
     if locale == "pt":
         data["locale"] = "pt_BR"
-        data["language_pack"] = get_language_pack("pt_BR")
+    elif locale == "en":
+        # Use default locale when server sent "en" (e.g. get_locale() was None)
+        data["locale"] = current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
     return data
 
 
