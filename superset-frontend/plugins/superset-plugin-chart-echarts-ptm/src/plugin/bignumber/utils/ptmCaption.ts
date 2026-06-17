@@ -17,26 +17,22 @@
  * under the License.
  */
 
-/** PTM layout renders captions via additional_text only (below the number). */
+/**
+ * Resolves the caption fields for the PTM Big Number layout.
+ *
+ * The "Card Title" control in Explore is bound to `subheader`; PTM renders it as
+ * the title above the number, while `additional_text` is shown below. Keeping the
+ * subheader as the title here is what surfaces the card title (e.g. "% Absenteísmo")
+ * on the dashboard for both `ptm` and classic layouts.
+ */
 export function resolvePtmCaption(
-  layoutMode: string,
+  _layoutMode: string,
   subheader: string,
   additionalText: string,
 ): { title: string; additionalText: string; subheader: string } {
-  if (layoutMode !== 'ptm') {
-    return {
-      title: subheader,
-      additionalText,
-      subheader,
-    };
-  }
-
-  const caption =
-    (additionalText || '').trim() || (subheader || '').trim();
-
   return {
-    title: '',
-    subheader: '',
-    additionalText: caption,
+    title: subheader,
+    subheader,
+    additionalText,
   };
 }
