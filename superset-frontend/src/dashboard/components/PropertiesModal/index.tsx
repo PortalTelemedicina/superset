@@ -68,7 +68,10 @@ import {
 import { areObjectsEqual } from 'src/reduxUtils';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
 import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
-import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
+import {
+  convertPtmChartsForDashboard,
+  revertPtmChartsForDashboard,
+} from 'src/ptm/extensions/dashboardSaveRegistry';
 
 const StyledJsonEditor = styled(JsonEditor)`
   /* Border is already applied by AceEditor itself */
@@ -471,10 +474,18 @@ const PropertiesModal = ({
       addSuccessToast(t('Dashboard properties updated'));
     } else {
       const saveDashboard = async () => {
-        const turnedOffPtmAutoconvert =
-          initialPtmAutoconvert.current === true && !ptmAutoconvert;
-        if (isPtmExtensionEnabled() && turnedOffPtmAutoconvert) {
-          await revertPtmChartsForDashboard(dashboardId);
+        // Chart conversion/reversion happens ONLY here, on an explicit toggle of "Use PTM".
+        // Never convert/revert charts that are shared with other dashboards.
+        if (isPtmExtensionEnabled() && !hasSharedCharts) {
+          const turnedOnPtmAutoconvert =
+            initialPtmAutoconvert.current !== true && ptmAutoconvert === true;
+          const turnedOffPtmAutoconvert =
+            initialPtmAutoconvert.current === true && ptmAutoconvert !== true;
+          if (turnedOnPtmAutoconvert) {
+            await convertPtmChartsForDashboard(dashboardId);
+          } else if (turnedOffPtmAutoconvert) {
+            await revertPtmChartsForDashboard(dashboardId);
+          }
         }
         return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${dashboardId}`,
