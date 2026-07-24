@@ -4016,6 +4016,11 @@ def ensure_scoped_dashboard(
         ),
         "cross_filters_enabled": True,
         "ptm_autoconvert": True,
+        # July 10 feedback: force the "Atrasadas" (late) series to red across the
+        # dashboard. Superset's shared color map is driven by dashboard-level
+        # label_colors (the chart-level form_data.label_colors is not reliably
+        # applied on dashboards), so it must live here to take effect.
+        "label_colors": {"Atrasadas": "#D32F2F"},
     }
     payload = {
         "dashboard_title": dashboard_title,
