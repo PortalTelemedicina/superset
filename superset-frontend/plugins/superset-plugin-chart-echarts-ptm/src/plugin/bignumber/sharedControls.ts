@@ -190,6 +190,44 @@ export const infoText: CustomControlItem = {
   },
 };
 
+export const subheaderMetric: CustomControlItem = {
+  name: 'subheader_metric',
+  config: {
+    type: 'MetricsControl',
+    label: t('Secondary metric (absolute or %)'),
+    description: t(
+      'Optional second metric shown under the big number (e.g. percentage next to a count).',
+    ),
+    multi: false,
+    mapStateToProps: ({ datasource }) => ({
+      columns: datasource?.columns || [],
+      savedMetrics: datasource?.metrics || [],
+      datasource,
+      datasourceType: datasource?.type,
+    }),
+  },
+};
+
+export const subheaderMetricFormat: CustomControlItem = {
+  name: 'subheader_metric_format',
+  config: {
+    type: 'SelectControl',
+    freeForm: true,
+    label: t('Secondary metric format'),
+    renderTrigger: true,
+    default: '.1%',
+    choices: [
+      ['.1%', '.1%'],
+      [',', ','],
+      [',.0f', ',.0f'],
+      ['.2f', '.2f'],
+    ],
+    description: t('D3 format for the secondary metric value.'),
+    visibility: ({ controls }: any) =>
+      Boolean(controls?.subheader_metric?.value),
+  },
+};
+
 export const autofit: CustomControlItem = {
   name: 'autofit',
   config: {

@@ -151,12 +151,18 @@ UUIDS: dict[str, str] = {
     # v2 charts — Section 4 (Data Quality)
     "chart.v2.15_suspicious_by_reason": _uid("chart.v2.15_suspicious_by_reason"),
     "chart.v2.16_suspicious_by_vaccine": _uid("chart.v2.16_suspicious_by_vaccine"),
+    # July 10 feedback: DQ deep-dive by establishment (CNES) × reason.
+    "chart.v2.17_dq_by_establishment": _uid("chart.v2.17_dq_by_establishment"),
     "chart.v2.18_unknown_municipality": _uid("chart.v2.18_unknown_municipality"),
     # v2 charts — Section 5 (State Monitoring)
     "chart.v2.19_state_priority_table": _uid("chart.v2.19_state_priority_table"),
     "chart.v2.20_state_coverage_matrix": _uid("chart.v2.20_state_coverage_matrix"),
     "chart.v2.21_kpi_cross_jurisdiction": _uid("chart.v2.21_kpi_cross_jurisdiction"),
+    # Retired July 10 feedback — kept so existing Superset records can be
+    # found and detached; replaced on the dashboard by 22a/22b below.
     "chart.v2.22_cross_jurisdiction_origin": _uid("chart.v2.22_cross_jurisdiction_origin"),
+    "chart.v2.22a_cross_out_of_state": _uid("chart.v2.22a_cross_out_of_state"),
+    "chart.v2.22b_cross_in_state": _uid("chart.v2.22b_cross_in_state"),
     "chart.v2.23_forecast_attended": _uid("chart.v2.23_forecast_attended"),
     "chart.v2.24_forecast_resident": _uid("chart.v2.24_forecast_resident"),
     # Coverage + cross-jurisdiction origin breakdown cards
@@ -167,6 +173,10 @@ UUIDS: dict[str, str] = {
     "chart.v2.29_kpi_regional_children": _uid("chart.v2.29_kpi_regional_children"),
     "chart.v2.30_kpi_out_of_state_children": _uid("chart.v2.30_kpi_out_of_state_children"),
     "chart.v2.31_kpi_unmapped_children": _uid("chart.v2.31_kpi_unmapped_children"),
+    # July 10 feedback: monthly municipality-vs-municipality comparison.
+    "chart.v2.32_municipality_monthly_compare": _uid(
+        "chart.v2.32_municipality_monthly_compare"
+    ),
     "dataset.dose_forecast_monthly": _uid("dataset.gold_immunization_dose_forecast_monthly"),
     "dataset.cross_jurisdiction_daily": _uid(
         "dataset.gold_immunization_cross_jurisdiction_daily"
@@ -525,6 +535,8 @@ _COLUMN_LABELS: dict[str, str] = {
     # Vaccine
     "vaccine_code": "Cód. vacina",
     "vaccine_name": "Vacina",
+    "vaccine_commercial_name": "Nome comercial",
+    "vaccine_label": "Vacina",
     "dose_code": "Cód. dose",
     "dose_label": "Tipo de dose",
     "dose_sequence": "Seq. da dose",
@@ -872,7 +884,8 @@ _ESTABLISHMENT_SCOPE_CHARTS: frozenset[str] = frozenset({
     "chart.v2.11_upcoming_workload",
     "chart.v2.12_overdue_bucket_dist",
     "chart.v2.21_kpi_cross_jurisdiction",
-    "chart.v2.22_cross_jurisdiction_origin",
+    "chart.v2.22a_cross_out_of_state",
+    "chart.v2.22b_cross_in_state",
     "chart.v2.23_forecast_attended",
     "chart.v2.25_kpi_total_children",
     "chart.v2.26_kpi_children_overdue",
@@ -893,10 +906,12 @@ _RESIDENCE_SCOPE_CHARTS: frozenset[str] = frozenset({
     "chart.v2.14_dropout_bar",
     "chart.v2.15_suspicious_by_reason",
     "chart.v2.16_suspicious_by_vaccine",
+    "chart.v2.17_dq_by_establishment",
     "chart.v2.18_unknown_municipality",
     "chart.v2.19_state_priority_table",
     "chart.v2.20_state_coverage_matrix",
     "chart.v2.24_forecast_resident",
+    "chart.v2.32_municipality_monthly_compare",
 })
 
 
@@ -1995,6 +2010,22 @@ DATASETS_V2: list[dict] = [
                 "d3format": ".1%",
             },
             {
+                "metric_name": "applied_share_v2",
+                "verbose_name": "% Aplicadas",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(applied_count), NULLIF(SUM(child_rule_pairs), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "upcoming_share_v2",
+                "verbose_name": "% A Vencer",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(upcoming_count), NULLIF(SUM(child_rule_pairs), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
                 "metric_name": "cross_jurisdiction_pairs",
                 "verbose_name": "Pares cross-jurisdição",
                 "expression": (
@@ -2102,6 +2133,54 @@ DATASETS_V2: list[dict] = [
                 ),
                 "d3format": ".1%",
             },
+            # July 10 feedback: KPI storytelling — share metrics so every
+            # cross-jurisdiction/coverage KPI card can show a % subheader.
+            {
+                "metric_name": "cross_jurisdiction_pct",
+                "verbose_name": "% de outro município",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(CASE WHEN is_cross_jurisdiction THEN children ELSE 0 END), "
+                    "NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "regional_children_pct",
+                "verbose_name": "% regional (mesmo estado)",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(CASE WHEN origin_quality = 'Outro município do estado' "
+                    "THEN children ELSE 0 END), NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "out_of_state_children_pct",
+                "verbose_name": "% fora do estado",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(CASE WHEN origin_quality = "
+                    "'Fora do estado (verificar cadastro)' THEN children ELSE 0 END), "
+                    "NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "unmapped_children_pct",
+                "verbose_name": "% origem não mapeada",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(CASE WHEN origin_quality = "
+                    "'Origem não mapeada (verificar cadastro)' THEN children ELSE 0 END), "
+                    "NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "children_overdue_pct",
+                "verbose_name": "% com dose em atraso",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(children_overdue), NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
         ],
     },
     {
@@ -2134,6 +2213,22 @@ DATASETS_V2: list[dict] = [
                 "metric_name": "effective_dropout_avg",
                 "verbose_name": "Abandono efetivo médio",
                 "expression": "AVG(effective_dropout_rate)",
+                "d3format": ".1%",
+            },
+            # July 10 feedback: prefer display_dropout_rate / adherence_rate
+            # (NULL-safe aliases of effective_dropout_rate) for chart-facing
+            # metrics — same value, but the "display_" name signals the
+            # N/A-when-denominator-warning contract to anyone browsing metrics.
+            {
+                "metric_name": "display_dropout_avg",
+                "verbose_name": "Taxa de abandono (exibição)",
+                "expression": "AVG(display_dropout_rate)",
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "adherence_avg",
+                "verbose_name": "Adesão média",
+                "expression": "AVG(adherence_rate)",
                 "d3format": ".1%",
             },
             {
@@ -2186,6 +2281,24 @@ DATASETS_V2: list[dict] = [
                 "verbose_name": "Total com regra",
                 "expression": "SUM(total_with_schedule_match)",
             },
+            # July 10 feedback: % metrics for KPI subheaders and the new
+            # municipality-vs-municipality comparison pivot (v2.32).
+            {
+                "metric_name": "on_time_pct_metric",
+                "verbose_name": "% No Prazo",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(on_time_count), NULLIF(SUM(total_with_schedule_match), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
+                "metric_name": "late_pct_metric",
+                "verbose_name": "% Atrasadas",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(late_count), NULLIF(SUM(total_with_schedule_match), 0))"
+                ),
+                "d3format": ".1%",
+            },
         ],
     },
     {
@@ -2235,6 +2348,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Total de Doses Atrasadas",
             extra={
                 "metric": "overdue_count_v2",
+                "subheader_metric": "overdue_share_v2",
+                "subheader_metric_format": ".1%",
                 "adhoc_filters": [],
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
@@ -2251,6 +2366,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Doses a Vencer (Até 30 dias)",
             extra={
                 "metric": "upcoming_count_v2",
+                "subheader_metric": "upcoming_share_v2",
+                "subheader_metric_format": ".1%",
                 "adhoc_filters": [],
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
@@ -2270,6 +2387,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Doses Aplicadas (Calendário)",
             extra={
                 "metric": "applied_count_v2",
+                "subheader_metric": "applied_share_v2",
+                "subheader_metric_format": ".1%",
                 "adhoc_filters": [],
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
@@ -2382,6 +2501,10 @@ CHARTS_V2: list[dict] = [
             "show_legend": True,
             "y_axis_format": ",d",
             "x_axis_time_format": "smart_date",
+            "color_scheme": "supersetColors",
+            # July 10 feedback: make the "Atrasadas" line unmistakably red so
+            # it can't be confused with "No prazo" at a glance.
+            "label_colors": {"Atrasadas": "#D32F2F"},
             **_PTM_SHOW_VALUE,
             "show_valueB": True,
         },
@@ -2419,6 +2542,28 @@ CHARTS_V2: list[dict] = [
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
+            # July 10 feedback: red (low coverage) -> green (high coverage)
+            # scale so gaps jump out without reading the raw %.
+            "conditional_formatting": [
+                {
+                    "operator": "<",
+                    "targetValue": 0.5,
+                    "colorScheme": "#d32f2f",
+                    "column": "% Cobertura",
+                },
+                {
+                    "operator": "<",
+                    "targetValue": 0.8,
+                    "colorScheme": "#ef6c00",
+                    "column": "% Cobertura",
+                },
+                {
+                    "operator": ">=",
+                    "targetValue": 0.8,
+                    "colorScheme": "#2e7d32",
+                    "column": "% Cobertura",
+                },
+            ],
         },
     },
     # -------------------------------------------------------------------------
@@ -2427,28 +2572,38 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.10_backlog_establishment",
         "slice_name": "Doses em atraso por unidade de saúde",
-        "viz_type": "ptm_echarts_timeseries",
+        "description": (
+            "Ranking de unidades por doses em atraso, com a participação "
+            "de cada unidade no total do backlog municipal."
+        ),
+        # July 10 feedback: bar chart of ~dozens of establishments was hard
+        # to scan; a sortable table with cell bars + share reads faster.
+        "viz_type": "ptm_table",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": {
-            # Snapshot view per establishment (no time series — single ref_date)
-            "x_axis": "establishment_name",
-            "metrics": [_metric("Doses em atraso", "SUM", "overdue_count")],
-            "groupby": [],
+            "query_mode": "aggregate",
+            "groupby": ["establishment_name"],
+            "metrics": [
+                _metric("Doses em atraso", "SUM", "overdue_count"),
+                {
+                    "expressionType": "SQL",
+                    "label": "% do Atraso Municipal",
+                    "sqlExpression": (
+                        "SAFE_DIVIDE(SUM(overdue_count), "
+                        "SUM(SUM(overdue_count)) OVER())"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_overdue_share_establishment",
+                },
+            ],
             "adhoc_filters": [],
             **_SNAPSHOT_TIME_RANGE,
-            "row_limit": 50,
-            "color_scheme": "supersetColors",
-            "show_legend": False,
-            "y_axis_format": ",",
-            "ptm_series_type": "bar",
-            "orientation": "horizontal",
-            "x_axis_sort": "Doses em atraso",
-            # Horizontal bars render bottom-to-top, so ascending puts the
-            # largest backlog at the TOP (most-actionable units first).
-            "x_axis_sort_asc": True,
-            **_PTM_BAR_RADIUS,
-            **_PTM_ZOOM,
-            **_PTM_SHOW_VALUE,
+            "row_limit": 200,
+            "page_length": 25,
+            "include_search": True,
+            "show_cell_bars": True,
+            "order_desc": True,
+            "order_by_cols": ['["Doses em atraso", false]'],
         },
     },
     {
@@ -2488,11 +2643,25 @@ CHARTS_V2: list[dict] = [
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
+            # July 10 feedback: strengthen the scale with a mid-tier so
+            # heavy buckets (91+ dias) stand out from merely non-zero ones.
             "conditional_formatting": [
                 {
                     "operator": ">",
                     "targetValue": 0,
+                    "colorScheme": "#ffab91",
+                    "column": "SUM(child_rule_pairs)",
+                },
+                {
+                    "operator": ">",
+                    "targetValue": 50,
                     "colorScheme": "#ef6c00",
+                    "column": "SUM(child_rule_pairs)",
+                },
+                {
+                    "operator": ">",
+                    "targetValue": 200,
+                    "colorScheme": "#d32f2f",
                     "column": "SUM(child_rule_pairs)",
                 },
             ],
@@ -2513,8 +2682,10 @@ CHARTS_V2: list[dict] = [
                 _metric("Dose seguinte (N)", "SUM", "applied_to_count"),
                 _metric("Ranking", "MIN", "priority_rank"),
             ],
+            # July 10 feedback #7: show técnico + comercial (vaccine_label) —
+            # dropout_by_series_v2 keeps vaccine_name technical-only.
             "groupby": [
-                "vaccine_name",
+                "vaccine_label",
                 "dose_from_label",
                 "dose_to_label",
                 "cohort_birth_year",
@@ -2529,18 +2700,26 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.14_dropout_bar",
         "slice_name": "Taxa de abandono por vacina",
+        "description": (
+            "Abandono efetivo entre doses consecutivas. N/A quando a base "
+            "de crianças na dose inicial é pequena demais (<30) para um "
+            "percentual confiável — ver display_dropout_rate."
+        ),
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.dropout_by_series_v2",
         "params": {
-            "groupbyRows": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label).
+            "groupbyRows": ["vaccine_label"],
             "groupbyColumns": ["dose_from_label"],
             "metrics": [
-                _metric("Taxa de abandono", "AVG", "effective_dropout_rate"),
+                _metric("Taxa de abandono", "AVG", "display_dropout_rate"),
+                _metric("Adesão", "AVG", "adherence_rate"),
             ],
             "metricsLayout": "COLUMNS",
             "adhoc_filters": [],
             "row_limit": 200,
             "valueFormat": ".1%",
+            "nullValue": "N/A",
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Average",
@@ -2549,13 +2728,19 @@ CHARTS_V2: list[dict] = [
                     "operator": ">",
                     "targetValue": 0.15,
                     "colorScheme": "#d32f2f",
-                    "column": "AVG(effective_dropout_rate)",
+                    "column": "AVG(display_dropout_rate)",
                 },
                 {
                     "operator": ">",
                     "targetValue": 0.05,
                     "colorScheme": "#ef6c00",
-                    "column": "AVG(effective_dropout_rate)",
+                    "column": "AVG(display_dropout_rate)",
+                },
+                {
+                    "operator": "<=",
+                    "targetValue": 0.05,
+                    "colorScheme": "#2e7d32",
+                    "column": "AVG(display_dropout_rate)",
                 },
             ],
         },
@@ -2606,6 +2791,30 @@ CHARTS_V2: list[dict] = [
             "page_length": 20,
             "include_search": True,
             "show_cell_bars": True,
+        },
+    },
+    {
+        "key": "chart.v2.17_dq_by_establishment",
+        "slice_name": "Inconsistências por unidade de saúde",
+        "description": (
+            "Detalha as inconsistências de dados por unidade de saúde "
+            "(CNES) e tipo de problema, para direcionar a correção de "
+            "cadastro na origem."
+        ),
+        "viz_type": "ptm_table",
+        "dataset_key": "dataset.data_quality_daily_v2",
+        "params": {
+            "query_mode": "aggregate",
+            "groupby": ["establishment_name", "reason_label"],
+            "metrics": [_metric("Total", "SUM", "issue_count")],
+            "adhoc_filters": [_filter_temporal("reference_month")],
+            "time_range": "last 90 days",
+            "row_limit": 500,
+            "page_length": 25,
+            "include_search": True,
+            "show_cell_bars": True,
+            "order_desc": True,
+            "order_by_cols": ['["Total", false]'],
         },
     },
     {
@@ -2712,46 +2921,118 @@ CHARTS_V2: list[dict] = [
             additional_text="Vacinados de Outros Municípios",
             extra={
                 "metric": "cross_jurisdiction_children",
+                "subheader_metric": "cross_jurisdiction_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
         ),
     },
+    # July 10 feedback: the stacked-bar "origin_quality" breakdown was hard
+    # to read (mixed municipality names + stacked categories on one axis).
+    # Split into two focused tables: out-of-state by UF, and same-state by
+    # municipality. chart.v2.22_cross_jurisdiction_origin is retired — its
+    # UUID stays in UUIDS for cleanup/detach only.
     {
-        "key": "chart.v2.22_cross_jurisdiction_origin",
-        "slice_name": "Origem das crianças de fora (por município e qualidade do cadastro)",
-        "viz_type": "ptm_echarts_timeseries",
+        "key": "chart.v2.22a_cross_out_of_state",
+        "slice_name": "Residentes fora do estado — por UF",
+        "description": (
+            "Crianças atendidas neste município cuja residência é em "
+            "outro estado, agrupadas por UF de residência — cadastro de "
+            "endereço deve ser verificado."
+        ),
+        "viz_type": "ptm_table",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": {
-            "x_axis": "residence_municipality_name",
-            "metrics": [_metric("Crianças", "SUM", "children")],
-            "groupby": ["origin_quality"],
-            "adhoc_filters": [_CROSS_JURISDICTION_FILTER],
+            "query_mode": "aggregate",
+            "groupby": ["residence_state_name"],
+            "metrics": [
+                _metric("Crianças", "SUM", "children"),
+                {
+                    "expressionType": "SQL",
+                    "label": "% do Total Fora do Estado",
+                    "sqlExpression": (
+                        "SAFE_DIVIDE(SUM(children), SUM(SUM(children)) OVER())"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_out_of_state_share",
+                },
+            ],
+            "adhoc_filters": [
+                {
+                    "expressionType": "SIMPLE",
+                    "subject": "is_out_of_state",
+                    "operator": "==",
+                    "comparator": True,
+                    "clause": "WHERE",
+                    "filterOptionName": "filter_is_out_of_state",
+                }
+            ],
             **_SNAPSHOT_TIME_RANGE,
-            "row_limit": 15,
-            "show_legend": True,
-            "y_axis_format": ",",
-            "ptm_series_type": "bar",
-            "orientation": "horizontal",
-            "stack": "Stack",
-            "x_axis_sort": "Crianças",
-            "x_axis_sort_asc": True,
-            **_PTM_BAR_RADIUS,
-            **_PTM_SHOW_VALUE,
+            "row_limit": 50,
+            "page_length": 20,
+            "include_search": True,
+            "show_cell_bars": True,
+            "order_desc": True,
+            "order_by_cols": ['["Crianças", false]'],
+        },
+    },
+    {
+        "key": "chart.v2.22b_cross_in_state",
+        "slice_name": "Outros municípios do estado",
+        "description": (
+            "Crianças atendidas neste município residentes em outros "
+            "municípios do mesmo estado (fluxo regional plausível)."
+        ),
+        "viz_type": "ptm_table",
+        "dataset_key": "dataset.cross_jurisdiction_daily",
+        "params": {
+            "query_mode": "aggregate",
+            "groupby": ["residence_municipality_name"],
+            "metrics": [
+                _metric("Crianças", "SUM", "children"),
+                {
+                    "expressionType": "SQL",
+                    "label": "% do Total Regional",
+                    "sqlExpression": (
+                        "SAFE_DIVIDE(SUM(children), SUM(SUM(children)) OVER())"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_regional_share",
+                },
+            ],
+            "adhoc_filters": [
+                {
+                    "expressionType": "SIMPLE",
+                    "subject": "origin_quality",
+                    "operator": "==",
+                    "comparator": "Outro município do estado",
+                    "clause": "WHERE",
+                    "filterOptionName": "filter_regional_origin",
+                }
+            ],
+            **_SNAPSHOT_TIME_RANGE,
+            "row_limit": 100,
+            "page_length": 20,
+            "include_search": True,
+            "show_cell_bars": True,
+            "order_desc": True,
+            "order_by_cols": ['["Crianças", false]'],
         },
     },
     # --- Coverage cards (distinct children) ----------------------------------
     {
         "key": "chart.v2.25_kpi_total_children",
-        "slice_name": "Total de Crianças Atendidas",
+        "slice_name": "Crianças ≤15 anos (histórico)",
         "description": (
-            "Crianças (distintas) atendidas em unidades deste município, "
-            "base para a cobertura."
+            "Crianças (distintas) já atendidas em unidades deste município "
+            "desde o início do histórico de dados, com idade limitada a "
+            "15 anos — base populacional (lifetime) para a cobertura."
         ),
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
-            additional_text="Total de Crianças Atendidas",
+            additional_text="Crianças ≤15 anos (histórico)",
             extra={
                 "metric": "children_total",
                 **_SNAPSHOT_TIME_RANGE,
@@ -2771,6 +3052,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Crianças com Doses em Atraso",
             extra={
                 "metric": "children_overdue_total",
+                "subheader_metric": "children_overdue_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
@@ -2780,8 +3063,9 @@ CHARTS_V2: list[dict] = [
         "key": "chart.v2.27_kpi_coverage_pct",
         "slice_name": "Cobertura Global Estimada",
         "description": (
-            "Crianças sem nenhuma dose atrasada ÷ total de crianças "
-            "(cobertura global aproximada)."
+            "Calendário binário completo: crianças com ZERO doses "
+            "atrasadas ÷ total de crianças. O card mostra o percentual; "
+            "o número absoluto de crianças em dia é a métrica secundária."
         ),
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
@@ -2789,6 +3073,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Cobertura Global Estimada",
             extra={
                 "metric": "coverage_up_to_date_pct",
+                "subheader_metric": "children_up_to_date_total",
+                "subheader_metric_format": ",",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ".1%",
             },
@@ -2798,7 +3084,10 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.28_kpi_own_children",
         "slice_name": "Moradores do Município",
-        "description": "Residentes no próprio município da unidade.",
+        "description": (
+            "Residentes (≤15 anos) no próprio município da unidade — não "
+            "inclui crianças de outros municípios ou estados."
+        ),
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.cross_jurisdiction_daily",
         "params": _ptm_kpi(
@@ -2822,6 +3111,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Atendimentos Regionais",
             extra={
                 "metric": "regional_children",
+                "subheader_metric": "regional_children_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
@@ -2843,6 +3134,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Residentes Fora do Estado",
             extra={
                 "metric": "out_of_state_children",
+                "subheader_metric": "out_of_state_children_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
@@ -2860,6 +3153,8 @@ CHARTS_V2: list[dict] = [
             additional_text="Erros de Correspondência",
             extra={
                 "metric": "unmapped_children",
+                "subheader_metric": "unmapped_children_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
@@ -2895,7 +3190,7 @@ CHARTS_V2: list[dict] = [
     },
     {
         "key": "chart.v2.24_forecast_resident",
-        "slice_name": "Volumes da demanda programada — população residente",
+        "slice_name": "Volumes da demanda programada (Mês/Ano) — população residente",
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.dose_forecast_monthly",
         "params": {
@@ -2906,6 +3201,7 @@ CHARTS_V2: list[dict] = [
             "adhoc_filters": [_FORECAST_FORWARD_RANGE, _PROGRAMMED_ONLY_FILTER],
             "row_limit": 10000,
             "valueFormat": ",",
+            "date_format": "smart_date",
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
@@ -2915,6 +3211,54 @@ CHARTS_V2: list[dict] = [
                     "targetValue": 0,
                     "colorScheme": "#1565c0",
                     "column": "SUM(expected_doses)",
+                },
+            ],
+        },
+    },
+    {
+        "key": "chart.v2.32_municipality_monthly_compare",
+        "slice_name": "Comparação mensal — atraso por município",
+        "description": (
+            "Evolução mensal do percentual de doses atrasadas, por "
+            "município, para comparar o ritmo de melhora entre localidades."
+        ),
+        "viz_type": "ptm_pivot_table",
+        "dataset_key": "dataset.timeliness_monthly",
+        "params": {
+            "groupbyRows": ["municipality_name"],
+            "groupbyColumns": ["reference_month"],
+            "metrics": [
+                {
+                    "expressionType": "SQL",
+                    "label": "% Atrasadas",
+                    "sqlExpression": (
+                        "SAFE_DIVIDE(SUM(late_count), "
+                        "NULLIF(SUM(total_with_schedule_match), 0))"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_late_pct_municipality_compare",
+                }
+            ],
+            "metricsLayout": "COLUMNS",
+            "adhoc_filters": [_filter_temporal("reference_month")],
+            "row_limit": 10000,
+            "valueFormat": ".1%",
+            "date_format": "smart_date",
+            "rowOrder": "value_z_to_a",
+            "colOrder": "key_a_to_z",
+            "aggregateFunction": "Sum",
+            "conditional_formatting": [
+                {
+                    "operator": ">",
+                    "targetValue": 0.15,
+                    "colorScheme": "#d32f2f",
+                    "column": "% Atrasadas",
+                },
+                {
+                    "operator": ">",
+                    "targetValue": 0.05,
+                    "colorScheme": "#ef6c00",
+                    "column": "% Atrasadas",
                 },
             ],
         },
@@ -2955,9 +3299,10 @@ _NATIVE_FILTER_SPECS_V2: list[dict] = [
         "dataset_key": _BACKLOG_DS,
         "column": "municipality_name",
         "control_values": {**_SELECT_MULTI, "inverseSelection": False},
-        "default_data_mask": {
-            "filterState": {"value": [_PILOT_MUNICIPALITY_NAME]},
-        },
+        # July 10 feedback: the national dashboard was silently defaulting
+        # to Cocal, hiding all other municipalities on first paint. No
+        # default here — scoped muni dashboards still get the pilot default
+        # via build_native_filters_v2(default_municipality_name=...).
     },
     {
         "id": "NATIVE_FILTER_V2-establishment",
@@ -3309,6 +3654,15 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
         ("ROW-V2-priority-table", [
             ("chart.v2.06_priority_ranking", 12, 55),
         ]),
+        # July 10 feedback: dedicated municipality-comparison sub-section
+        # right below the priority ranking (v2.06), so users can go from
+        # "who's worst" to "is it getting better or worse" in one scroll.
+        ("ROW-V2-sec2b", [(
+            "MD::### Comparação entre municípios\n"
+            "Evolução mensal do atraso, município a município.", 12, 6)]),
+        ("ROW-V2-muni-compare", [
+            ("chart.v2.32_municipality_monthly_compare", 12, 55),
+        ]),
         ("ROW-V2-state-priority-table", [
             ("chart.v2.19_state_priority_table", 12, 55),
         ]),
@@ -3348,7 +3702,8 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
             ("chart.v2.31_kpi_unmapped_children", 4, 22),
         ]),
         ("ROW-V2-cross-origin", [
-            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+            ("chart.v2.22a_cross_out_of_state", 6, 55),
+            ("chart.v2.22b_cross_in_state", 6, 55),
         ]),
         # ===== 5. PREVISIBILIDADE DE DOSES ===============================
         ("ROW-V2-sec5", [(
@@ -3382,6 +3737,9 @@ def build_dashboard_position_v2(chart_id_by_key: dict[str, int]) -> dict[str, An
         ("ROW-V2-dq", [
             ("chart.v2.15_suspicious_by_reason", 6, 55),
             ("chart.v2.16_suspicious_by_vaccine", 6, 55),
+        ]),
+        ("ROW-V2-dq-establishment", [
+            ("chart.v2.17_dq_by_establishment", 12, 55),
         ]),
     ]
     return _build_dashboard_position_from_rows(
@@ -3424,6 +3782,14 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
         ("ROW-STATE-priority-table", [
             ("chart.v2.06_priority_ranking", 12, 55),
         ]),
+        # July 10 feedback: municipality-comparison sub-section, right
+        # below the priority ranking.
+        ("ROW-STATE-sec2b", [(
+            "MD::### Comparação entre municípios\n"
+            "Evolução mensal do atraso, município a município.", 12, 6)]),
+        ("ROW-STATE-muni-compare", [
+            ("chart.v2.32_municipality_monthly_compare", 12, 55),
+        ]),
         ("ROW-STATE-coverage-heatmap", [
             ("chart.v2.09_coverage_heatmap", 12, 55),
         ]),
@@ -3460,7 +3826,8 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
             ("chart.v2.31_kpi_unmapped_children", 4, 22),
         ]),
         ("ROW-STATE-cross-origin", [
-            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+            ("chart.v2.22a_cross_out_of_state", 6, 55),
+            ("chart.v2.22b_cross_in_state", 6, 55),
         ]),
         # ===== 5. PREVISIBILIDADE DE DOSES ===============================
         ("ROW-STATE-sec5", [(
@@ -3493,6 +3860,9 @@ def build_dashboard_position_state(chart_id_by_key: dict[str, int]) -> dict[str,
         ("ROW-STATE-dq", [
             ("chart.v2.15_suspicious_by_reason", 6, 55),
             ("chart.v2.16_suspicious_by_vaccine", 6, 55),
+        ]),
+        ("ROW-STATE-dq-establishment", [
+            ("chart.v2.17_dq_by_establishment", 12, 55),
         ]),
     ]
     return _build_dashboard_position_from_rows(
@@ -3561,7 +3931,8 @@ def build_dashboard_position_muni(chart_id_by_key: dict[str, int]) -> dict[str, 
             ("chart.v2.31_kpi_unmapped_children", 4, 22),
         ]),
         ("ROW-MUNI-flow-origin", [
-            ("chart.v2.22_cross_jurisdiction_origin", 12, 55),
+            ("chart.v2.22a_cross_out_of_state", 6, 55),
+            ("chart.v2.22b_cross_in_state", 6, 55),
         ]),
         # ===== 5. PREVISIBILIDADE DE DOSES ===============================
         ("ROW-MUNI-sec5", [(
@@ -3593,6 +3964,9 @@ def build_dashboard_position_muni(chart_id_by_key: dict[str, int]) -> dict[str, 
         ]),
         ("ROW-MUNI-dq-table", [
             ("chart.v2.16_suspicious_by_vaccine", 12, 55),
+        ]),
+        ("ROW-MUNI-dq-establishment", [
+            ("chart.v2.17_dq_by_establishment", 12, 55),
         ]),
     ]
     return _build_dashboard_position_from_rows(
@@ -3684,7 +4058,12 @@ def ensure_dashboard_v2(
     dataset_id_by_key: dict[str, int],
     dry_run: bool,
 ) -> str:
-    """Internal nacional dashboard (all states, pilot muni default)."""
+    """Internal nacional dashboard (all states, no municipality default).
+
+    July 10 feedback: the national/internal view must load unscoped so
+    analysts see every municipality by default. Per-muni pilot default
+    lives only in ``ensure_dashboard_muni``.
+    """
     position = build_dashboard_position_v2(chart_id_by_key)
     return ensure_scoped_dashboard(
         c,
@@ -3695,7 +4074,6 @@ def ensure_dashboard_v2(
         chart_id_by_key=chart_id_by_key,
         dataset_id_by_key=dataset_id_by_key,
         dry_run=dry_run,
-        default_municipality_name=_PILOT_MUNICIPALITY_NAME,
     )
 
 

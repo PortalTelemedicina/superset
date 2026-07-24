@@ -596,3 +596,23 @@ Mapa de propagação dos filtros principais:
 - Registry de municípios ativos: tabela BigQuery `governance.municipality_activation`, espelhada do Django `activation_municipalityactivation` via Airflow
 - Bootstrap dos dashboards: [`bootstrap_via_api.py`](bootstrap_via_api.py) — fonte da verdade para datasets, gráficos, filtros, layouts
 - Operação local-first → dev → prod: ver seções "Workflow recomendado" e "Dashboard tiers" no [`README.md`](README.md)
+
+---
+
+## Changelog — 2026-07-10 (feedback Meira / Almeida)
+
+Implementado no branch `feature/immunization-july10-feedback` (Superset) +
+`feature/immunization-july10-feedback` (ptm-dw-modeling). Detalhe em
+[`FEEDBACK_LOG.md`](FEEDBACK_LOG.md) e [`PILOT_3_MUNICIPALITIES.md`](PILOT_3_MUNICIPALITIES.md).
+
+| Tema | Mudança |
+|------|---------|
+| KPIs | Absolute + % via `subheader_metric`; copy ≤15 anos / histórico |
+| Visual | Heatmaps, late series vermelha, UBS em tabela, forecast Mês/Ano |
+| Fluxo | Tabelas fora-do-estado / outros municípios + % |
+| DQ | Grain por UBS (`establishment_cnes`) + chart v2.17 |
+| Abandono | `display_dropout_rate` / `adherence_rate` / N/A; audit doc |
+| Vacinas | `vaccine_commercial_name` → `vaccine_label` |
+| Gestão estadual | Seção comparação (ranking + mensal) em national/state |
+| Piloto | Cocal + Porto + Parnaíba (ops runbook) |
+| **Deferred** | Visão paciente / embed no app / push — backlog pós-SME |

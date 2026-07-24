@@ -36,6 +36,11 @@
 **/.terser-plugin-cache/
 **/node_modules/
 
+# PTM: dashboards_ptm is baked into the image (see Dockerfile), but never ship
+# local credentials or large presentation assets.
+dashboards_ptm/**/secrets/
+dashboards_ptm/**/*.pdf
+
 tests/
 docs/
 install/

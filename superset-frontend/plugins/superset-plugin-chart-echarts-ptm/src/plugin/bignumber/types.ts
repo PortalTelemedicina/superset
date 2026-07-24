@@ -107,5 +107,6 @@ export type BigNumberVizProps = {
   additionalText?: string;
   additionalTextFontSize?: number;
   infoText?: string;
+  secondaryMetricText?: string;
   autofit?: boolean;
 };

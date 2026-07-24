@@ -227,3 +227,71 @@ FROM `ptm-data-prod.gold.gold_immunization_timeliness_monthly`;
 -- Expectation: all three return distinct_states >= 1 and NOT NULL.
 -- If query errors with "Unrecognized name: state_name", the fix PR is not
 -- yet merged + applied to prod.
+
+-- ===========================================================================
+-- 13. JULY 10 — THREE-MUNI PILOT + SHAREING DENOMINATOR
+-- Prefer schema `dbt_gold` in prod (legacy `gold` may still exist).
+-- ===========================================================================
+SELECT
+    municipality_code
+    , ANY_VALUE(municipality_name) AS municipality_name
+    , SUM(overdue_count) AS overdue_total
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
+WHERE
+    ref_date = CURRENT_DATE()
+    AND municipality_code IN ('220270', '220850', '220770')
+GROUP BY municipality_code
+ORDER BY municipality_code;
+-- Expectation: THREE rows (Cocal, Porto, Parnaíba). Fewer ⇒ activation/ingest
+-- incomplete — see PILOT_3_MUNICIPALITIES.md.
+
+-- ===========================================================================
+-- 14. JULY 10 — CROSS-JURISDICTION SHARES SUM TO ~1 PER ESTABLISHMENT MUNI
+-- ===========================================================================
+SELECT
+    establishment_municipality_code
+    , SUM(children) AS children_total
+    , ROUND(SUM(children_share_of_attended), 4) AS share_sum
+FROM `ptm-data-prod.dbt_gold.gold_immunization_cross_jurisdiction_daily`
+WHERE
+    ref_date = CURRENT_DATE()
+    AND establishment_municipality_code = '220270'
+GROUP BY establishment_municipality_code;
+-- Expectation: share_sum ≈ 1.0 (±0.01).
+
+-- ===========================================================================
+-- 15. JULY 10 — DROPOUT N/A vs 0% (denominator_warning + display rate)
+-- ===========================================================================
+SELECT
+    vaccine_name
+    , dose_from_label
+    , dose_to_label
+    , applied_from_count
+    , denominator_warning
+    , display_dropout_rate
+    , adherence_rate
+    , is_applicable_pair
+FROM `ptm-data-prod.dbt_gold.gold_immunization_dropout_by_series_v2`
+WHERE municipality_code = '220270'
+  AND vaccine_code = '41'  -- MenC
+ORDER BY dose_from_sequence, cohort_birth_year DESC
+LIMIT 20;
+-- Expectation: denominator_warning=true ⇒ display_dropout_rate IS NULL (N/A).
+-- High reforço dropout can be real — do not coerce NULL to 0%.
+
+-- ===========================================================================
+-- 16. JULY 10 — DQ BY UBS (establishment grain present)
+-- ===========================================================================
+SELECT
+    establishment_cnes
+    , ANY_VALUE(establishment_name) AS establishment_name
+    , reason_label
+    , SUM(issue_count) AS total
+FROM `ptm-data-prod.dbt_gold.gold_immunization_data_quality_daily`
+WHERE reference_month >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)
+  AND municipality_code = '220270'
+GROUP BY establishment_cnes, reason_label
+ORDER BY total DESC
+LIMIT 20;
+-- Expectation: establishment_cnes populated (not all UNKNOWN). Query error on
+-- establishment_cnes ⇒ July 10 dbt PR not applied yet.

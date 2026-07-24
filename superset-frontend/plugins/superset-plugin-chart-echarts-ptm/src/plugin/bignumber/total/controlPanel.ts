@@ -38,6 +38,8 @@ import {
   additionalText,
   additionalTextFontSize,
   infoText,
+  subheaderMetric,
+  subheaderMetricFormat,
   autofit,
 } from '../sharedControls';
 
@@ -46,7 +48,12 @@ export default {
     {
       label: t('Query'),
       expanded: true,
-      controlSetRows: [['metric'], ['adhoc_filters']],
+      controlSetRows: [
+        ['metric'],
+        [subheaderMetric],
+        [subheaderMetricFormat],
+        ['adhoc_filters'],
+      ],
     },
     {
       label: t('Display settings'),

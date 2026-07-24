@@ -2,6 +2,9 @@
 
 Checklist para ativar um município piloto (testado com **Parnaíba/PI — IBGE 220770**).
 
+Para o piloto de **três municípios** (Cocal + Porto + Parnaíba) após o feedback
+de 10/jul/2026, use também [PILOT_3_MUNICIPALITIES.md](PILOT_3_MUNICIPALITIES.md).
+
 ## Pré-requisitos
 
 - Merge do `ptm-dw-modeling` (#478+) em produção com marts `dbt_gold`.

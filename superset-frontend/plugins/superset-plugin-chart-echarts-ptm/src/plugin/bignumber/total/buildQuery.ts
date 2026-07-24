@@ -16,8 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { buildQueryContext, QueryFormData } from '@superset-ui/core';
+import {
+  buildQueryContext,
+  getMetricLabel,
+  QueryFormData,
+  QueryFormMetric,
+} from '@superset-ui/core';
 
 export default function buildQuery(formData: QueryFormData) {
-  return buildQueryContext(formData, baseQueryObject => [baseQueryObject]);
+  return buildQueryContext(formData, baseQueryObject => {
+    const fd = formData as QueryFormData & {
+      subheader_metric?: QueryFormMetric;
+    };
+    const metrics = [...(baseQueryObject.metrics || [])];
+    if (fd.subheader_metric) {
+      const secondaryLabel = getMetricLabel(fd.subheader_metric);
+      const alreadyIncluded = metrics.some(
+        m => getMetricLabel(m) === secondaryLabel,
+      );
+      if (!alreadyIncluded) {
+        metrics.push(fd.subheader_metric);
+      }
+    }
+    return [
+      {
+        ...baseQueryObject,
+        metrics,
+      },
+    ];
+  });
 }

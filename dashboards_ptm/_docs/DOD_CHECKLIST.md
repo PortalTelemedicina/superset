@@ -68,3 +68,21 @@ A ordenação alfabética de meses (Abr, Ago...) inutiliza o gráfico.
   - *Rationale:* Segurança Operacional. O gestor precisa saber se está tomando decisão com base no dado de agora ou no do fechamento de ontem (D-1).
 - [ ] **Anonimização de Dados** — Nomes de pacientes estão visíveis sem necessidade?
   - *Rationale:* Se for um dash gerencial, não deve haver nomes, apenas agregados. Se for operacional, deve haver controle de acesso
+
+## JULY 10 FEEDBACK — IMMUNIZATION V2 (pre-SME review)
+
+- [ ] **KPI dual values** — Absolute + % (or % + count) visible on coverage, overdue children, applied, overdue/due doses, cross-juris cards (`subheader_metric`).
+- [ ] **Age / lifetime copy** — “Crianças ≤15 anos (histórico)” + info tooltip explaining lifetime + age cap.
+- [ ] **Coverage definition** — Info text states binary “zero overdue doses / total children”.
+- [ ] **Pontualidade colors** — Late series is red/pink (`#D32F2F`), not dark blue.
+- [ ] **Heatmaps** — Coverage, severity, dropout matrices have conditional color scales; dropout NULL → N/A not 0%.
+- [ ] **UBS backlog** — Table (not bar) with count + % of municipal overdue.
+- [ ] **Cross-juris** — Split tables (out-of-state by UF / in-state by município) with %.
+- [ ] **Forecast** — Pivot labeled Mês/Ano.
+- [ ] **DQ by UBS** — Chart v2.17 openable by establishment.
+- [ ] **Comparação entre municípios** — Ranking + monthly compare on national/state (not muni-only).
+- [ ] **Filters** — National has no hardcoded Cocal default; Estado/Município propagate.
+- [ ] **3-muni pilot** — Cocal + Porto + Parnaíba present in gold + ranking (≥3 rows). See `PILOT_3_MUNICIPALITIES.md`.
+- [ ] **Dropout audit** — MenC (and peers) reviewed; see `ptm-dw-modeling/docs/immunization-dropout-audit-2026-07.md`.
+- [ ] **Vaccine labels** — Technical + commercial (`vaccine_label`) on pivots after dbt seed deploy.
+- [ ] **Deferred** — Patient app embed / push notifications explicitly out of this round (FEEDBACK_LOG #17).

@@ -35,3 +35,31 @@ Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
 
 Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
 
+## 2026-07-10 — Dashboard de imunização (apresentação Meira / Almeida)
+
+Source: stakeholder walkthrough transcription + Gemini summary. Full next-round package before immunization SME review.
+
+| # | Suggestion | Change | Charts / models affected |
+|---|------------|--------|--------------------------|
+| 1 | Filters estado / município (not hardcoded Cocal on national) | National default municipality cleared; scoped muni slug keeps Cocal; `state_name` aliases verified | native filters v2 |
+| 2 | Clarify crianças atendidas (≤15a, histórico) | Titles/descriptions: “Crianças ≤15 anos (histórico)” | v2.25, v2.28 |
+| 3 | Absolute + % on KPIs | `subheader_metric` on PTM big-number + share metrics in gold/bootstrap | v2.01–03, v2.21, v2.25–31 |
+| 4 | Support text for binary coverage | Stronger `info_text` / description | v2.27 |
+| 5 | Heatmaps coverage / severity / dropout | Richer conditional formatting color scales | v2.09, v2.12, v2.14 |
+| 6 | Late series pink/red + % on pontualidade | Color override + late/on-time % metrics | v2.08 |
+| 7 | Vaccine technical + commercial name | `vaccine_commercial_name` seed → `vaccine_label` in gold | pivots/tables using vaccine_name |
+| 8 | UBS backlog → table | `ptm_table` with count + % | v2.10 |
+| 9 | Cross-juris % of total attended | Share metrics on KPIs | v2.21, v2.29–31 |
+| 10 | Split out-of-state vs in-state tables | Two `ptm_table`s replace stacked bar | v2.22a, v2.22b |
+| 11 | Forecast table mês/ano labels | Slice/column rename + month format | v2.24 |
+| 12 | Dropout audit; blanks → N/A or 0%; heatmap | Model: `adherence_rate`, `is_applicable_pair`; matrix NA/0% + green/red | dropout v2 + v2.14 |
+| 13 | DQ deep-dive by UBS | `establishment_cnes/name` on suspicious + DQ daily; new table | v2.17 |
+| 14 | Ranking + comparação histórica mensal | New section on national/state layouts | v2.06 enhanced + v2.32 |
+| 15 | Pilot 3 municipalities | Cocal + Porto + Parnaíba activation runbook | ops / Airflow |
+| 16 | Double-check data congruence | Extended `validation_queries.sql` + DoD | docs |
+| 17 | Patient / app vision | **Deferred** — backlog only this round | docs |
+
+Pilot municipalities: Cocal `220270`, Porto `220850`, Parnaíba `220770`.
+
+Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
+
