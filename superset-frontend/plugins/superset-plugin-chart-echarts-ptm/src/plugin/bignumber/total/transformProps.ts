@@ -65,9 +65,15 @@ export default function transformProps(
     additionalTextFontSize = 12,
     infoText = '',
     autofit = true,
+  } = formData;
+  // `subheader_metric` is a custom PTM control. `chartProps.formData` is the
+  // camelCased form data, so the snake_case key is absent here (it survives on
+  // `rawFormData`, which is also what buildQuery reads). Read it from there so
+  // the secondary metric actually renders.
+  const {
     subheader_metric: subheaderMetric,
     subheader_metric_format: subheaderMetricFormat = '.1%',
-  } = formData as typeof formData & {
+  } = (rawFormData ?? {}) as {
     subheader_metric?: typeof metric;
     subheader_metric_format?: string;
   };
