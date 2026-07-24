@@ -200,13 +200,17 @@ class Dashboard extends PureComponent {
         start_offset: Logger.getTimestamp(),
         ts: new Date().getTime(),
       };
-    } else if (document.visibilityState === 'visible') {
-      // from hidden to visible
+    } else if (
+      document.visibilityState === 'visible' &&
+      this.visibilityEventData
+    ) {
+      // from hidden to visible (only log when we captured the hidden event)
       const logStart = this.visibilityEventData.start_offset;
       this.props.actions.logEvent(LOG_ACTIONS_HIDE_BROWSER_TAB, {
         ...this.visibilityEventData,
         duration: Logger.getTimestamp() - logStart,
       });
+      this.visibilityEventData = undefined;
     }
   }
 
