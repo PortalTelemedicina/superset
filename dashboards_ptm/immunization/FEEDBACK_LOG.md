@@ -63,3 +63,22 @@ Pilot municipalities: Cocal `220270`, Porto `220850`, Parnaíba `220770`.
 
 Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
 
+## 2026-07-24 — Local validation round (render verification of the July 10 package)
+
+Browser validation against local stack + `dbt_gold` exposed items that were
+configured but never rendered. Root causes and fixes:
+
+| # | Issue found | Root cause | Fix |
+|---|-------------|-----------|-----|
+| 1 | KPI %/absolute subheader never rendered (July 10 row 3) | PTM plugin `transformProps` read `subheader_metric` (snake_case) from the camelized `formData` | Read from `rawFormData` (same source `buildQuery` uses) |
+| 2 | Heatmap cell colors never rendered on ANY pivot (July 10 rows 5/12) | Three stacked causes: (a) `conditional_formatting.column` referenced auto-generated metric names (`SUM(col)`) instead of the custom labels; (b) PTM pivot theme forced `background-color: #ffffff !important` on every cell, overriding the formatter's inline style; (c) `>=`/`<=` operators are `≥`/`≤` (unicode) in Superset's Comparator enum, so those rules were ignored | Formatter `column` now matches the metric label; removed the `!important` cell background from `Styles.tsx`; unicode operators; rules reordered least→most severe because the renderer lets the LAST matching rule win |
+| 3 | "Atrasadas" series still blue (July 10 row 6) | Shared color map does not reliably apply `label_colors` to mixed-timeseries inside dashboards | PTM mixed-timeseries wrapper now pins `label_colors` directly on ECharts series (`itemStyle`/`lineStyle`) |
+| 4 | Pontualidade had no % (July 10 row 6 was logged as done but only counts were plotted) | — | v2.08: counts as bars (Query A) + "% Atrasadas" line on secondary axis (Query B, `.1%`), denominator consistent with v2.32 |
+| 5 | Rankings truncated (Meira: "o gestor estadual quer todos", not top-N) | `row_limit` 50 (v2.06) / 200 (v2.19) < 224 municípios do PI | `row_limit: 300` on both |
+| 6 | `vaccine_label` (técnico + comercial) only on dropout charts | — | Extended to v2.07/v2.09/v2.11/v2.12/v2.20 (backlog mart exposes it); forecast mart has no `vaccine_label` yet, v2.23/v2.24 keep `vaccine_name` |
+| 7 | "Moradores do Município" KPI had no % context | — | New `own_municipality_children_pct` dataset metric as subheader |
+| 8 | Update frequency not stated anywhere | — | "atualizada automaticamente a cada 6 horas" on the RNDS freshness card description |
+| 9 | Dashboard crash `Cannot read properties of undefined (reading 'start_offset')` | `Dashboard.onVisibilityChange` assumed a hidden event was always captured first | Guard + reset in `Dashboard.jsx` (upstream Superset bug) |
+
+Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
+

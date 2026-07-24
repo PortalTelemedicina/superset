@@ -1179,7 +1179,7 @@ CHARTS: list[dict] = [
                     "operator": ">",
                     "targetValue": 0,
                     "colorScheme": "#d32f2f",
-                    "column": "SUM(overdue_count)",
+                    "column": "Doses em atraso",
                 },
             ],
         },
@@ -2174,6 +2174,16 @@ DATASETS_V2: list[dict] = [
                 "d3format": ".1%",
             },
             {
+                "metric_name": "own_municipality_children_pct",
+                "verbose_name": "% do próprio município",
+                "expression": (
+                    "SAFE_DIVIDE(SUM(CASE WHEN origin_quality = "
+                    "'Município da unidade' THEN children ELSE 0 END), "
+                    "NULLIF(SUM(children), 0))"
+                ),
+                "d3format": ".1%",
+            },
+            {
                 "metric_name": "children_overdue_pct",
                 "verbose_name": "% com dose em atraso",
                 "expression": (
@@ -2398,7 +2408,10 @@ CHARTS_V2: list[dict] = [
     {
         "key": "chart.v2.04_kpi_freshness",
         "slice_name": "Última atualização da RNDS",
-        "description": "Data e hora da última carga de dados do RNDS.",
+        "description": (
+            "Data e hora da última carga de dados do RNDS. A base é "
+            "atualizada automaticamente a cada 6 horas."
+        ),
         "viz_type": "ptm_big_number_total",
         "dataset_key": "dataset.data_freshness",
         "params": _ptm_kpi(
@@ -2448,7 +2461,9 @@ CHARTS_V2: list[dict] = [
             ],
             "adhoc_filters": [],
             **_SNAPSHOT_TIME_RANGE,
-            "row_limit": 50,
+            # July 10 feedback: the state manager wants ALL municipalities
+            # ranked (224 in PI), explicitly not a top-N cut.
+            "row_limit": 300,
             "page_length": 20,
             "include_search": True,
             "show_cell_bars": True,
@@ -2461,7 +2476,8 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": {
-            "groupbyRows": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label).
+            "groupbyRows": ["vaccine_label"],
             "groupbyColumns": ["dose_label"],
             "metrics": [_metric("Doses em atraso", "SUM", "overdue_count")],
             "metricsLayout": "COLUMNS",
@@ -2477,7 +2493,7 @@ CHARTS_V2: list[dict] = [
                     "operator": ">",
                     "targetValue": 0,
                     "colorScheme": "#d32f2f",
-                    "column": "SUM(overdue_count)",
+                    "column": "Doses em atraso",
                 },
             ],
         },
@@ -2490,23 +2506,42 @@ CHARTS_V2: list[dict] = [
         "params": {
             "x_axis": "reference_month",
             "time_grain_sqla": "P1M",
-            "metrics": [_metric("No prazo", "SUM", "on_time_count")],
-            "metrics_b": [_metric("Atrasadas", "SUM", "late_count")],
+            # July 10 feedback: counts as bars (Query A) plus the late share
+            # as a % line on the secondary axis (Query B) — Meira asked for
+            # percentages alongside the absolute monthly volumes.
+            "metrics": [
+                _metric("No prazo", "SUM", "on_time_count"),
+                _metric("Atrasadas", "SUM", "late_count"),
+            ],
+            "metrics_b": [
+                {
+                    "expressionType": "SQL",
+                    "label": "% Atrasadas",
+                    "sqlExpression": (
+                        "SAFE_DIVIDE(SUM(late_count), "
+                        "NULLIF(SUM(total_with_schedule_match), 0))"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_late_pct_timeliness_trend",
+                }
+            ],
             "groupby": [],
             "groupby_b": [],
             "adhoc_filters": [_filter_temporal("reference_month")],
             "adhoc_filters_b": [_filter_temporal("reference_month")],
             "seriesType": "echarts_timeseries_bar",
             "seriesTypeB": "echarts_timeseries_line",
+            "yAxisIndexB": 1,
             "show_legend": True,
             "y_axis_format": ",d",
+            "y_axis_format_secondary": ".1%",
             "x_axis_time_format": "smart_date",
             "color_scheme": "supersetColors",
-            # July 10 feedback: make the "Atrasadas" line unmistakably red so
-            # it can't be confused with "No prazo" at a glance.
-            "label_colors": {"Atrasadas": "#D32F2F"},
+            # July 10 feedback: make the "Atrasadas" series unmistakably red
+            # so it can't be confused with "No prazo" at a glance.
+            "label_colors": {"Atrasadas": "#D32F2F", "% Atrasadas": "#B71C1C"},
             **_PTM_SHOW_VALUE,
-            "show_valueB": True,
+            "show_valueB": False,
         },
     },
     {
@@ -2515,7 +2550,9 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": {
-            "groupbyRows": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label) — this
+            # is the exact table Meira commented on.
+            "groupbyRows": ["vaccine_label"],
             "groupbyColumns": ["dose_label"],
             # Real coverage: SUM(applied) / SUM(child × rule pairs).
             # AVG(overdue_share) was misleading — it averaged shares across
@@ -2544,13 +2581,9 @@ CHARTS_V2: list[dict] = [
             "aggregateFunction": "Sum",
             # July 10 feedback: red (low coverage) -> green (high coverage)
             # scale so gaps jump out without reading the raw %.
+            # NOTE: when several rules match a cell, the LAST matching rule
+            # wins in the pivot renderer — order from least to most severe.
             "conditional_formatting": [
-                {
-                    "operator": "<",
-                    "targetValue": 0.5,
-                    "colorScheme": "#d32f2f",
-                    "column": "% Cobertura",
-                },
                 {
                     "operator": "<",
                     "targetValue": 0.8,
@@ -2558,7 +2591,14 @@ CHARTS_V2: list[dict] = [
                     "column": "% Cobertura",
                 },
                 {
-                    "operator": ">=",
+                    "operator": "<",
+                    "targetValue": 0.5,
+                    "colorScheme": "#d32f2f",
+                    "column": "% Cobertura",
+                },
+                {
+                    # Superset's Comparator enum uses the unicode symbol.
+                    "operator": "≥",
                     "targetValue": 0.8,
                     "colorScheme": "#2e7d32",
                     "column": "% Cobertura",
@@ -2616,7 +2656,8 @@ CHARTS_V2: list[dict] = [
                 _metric("Devidas Hoje", "SUM", "due_count"),
                 _metric("A Vencer", "SUM", "upcoming_count"),
             ],
-            "groupby": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label).
+            "groupby": ["vaccine_label"],
             "adhoc_filters": [],
             **_SNAPSHOT_TIME_RANGE,
             "row_limit": 10000,
@@ -2632,7 +2673,8 @@ CHARTS_V2: list[dict] = [
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": {
-            "groupbyRows": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label).
+            "groupbyRows": ["vaccine_label"],
             "groupbyColumns": ["overdue_bucket_label"],
             "metrics": [_metric("Doses", "SUM", "child_rule_pairs")],
             "metricsLayout": "COLUMNS",
@@ -2650,19 +2692,19 @@ CHARTS_V2: list[dict] = [
                     "operator": ">",
                     "targetValue": 0,
                     "colorScheme": "#ffab91",
-                    "column": "SUM(child_rule_pairs)",
+                    "column": "Doses",
                 },
                 {
                     "operator": ">",
                     "targetValue": 50,
                     "colorScheme": "#ef6c00",
-                    "column": "SUM(child_rule_pairs)",
+                    "column": "Doses",
                 },
                 {
                     "operator": ">",
                     "targetValue": 200,
                     "colorScheme": "#d32f2f",
-                    "column": "SUM(child_rule_pairs)",
+                    "column": "Doses",
                 },
             ],
         },
@@ -2723,24 +2765,27 @@ CHARTS_V2: list[dict] = [
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Average",
+            # NOTE: when several rules match a cell, the LAST matching rule
+            # wins in the pivot renderer — order from least to most severe.
             "conditional_formatting": [
-                {
-                    "operator": ">",
-                    "targetValue": 0.15,
-                    "colorScheme": "#d32f2f",
-                    "column": "AVG(display_dropout_rate)",
-                },
                 {
                     "operator": ">",
                     "targetValue": 0.05,
                     "colorScheme": "#ef6c00",
-                    "column": "AVG(display_dropout_rate)",
+                    "column": "Taxa de abandono",
                 },
                 {
-                    "operator": "<=",
+                    "operator": ">",
+                    "targetValue": 0.15,
+                    "colorScheme": "#d32f2f",
+                    "column": "Taxa de abandono",
+                },
+                {
+                    # Superset's Comparator enum uses the unicode symbol.
+                    "operator": "≤",
                     "targetValue": 0.05,
                     "colorScheme": "#2e7d32",
-                    "column": "AVG(display_dropout_rate)",
+                    "column": "Taxa de abandono",
                 },
             ],
         },
@@ -2869,7 +2914,9 @@ CHARTS_V2: list[dict] = [
             ],
             "adhoc_filters": [],
             **_SNAPSHOT_TIME_RANGE,
-            "row_limit": 200,
+            # July 10 feedback: rank ALL municipalities (PI has 224), not a
+            # truncated list.
+            "row_limit": 300,
             "page_length": 20,
             "include_search": True,
             "show_cell_bars": True,
@@ -2882,7 +2929,8 @@ CHARTS_V2: list[dict] = [
         "dataset_key": "dataset.operational_backlog_daily_v2",
         "params": {
             "groupbyRows": ["state_name"],
-            "groupbyColumns": ["vaccine_name"],
+            # July 10 feedback #7: técnico + comercial (vaccine_label).
+            "groupbyColumns": ["vaccine_label"],
             "metrics": [
                 {
                     "expressionType": "SQL",
@@ -3094,6 +3142,9 @@ CHARTS_V2: list[dict] = [
             additional_text="Moradores do Município",
             extra={
                 "metric": "own_municipality_children",
+                # July 10 feedback: share of the attended universe as context.
+                "subheader_metric": "own_municipality_children_pct",
+                "subheader_metric_format": ".1%",
                 **_SNAPSHOT_TIME_RANGE,
                 "y_axis_format": ",",
             },
@@ -3210,7 +3261,7 @@ CHARTS_V2: list[dict] = [
                     "operator": ">",
                     "targetValue": 0,
                     "colorScheme": "#1565c0",
-                    "column": "SUM(expected_doses)",
+                    "column": "Doses previstas",
                 },
             ],
         },
@@ -3247,17 +3298,19 @@ CHARTS_V2: list[dict] = [
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
+            # NOTE: when several rules match a cell, the LAST matching rule
+            # wins in the pivot renderer — order from least to most severe.
             "conditional_formatting": [
-                {
-                    "operator": ">",
-                    "targetValue": 0.15,
-                    "colorScheme": "#d32f2f",
-                    "column": "% Atrasadas",
-                },
                 {
                     "operator": ">",
                     "targetValue": 0.05,
                     "colorScheme": "#ef6c00",
+                    "column": "% Atrasadas",
+                },
+                {
+                    "operator": ">",
+                    "targetValue": 0.15,
+                    "colorScheme": "#d32f2f",
                     "column": "% Atrasadas",
                 },
             ],
@@ -4020,7 +4073,7 @@ def ensure_scoped_dashboard(
         # dashboard. Superset's shared color map is driven by dashboard-level
         # label_colors (the chart-level form_data.label_colors is not reliably
         # applied on dashboards), so it must live here to take effect.
-        "label_colors": {"Atrasadas": "#D32F2F"},
+        "label_colors": {"Atrasadas": "#D32F2F", "% Atrasadas": "#B71C1C"},
     }
     payload = {
         "dashboard_title": dashboard_title,
