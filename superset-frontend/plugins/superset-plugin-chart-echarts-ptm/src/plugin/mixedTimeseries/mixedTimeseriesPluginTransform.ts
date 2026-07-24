@@ -71,6 +71,34 @@ export function mixedTimeseriesPluginTransform(
     barBorderRadius,
   ) as EchartOptions;
 
+  // Honor explicit label_colors (chart params or dashboard metadata) directly
+  // on the ECharts series. Superset's shared color map does not reliably apply
+  // label_colors to mixed-timeseries charts rendered inside dashboards, so we
+  // pin the colors here deterministically.
+  const labelColors = (formData.labelColors ?? formData.label_colors) as
+    | Record<string, string>
+    | undefined;
+  if (labelColors && Array.isArray(finalOptions.series)) {
+    finalOptions.series = finalOptions.series.map(series => {
+      const name = series.name as string | undefined;
+      const color = name ? labelColors[name] : undefined;
+      if (!color) {
+        return series;
+      }
+      return {
+        ...series,
+        itemStyle: {
+          ...((series.itemStyle as Record<string, unknown>) ?? {}),
+          color,
+        },
+        lineStyle: {
+          ...((series.lineStyle as Record<string, unknown>) ?? {}),
+          color,
+        },
+      };
+    });
+  }
+
   if (transforms.dataZoom) {
     const themeZoomOverrides = getThemeDataZoom(formData);
 
