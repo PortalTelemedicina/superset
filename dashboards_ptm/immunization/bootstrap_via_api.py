@@ -3252,7 +3252,9 @@ CHARTS_V2: list[dict] = [
             "adhoc_filters": [_FORECAST_FORWARD_RANGE, _PROGRAMMED_ONLY_FILTER],
             "row_limit": 10000,
             "valueFormat": ",",
-            "date_format": "smart_date",
+            # Same as v2.32: avoid "YYYY-MM-01 00:00:00" column headers.
+            "date_format": "%b %Y",
+            "time_grain_sqla": "P1M",
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
@@ -3294,7 +3296,11 @@ CHARTS_V2: list[dict] = [
             "adhoc_filters": [_filter_temporal("reference_month")],
             "row_limit": 10000,
             "valueFormat": ".1%",
-            "date_format": "smart_date",
+            # smart_date falls back to full DATABASE_DATETIME
+            # ("2026-07-01 00:00:00") when the pivot has no time grain —
+            # force month+year text instead (same format P1M uses).
+            "date_format": "%b %Y",
+            "time_grain_sqla": "P1M",
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Sum",
