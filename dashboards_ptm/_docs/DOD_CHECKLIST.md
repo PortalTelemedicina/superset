@@ -71,18 +71,18 @@ A ordenação alfabética de meses (Abr, Ago...) inutiliza o gráfico.
 
 ## JULY 10 FEEDBACK — IMMUNIZATION V2 (pre-SME review)
 
-- [ ] **KPI dual values** — Absolute + % (or % + count) visible on coverage, overdue children, applied, overdue/due doses, cross-juris cards (`subheader_metric`).
-- [ ] **Age / lifetime copy** — “Crianças ≤15 anos (histórico)” + info tooltip explaining lifetime + age cap.
-- [ ] **Coverage definition** — Info text states binary “zero overdue doses / total children”.
-- [ ] **Pontualidade colors** — Late series is red/pink (`#D32F2F`), not dark blue.
-- [ ] **Heatmaps** — Coverage, severity, dropout matrices have conditional color scales; dropout NULL → N/A not 0%.
-- [ ] **UBS backlog** — Table (not bar) with count + % of municipal overdue.
-- [ ] **Cross-juris** — Split tables (out-of-state by UF / in-state by município) with %.
-- [ ] **Forecast** — Pivot labeled Mês/Ano.
-- [ ] **DQ by UBS** — Chart v2.17 openable by establishment.
-- [ ] **Comparação entre municípios** — Ranking + monthly compare on national/state (not muni-only).
-- [ ] **Filters** — National has no hardcoded Cocal default; Estado/Município propagate.
-- [ ] **3-muni pilot** — Cocal + Porto + Parnaíba present in gold + ranking (≥3 rows). See `PILOT_3_MUNICIPALITIES.md`.
-- [ ] **Dropout audit** — MenC (and peers) reviewed; see `ptm-dw-modeling/docs/immunization-dropout-audit-2026-07.md`.
-- [ ] **Vaccine labels** — Technical + commercial (`vaccine_label`) on pivots after dbt seed deploy.
-- [ ] **Deferred** — Patient app embed / push notifications explicitly out of this round (FEEDBACK_LOG #17).
+- [x] **KPI dual values** — Absolute + % (or % + count) visible on coverage, overdue children, applied, overdue/due doses, cross-juris cards (`subheader_metric`). *Verified in browser 2026-07-24 after `rawFormData` fix (83.2% / 16.8% / 22.4% / 34.6% rendering).*
+- [x] **Age / lifetime copy** — “Crianças ≤15 anos (histórico)” + info tooltip explaining lifetime + age cap. *On screen 2026-07-24.*
+- [x] **Coverage definition** — Info text states binary “zero overdue doses / total children”.
+- [x] **Pontualidade colors** — Late series is red/pink (`#D32F2F`), not dark blue. *Verified 2026-07-24 after PTM mixed-timeseries pins `label_colors`; “% Atrasadas” line added on secondary axis.*
+- [x] **Heatmaps** — Coverage, severity, dropout matrices have conditional color scales; dropout NULL → N/A not 0%. *Verified 2026-07-24 after 3 fixes: formatter `column` = metric label, unicode `≥`/`≤` operators, removal of the `!important` white cell background in the PTM pivot theme.*
+- [x] **UBS backlog** — Table (not bar) with count + % of municipal overdue. *On screen 2026-07-24.*
+- [x] **Cross-juris** — Split tables (out-of-state by UF / in-state by município) with %. *Charts v2.29/v2.30 present; C3 shares sum to 1.0.*
+- [x] **Forecast** — Pivot labeled Mês/Ano. *Title “Volumes da demanda programada (Mês/Ano)”.*
+- [x] **DQ by UBS** — Chart v2.17 openable by establishment. *C5: 0 UNKNOWN CNES, 17 UBS.*
+- [x] **Comparação entre municípios** — Ranking + monthly compare on national/state (not muni-only). *v2.19 (row_limit 300) + v2.32 on national layout.*
+- [x] **Filters** — National has no hardcoded Cocal default; Estado/Município propagate. *Filter bar shows 26 UFs / 205 municípios, no preselection.*
+- [ ] **3-muni pilot** — Cocal + Porto + Parnaíba present in gold + ranking (≥3 rows). See `PILOT_3_MUNICIPALITIES.md`. *2026-07-24: Cocal (3.477 overdue) and Parnaíba (70) in the priority mart; **Porto (220850) has no rows** — verify activation/ingestion for Porto before the SME review.*
+- [x] **Dropout audit** — MenC (and peers) reviewed; see `ptm-dw-modeling/docs/immunization-dropout-audit-2026-07.md`. *C4 2026-07-24: pairing correct (MenC 2012–2025 cohorts 5–27%); residual ~100% rows come from out-of-window cohorts — registered as delta G5 in `ptm-dw-modeling/specs/imunizacao/3. tasks.md`.*
+- [x] **Vaccine labels** — Technical + commercial (`vaccine_label`) on pivots after dbt seed deploy. *Extended to v2.07/v2.09/v2.11/v2.12/v2.20; rendering verified (“VIP (Pólio inativada)”, “MenACWY (Meningocócica ACWY)”).*
+- [x] **Deferred** — Patient app embed / push notifications explicitly out of this round (FEEDBACK_LOG #17).

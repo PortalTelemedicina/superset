@@ -21,7 +21,7 @@ SELECT
     ) AS minutes_since_ingestion
     , s2_fact_immunization_rows
     , s3_fact_immunization_enriched_rows
-FROM `ptm-data-prod.gold.gold_immunization_data_freshness`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_data_freshness`
 ORDER BY checked_at DESC
 LIMIT 1;
 -- Expectation: minutes_since_ingestion < 60.
@@ -38,7 +38,7 @@ SELECT
     , SUM(overdue_count) AS total_overdue
     , SUM(due_count) AS total_due
     , SUM(applied_count) AS total_applied
-FROM `ptm-data-prod.gold.gold_immunization_operational_backlog_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
 WHERE ref_date = CURRENT_DATE()
 GROUP BY ref_date;
 -- Expectation: rows > 0, municipalities >= 1 (pilot), vaccines > 10.
@@ -54,7 +54,7 @@ SELECT
     , SUM(child_rule_pairs) AS eligible
     , SAFE_DIVIDE(SUM(applied_count), NULLIF(SUM(child_rule_pairs), 0))
         AS coverage
-FROM `ptm-data-prod.gold.gold_immunization_operational_backlog_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
 WHERE ref_date = CURRENT_DATE()
 GROUP BY vaccine_name, dose_label
 HAVING coverage < 0 OR coverage > 1
@@ -74,7 +74,7 @@ SELECT
         * 100
         , 2
     ) AS pct
-FROM `ptm-data-prod.gold.gold_immunization_operational_backlog_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
 WHERE ref_date = CURRENT_DATE()
 GROUP BY status_bucket
 ORDER BY total_pairs DESC;
@@ -95,7 +95,7 @@ SELECT
         SAFE_DIVIDE(SUM(overdue_count), NULLIF(SUM(child_rule_pairs), 0))
         , 4
     ) AS overdue_share
-FROM `ptm-data-prod.gold.gold_immunization_operational_backlog_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
 WHERE ref_date = CURRENT_DATE()
 GROUP BY state_name, municipality_name, municipality_code
 ORDER BY overdue_total DESC
@@ -117,7 +117,7 @@ SELECT
     , overdue_trend_7d
     , due_next_30
     , recommended_action
-FROM `ptm-data-prod.gold.gold_immunization_priority_daily_v2`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_priority_daily_v2`
 WHERE ref_date = CURRENT_DATE()
 ORDER BY priority_score DESC
 LIMIT 10;
@@ -132,7 +132,7 @@ SELECT
     , COUNT(*) AS rows
     , COUNTIF(effective_dropout_rate IS NULL) AS null_rate
     , COUNTIF(effective_dropout_rate IS NOT NULL) AS valid_rate
-FROM `ptm-data-prod.gold.gold_immunization_dropout_by_series_v2`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_dropout_by_series_v2`
 GROUP BY denominator_warning
 ORDER BY denominator_warning DESC;
 -- Expectation: when denominator_warning=true, null_rate = rows
@@ -150,7 +150,7 @@ SELECT
     , applied_to_count
     , ROUND(effective_dropout_rate, 4) AS rate
     , priority_rank
-FROM `ptm-data-prod.gold.gold_immunization_dropout_by_series_v2`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_dropout_by_series_v2`
 WHERE
     effective_dropout_rate IS NOT NULL
     AND applied_from_count >= 50
@@ -166,7 +166,7 @@ SELECT
     severity
     , reason_label
     , SUM(issue_count) AS total
-FROM `ptm-data-prod.gold.gold_immunization_data_quality_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_data_quality_daily`
 WHERE reference_month >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)
 GROUP BY severity, reason_label
 ORDER BY total DESC;
@@ -180,7 +180,7 @@ ORDER BY total DESC;
 SELECT
     SUM(child_rule_pairs) AS unknown_pairs
     , COUNT(DISTINCT vaccine_code) AS vaccines_affected
-FROM `ptm-data-prod.gold.gold_immunization_operational_backlog_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_operational_backlog_daily`
 WHERE
     ref_date = CURRENT_DATE()
     AND municipality_code = 'UNKNOWN';
@@ -213,17 +213,17 @@ ORDER BY a.activated_at DESC;
 SELECT
     'data_quality' AS mart
     , COUNT(DISTINCT state_name) AS distinct_states
-FROM `ptm-data-prod.gold.gold_immunization_data_quality_daily`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_data_quality_daily`
 UNION ALL
 SELECT
     'dropout' AS mart
     , COUNT(DISTINCT state_name) AS distinct_states
-FROM `ptm-data-prod.gold.gold_immunization_dropout_by_series_v2`
+FROM `ptm-data-prod.dbt_gold.gold_immunization_dropout_by_series_v2`
 UNION ALL
 SELECT
     'timeliness' AS mart
     , COUNT(DISTINCT state_name) AS distinct_states
-FROM `ptm-data-prod.gold.gold_immunization_timeliness_monthly`;
+FROM `ptm-data-prod.dbt_gold.gold_immunization_timeliness_monthly`;
 -- Expectation: all three return distinct_states >= 1 and NOT NULL.
 -- If query errors with "Unrecognized name: state_name", the fix PR is not
 -- yet merged + applied to prod.

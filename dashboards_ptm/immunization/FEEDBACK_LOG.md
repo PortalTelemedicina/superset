@@ -80,5 +80,18 @@ configured but never rendered. Root causes and fixes:
 | 8 | Update frequency not stated anywhere | — | "atualizada automaticamente a cada 6 horas" on the RNDS freshness card description |
 | 9 | Dashboard crash `Cannot read properties of undefined (reading 'start_offset')` | `Dashboard.onVisibilityChange` assumed a hidden event was always captured first | Guard + reset in `Dashboard.jsx` (upstream Superset bug) |
 
+### Consistency sweep C1-C8 (2026-07-24, against `ptm-data-prod.dbt_gold`)
+
+| Check | Result |
+|-------|--------|
+| C1 schema naming | FIXED — all 17 refs in `validation_queries.sql` now `dbt_gold.` |
+| C2 denominators | PASS — snapshot 2026-07-24: 24,616 rows, 205 munis, 19 vaccines; 0 coverage cells outside [0,1] |
+| C3 cross-juris shares | PASS — origin shares sum to exactly 1.0 per municipality |
+| C4 dropout truth | PARTIAL — pairing fix holds (MenC 2012–2025 cohorts: 5–27%, no warning). NEW audit item G5: cohorts 2003–2009 (adolescent/catch-up dose, D2 never applicable) and 2026 (D2 not yet due) show ~100% with N≥30, bypassing `denominator_warning`. Registered in `ptm-dw-modeling/specs/imunizacao/3. tasks.md`. MenACWY is absent from the dropout mart (no pairable child-routine series) — expected |
+| C5 DQ by UBS | PASS — 0 UNKNOWN `establishment_cnes`, 17 distinct UBS |
+| C6 filter propagation | PASS — 0 null `state_name` on DQ / dropout / timeliness |
+| C7 dedup grain | PASS — 0 duplicate groups on backlog full grain and DQ reason grain |
+| C8 cross-chart reconciliation | PASS — total overdue 4,669 identical across KPI, vaccine×dose pivot and UBS groupings; matches on-screen KPI |
+
 Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
 
