@@ -102,7 +102,9 @@ export default styled.div`
       table.pvtTable tbody tr td {
         color: #374151 !important;
         padding: 8px 16px !important;
-        background-color: #ffffff !important;
+        /* No background-color here: it must NOT be forced, otherwise the
+           inline conditional-formatting (heatmap) backgrounds set by
+           PivotTableChart are overridden. The row already paints white. */
         border-top: 1px solid #f3f4f6 !important;
         border-left: 1px solid #e5e7eb !important;
         vertical-align: top !important;
