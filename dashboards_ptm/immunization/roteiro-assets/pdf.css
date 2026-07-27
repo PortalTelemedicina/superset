@@ -1,0 +1,91 @@
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm 14mm;
+  @bottom-center {
+    content: counter(page);
+    font-family: -apple-system, "Helvetica Neue", sans-serif;
+    font-size: 9pt;
+    color: #888;
+  }
+}
+
+body {
+  font-family: -apple-system, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 12pt;
+  line-height: 1.55;
+  color: #1a1a1a;
+}
+
+h1 {
+  font-size: 22pt;
+  color: #14538a;
+  margin-bottom: 2mm;
+}
+
+h2 {
+  font-size: 15pt;
+  color: #14538a;
+  margin-top: 9mm;
+  padding-bottom: 1.5mm;
+  border-bottom: 2px solid #cfe0ef;
+  /* Cada seção do roteiro é consultada isoladamente durante a fala. */
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 12.5pt;
+  margin-top: 6mm;
+  page-break-after: avoid;
+}
+
+p, li { orphans: 3; widows: 3; }
+
+strong { color: #0d3d66; }
+
+img {
+  max-width: 100%;
+  border: 1px solid #dcdcdc;
+  border-radius: 3px;
+  page-break-inside: avoid;
+  margin: 3mm 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+  margin: 3mm 0;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid #d0d0d0;
+  padding: 2mm 2.5mm;
+  text-align: left;
+  vertical-align: top;
+}
+
+th { background: #eef4fa; color: #0d3d66; }
+
+blockquote {
+  margin: 3mm 0;
+  padding: 2mm 4mm;
+  border-left: 3px solid #14538a;
+  background: #f6f9fc;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e2e2e2;
+  margin: 6mm 0;
+}
+
+code {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10.5pt;
+  background: #f2f2f2;
+  padding: 0 1mm;
+  border-radius: 2px;
+}
+
+em { color: #124e7d; }

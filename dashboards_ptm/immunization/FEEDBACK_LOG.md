@@ -95,3 +95,72 @@ configured but never rendered. Root causes and fixes:
 
 Validated against: [DOD_CHECKLIST.md](../_docs/DOD_CHECKLIST.md)
 
+## 2026-07-27 — Reabertura do item de 12/jun (legibilidade de séries categóricas)
+
+The 2026-06-12 round logged "Tendência da demanda programada unreadable with ~20
+vaccine lines" as closed by capping the chart at the top-5 series. Revisiting the
+rendered chart shows the underlying complaint — readability — was never resolved:
+the PTM plugin wrapper (`applyColorPalette`) discards Superset's `color_scheme`
+and defaults every chart to the six-shade **blue** ramp, so the surviving 5
+vaccine lines are near-identical blues. Charts that set `color_scheme` explicitly
+(`supersetColors`, `d3Category20`) were silently overridden.
+
+| # | Issue | Change | Charts affected |
+|---|-------|--------|-----------------|
+| 1 | Top-5 vaccine lines indistinguishable (blue ramp) — 12/jun item 3 only half-fixed | Opt into the existing `mixed` ("Multicolorido") PTM palette via `_PTM_MULTI_HUE` | v2.23 |
+| 2 | 2-series DQ chart: "Dose duplicada no mesmo dia" invisible behind "Dose aplicada antes da idade mínima" | idem | v2.15 |
+| 3 | Same defect, not previously reported: monthly doses by vaccine, and a monochrome dropout pie | idem | chart.04, chart.08 |
+
+Any PTM chart with a `groupby` needs `_PTM_MULTI_HUE`; the blue ramp is only safe
+for single-series charts.
+
+Found while verifying the above: the "Última atualização da RNDS" card rendered
+the mart's UTC timestamp verbatim (`15:42` while the wall clock read `14:0x`), so
+a freshness indicator was showing a time in the future. The metric now wraps the
+aggregate in `DATETIME(…, 'America/Sao_Paulo')`. The d3 formatter renders the
+epoch as UTC, so no second shift occurs.
+
+> **Deployment gap:** `bootstrap_via_api.py` writes dataset metrics only when it
+> *creates* the dataset — changing an `expression` in the spec never reaches an
+> existing dataset. The local instance was patched over the API
+> (`PUT /api/v1/dataset/<id>` with the full `metrics` array). **Production still
+> renders the UTC timestamp** until the same patch is applied there.
+
+DoD: "Paleta de cores corporativa" and "Semântica de Cores" stay **unchecked** —
+`mixed` restores series differentiation but whether it matches the Portal brand
+manual is a design ruling, not an engineering one.
+
+## 2026-07-27 — Células vazias: cor enganosa e rótulo ambíguo
+
+Two defects around cells with no value, both surfaced by the dropout matrix. They
+live in frontend code shared beyond immunization, so the blast radius was measured
+against a production export before choosing how to fix each one.
+
+**1. Conditional formatting painted empty cells with the best colour.** The
+relational operators in `getColorFunction` coerce `null`/`undefined` to `0`, so a
+rule like "≤ 5% is green" matched every blank cell — a missing measurement read as
+the best possible result. The guard now returns no colour for `null`, `undefined`,
+`''` and `NaN`, while a real `0` is still coloured.
+
+This lives in `superset-ui-chart-controls`, consumed by Table, Pivot Table, AG Grid
+Table, Big Number Total and the PTM Big Number — **1,330 production charts use
+conditional formatting**, mostly outside immunization. The fix was kept global on
+purpose: painting an absent value is wrong everywhere. Covered by four assertions
+in `getColorFormatters.test.ts`.
+
+**2. The `N/A` placeholder is now opt-in per chart.** It started as unconditional
+CSS in the PTM pivot theme, which would have reached **all 35 production charts of
+viz type `ptm_pivot_table` — only 13 of them immunization**. The other 22 belong to
+Telediagnóstico and Teleconsulta (`TD_mediana_cliente`, `TD_tabela_cliente_mes`,
+`TC_desfechos_clinico2`, `HC_hora`, …), where a blank cell means "no volume in the
+period", not "not applicable". Labelling those `N/A` would change the meaning of a
+client-facing number.
+
+The placeholder is now the `ptm_empty_cell_label` control (blank by default), and
+only the dropout matrix sets it to `N/A` — the one chart where blank genuinely
+means the dose pair is absent from the calendar or the base is under 30 children.
+
+> **Deployment gap:** both fixes are frontend, so they need an image rebuild to
+> reach production. Applying `bootstrap_via_api.py` alone propagates the
+> `ptm_empty_cell_label` param but renders nothing until the build ships.
+
