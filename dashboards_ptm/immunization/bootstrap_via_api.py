@@ -792,10 +792,16 @@ DATASETS: list[dict] = [
                 ),
                 "d3format": ",d",
             },
+            # The mart stores ingestion timestamps in UTC. Rendered raw, the card
+            # reads ~3h ahead of the wall clock for a Brazilian viewer — on a
+            # freshness indicator that looks like broken data.
             {
                 "metric_name": "last_rnds_ingestion_ts",
                 "verbose_name": "Última atualização da RNDS",
-                "expression": "MAX(s3_enriched_max_ingestion_ts)",
+                "expression": (
+                    "DATETIME(MAX(s3_enriched_max_ingestion_ts), "
+                    "'America/Sao_Paulo')"
+                ),
                 "d3format": "%d/%m/%Y %H:%M",
             },
         ],
@@ -1000,6 +1006,12 @@ _PTM_ZOOM: dict = {
     "ptm_zoom_inset": "24",
 }
 
+# The PTM plugin wrapper replaces Superset's `color_scheme` with its own
+# palette and defaults to a six-shade blue ramp, so charts that split a metric
+# into categorical series render as near-identical blues. Any chart with a
+# `groupby` has to opt into a multi-hue palette to stay readable.
+_PTM_MULTI_HUE: dict = {"ptm_color_palette": "mixed"}
+
 
 # ---------------------------------------------------------------------------
 # PTM Big-Number card defaults — matches the official PTM card style:
@@ -1154,6 +1166,7 @@ CHARTS: list[dict] = [
             "ptm_series_type": "bar",
             **_PTM_BAR_RADIUS,
             **_PTM_ZOOM,
+            **_PTM_MULTI_HUE,
         },
     },
     # 6. Heatmap atraso — PTM pivot table
@@ -1226,6 +1239,7 @@ CHARTS: list[dict] = [
             "show_legend": True,
             "label_type": "key_value_percent",
             "number_format": ".1%",
+            **_PTM_MULTI_HUE,
         },
     },
     # 10. Suspicious records — PTM table (aggregate mode)
@@ -2326,10 +2340,16 @@ DATASETS_V2: list[dict] = [
                 ),
                 "d3format": ",",
             },
+            # The mart stores ingestion timestamps in UTC. Rendered raw, the card
+            # reads ~3h ahead of the wall clock for a Brazilian viewer — on a
+            # freshness indicator that looks like broken data.
             {
                 "metric_name": "last_rnds_ingestion_ts",
                 "verbose_name": "Última atualização da RNDS",
-                "expression": "MAX(s3_enriched_max_ingestion_ts)",
+                "expression": (
+                    "DATETIME(MAX(s3_enriched_max_ingestion_ts), "
+                    "'America/Sao_Paulo')"
+                ),
                 "d3format": "%d/%m/%Y %H:%M",
             },
         ],
@@ -2761,7 +2781,9 @@ CHARTS_V2: list[dict] = [
             "adhoc_filters": [],
             "row_limit": 200,
             "valueFormat": ".1%",
-            "nullValue": "N/A",
+            # Here a blank cell means the dose pair does not exist in the
+            # calendar, or the base is under 30 children — not a zero.
+            "ptm_empty_cell_label": "N/A",
             "rowOrder": "value_z_to_a",
             "colOrder": "key_a_to_z",
             "aggregateFunction": "Average",
@@ -2812,6 +2834,7 @@ CHARTS_V2: list[dict] = [
             **_PTM_BAR_RADIUS,
             **_PTM_ZOOM,
             **_PTM_SHOW_VALUE,
+            **_PTM_MULTI_HUE,
         },
     },
     {
@@ -3237,6 +3260,7 @@ CHARTS_V2: list[dict] = [
             "ptm_series_type": "line",
             "x_axis_time_format": "smart_date",
             **_PTM_ZOOM,
+            **_PTM_MULTI_HUE,
         },
     },
     {
