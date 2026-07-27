@@ -131,6 +131,26 @@ test('getColorFunction LESS_OR_EQUAL', () => {
   expect(colorFunction(150)).toBeUndefined();
 });
 
+test('getColorFunction leaves cells without a value uncoloured', () => {
+  const colorFunction = getColorFunction(
+    {
+      operator: Comparator.LessOrEqual,
+      targetValue: 100,
+      colorScheme: '#FF0000',
+      column: 'count',
+    },
+    countValues,
+  );
+  // null/undefined would otherwise be coerced to 0 and match "<= 100",
+  // painting empty cells with the most favourable colour of the scale.
+  expect(colorFunction(null as unknown as number)).toBeUndefined();
+  expect(colorFunction(undefined as unknown as number)).toBeUndefined();
+  expect(colorFunction(NaN)).toBeUndefined();
+  expect(colorFunction('' as unknown as number)).toBeUndefined();
+  // 0 is a real measurement and must still be coloured.
+  expect(colorFunction(0)).toEqual('#FF0000FF');
+});
+
 test('getColorFunction EQUAL', () => {
   const colorFunction = getColorFunction(
     {

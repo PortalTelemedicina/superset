@@ -31,6 +31,13 @@ export const round = (num: number, precision = 0) =>
 const MIN_OPACITY_BOUNDED = 0.05;
 const MIN_OPACITY_UNBOUNDED = 0;
 const MAX_OPACITY = 1;
+
+const hasComparableValue = (value: unknown): boolean => {
+  if (value === null || value === undefined || value === '') {
+    return false;
+  }
+  return !Number.isNaN(Number(value));
+};
 export const getOpacity = (
   value: number | string,
   cutoffPoint: number | string,
@@ -183,6 +190,11 @@ export const getColorFunction = (
   }
 
   return (value: number) => {
+    // An empty cell has nothing to compare against. Without this guard the
+    // relational operators coerce null/undefined to 0, so a rule such as
+    // "<= 0.05" matches every blank cell and paints it with the most
+    // favourable colour of the scale.
+    if (!hasComparableValue(value)) return undefined;
     const compareResult = comparatorFunction(value, columnValues);
     if (compareResult === false) return undefined;
     const { cutoffValue, extremeValue } = compareResult;
