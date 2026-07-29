@@ -18,7 +18,7 @@
  */
 
 import { t } from '@superset-ui/core';
-import { CustomControlItem } from '@superset-ui/chart-controls';
+import { CustomControlItem, Dataset } from '@superset-ui/chart-controls';
 
 export const titleFontSize: CustomControlItem = {
   name: 'title_font_size',
@@ -201,7 +201,9 @@ export const subheaderMetric: CustomControlItem = {
     multi: false,
     mapStateToProps: ({ datasource }) => ({
       columns: datasource?.columns || [],
-      savedMetrics: datasource?.metrics || [],
+      // Only a Dataset carries saved metrics; a QueryResponse datasource
+      // (e.g. SQL Lab results) has none.
+      savedMetrics: (datasource as Dataset)?.metrics || [],
       datasource,
       datasourceType: datasource?.type,
     }),
