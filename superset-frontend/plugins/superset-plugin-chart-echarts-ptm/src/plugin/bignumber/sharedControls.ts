@@ -18,7 +18,10 @@
  */
 
 import { t } from '@superset-ui/core';
-import { CustomControlItem } from '@superset-ui/chart-controls';
+import {
+  CustomControlItem,
+  defineSavedMetrics,
+} from '@superset-ui/chart-controls';
 
 export const titleFontSize: CustomControlItem = {
   name: 'title_font_size',
@@ -187,6 +190,44 @@ export const infoText: CustomControlItem = {
     description: t(
       'Explanatory text shown in the info icon tooltip (PTM layout only)',
     ),
+  },
+};
+
+export const subheaderMetric: CustomControlItem = {
+  name: 'subheader_metric',
+  config: {
+    type: 'MetricsControl',
+    label: t('Secondary metric (absolute or %)'),
+    description: t(
+      'Optional second metric shown under the big number (e.g. percentage next to a count).',
+    ),
+    multi: false,
+    mapStateToProps: ({ datasource }) => ({
+      columns: datasource?.columns || [],
+      savedMetrics: defineSavedMetrics(datasource),
+      datasource,
+      datasourceType: datasource?.type,
+    }),
+  },
+};
+
+export const subheaderMetricFormat: CustomControlItem = {
+  name: 'subheader_metric_format',
+  config: {
+    type: 'SelectControl',
+    freeForm: true,
+    label: t('Secondary metric format'),
+    renderTrigger: true,
+    default: '.1%',
+    choices: [
+      ['.1%', '.1%'],
+      [',', ','],
+      [',.0f', ',.0f'],
+      ['.2f', '.2f'],
+    ],
+    description: t('D3 format for the secondary metric value.'),
+    visibility: ({ controls }: any) =>
+      Boolean(controls?.subheader_metric?.value),
   },
 };
 

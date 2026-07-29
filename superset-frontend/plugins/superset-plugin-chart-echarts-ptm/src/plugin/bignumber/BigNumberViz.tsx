@@ -366,6 +366,24 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     );
   }
 
+  renderSecondaryMetric(scaledFontSize?: number) {
+    const { secondaryMetricText } = this.props;
+    if (!secondaryMetricText || secondaryMetricText.trim() === '') return null;
+    return (
+      <div
+        className="ptm-secondary-metric"
+        style={{
+          fontSize: scaledFontSize ?? 14,
+          fontWeight: 600,
+          opacity: 0.85,
+          marginTop: 2,
+        }}
+      >
+        {secondaryMetricText}
+      </div>
+    );
+  }
+
   renderTrendBadge(fontSize: number) {
     const { subheader, className } = this.props;
 
@@ -412,6 +430,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
       additionalText,
       infoText,
       autofit = true,
+      secondaryMetricText,
     } = this.props;
     const className = this.getClassName();
 
@@ -447,6 +466,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const totalGaps =
       (title ? 1 : 0) +
       (additionalText ? 1 : 0) +
+      (secondaryMetricText ? 1 : 0) +
       (showTrendLine ? 1 : 0) +
       (headerRowHeight > 0 ? 1 : 0);
 
@@ -581,6 +601,9 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
 
         {this.renderFallbackWarning()}
         {this.renderHeader(headerMaxHeight)}
+        {this.renderSecondaryMetric(
+          Math.max(12, scaledAdditionalTextFontSize + 2),
+        )}
         {this.renderAdditionalText(scaledAdditionalTextFontSize)}
 
         {showTrendLine && (

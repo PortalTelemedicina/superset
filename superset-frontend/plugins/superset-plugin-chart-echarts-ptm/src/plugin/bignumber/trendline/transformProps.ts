@@ -303,7 +303,8 @@ export default function transformProps(
     iconSize,
     iconColor,
     iconBackgroundColor,
-    additionalText: layoutMode === 'ptm' ? caption.additionalText : additionalText,
+    additionalText:
+      layoutMode === 'ptm' ? caption.additionalText : additionalText,
     additionalTextFontSize,
     infoText,
     autofit,

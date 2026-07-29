@@ -19,8 +19,8 @@
 import { css, styled } from '@superset-ui/core';
 import { getThemeTokens } from '../../shared/themeTokens';
 
-export default styled.div`
-  ${({ theme }) => {
+export default styled.div<{ emptyCellLabel?: string }>`
+  ${({ theme, emptyCellLabel }) => {
     const tok = getThemeTokens(theme);
     return css`
       /* PTM Theme - Clean Minimal Pivot Table Design */
@@ -102,7 +102,9 @@ export default styled.div`
       table.pvtTable tbody tr td {
         color: #374151 !important;
         padding: 8px 16px !important;
-        background-color: #ffffff !important;
+        /* No background-color here: it must NOT be forced, otherwise the
+           inline conditional-formatting (heatmap) backgrounds set by
+           PivotTableChart are overridden. The row already paints white. */
         border-top: 1px solid #f3f4f6 !important;
         border-left: 1px solid #e5e7eb !important;
         vertical-align: top !important;
@@ -110,6 +112,19 @@ export default styled.div`
         font-size: 14px !important;
         font-weight: 400 !important;
       }
+
+      /* A blank cell means "no volume in the period" in some datasets and
+         "this combination does not exist" in others. Only the chart author
+         knows which, so the placeholder is opt-in per chart. */
+      ${emptyCellLabel
+        ? css`
+            table.pvtTable tbody tr td.pvtVal:empty::after {
+              content: ${JSON.stringify(emptyCellLabel)} !important;
+              color: #9ca3af !important;
+              font-weight: 400 !important;
+            }
+          `
+        : ''}
 
       table.pvtTable tbody tr th.pvtRowLabel {
         vertical-align: baseline !important;

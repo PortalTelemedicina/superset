@@ -22,6 +22,7 @@ import {
   getMetricLabel,
   Metric,
   QueryFormData,
+  getNumberFormatter,
   getValueFormatter,
 } from '@superset-ui/core';
 import { getColorFormatters } from '@superset-ui/chart-controls';
@@ -65,6 +66,17 @@ export default function transformProps(
     infoText = '',
     autofit = true,
   } = formData;
+  // `subheader_metric` is a custom PTM control. `chartProps.formData` is the
+  // camelCased form data, so the snake_case key is absent here (it survives on
+  // `rawFormData`, which is also what buildQuery reads). Read it from there so
+  // the secondary metric actually renders.
+  const {
+    subheader_metric: subheaderMetric,
+    subheader_metric_format: subheaderMetricFormat = '.1%',
+  } = (rawFormData ?? {}) as {
+    subheader_metric?: typeof metric;
+    subheader_metric_format?: string;
+  };
   const refs: Record<string, any> = {};
   const { data = [], coltypes = [] } = queriesData[0];
   const granularity = extractTimegrain(rawFormData as QueryFormData);
@@ -72,6 +84,17 @@ export default function transformProps(
   const caption = resolvePtmCaption(layoutMode, subheader, additionalText);
   const bigNumber =
     data.length === 0 ? null : parseMetricValue(data[0][metricName]);
+
+  let secondaryMetricText = '';
+  if (subheaderMetric && data.length > 0) {
+    const secondaryName = getMetricLabel(subheaderMetric);
+    const secondaryRaw = parseMetricValue(data[0][secondaryName]);
+    if (secondaryRaw !== null && secondaryRaw !== undefined) {
+      secondaryMetricText = getNumberFormatter(subheaderMetricFormat)(
+        Number(secondaryRaw),
+      );
+    }
+  }
 
   let metricEntry: Metric | undefined;
   if (chartProps.datasource?.metrics) {
@@ -131,6 +154,7 @@ export default function transformProps(
     additionalText: caption.additionalText,
     additionalTextFontSize,
     infoText,
+    secondaryMetricText,
     autofit,
   };
 }

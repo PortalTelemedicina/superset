@@ -31,10 +31,14 @@ import PivotTableStyles from './Styles';
  * Wraps the original PivotTableChart with PTM styling and optional text casing.
  */
 export default function PtmPivotTableChart(
-  props: PivotTableProps & { ptmTableTextCase?: PtmTextCase },
+  props: PivotTableProps & {
+    ptmTableTextCase?: PtmTextCase;
+    ptmEmptyCellLabel?: string;
+  },
 ) {
   const {
     ptmTableTextCase = 'none',
+    ptmEmptyCellLabel = '',
     verboseMap = {},
     metrics = [],
     ...rest
@@ -73,7 +77,7 @@ export default function PtmPivotTableChart(
   }, [props, ptmTableTextCase, verboseMap, metrics]);
 
   return (
-    <PivotTableStyles>
+    <PivotTableStyles emptyCellLabel={ptmEmptyCellLabel}>
       <PivotTableChart {...casedProps} />
     </PivotTableStyles>
   );

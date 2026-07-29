@@ -15,7 +15,8 @@
  * License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ChartProps } from '@superset-ui/core';
+import { ChartProps, t } from '@superset-ui/core';
+import { ControlSetRow } from '@superset-ui/chart-controls';
 import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import { PIVOT_TABLE_TRANSFORM_CONFIG } from './pivotTableTransformConfig';
 import thumbnail from './images/thumbnail.png';
@@ -31,6 +32,24 @@ import PtmPivotTableChart from './PtmPivotTableChart';
 
 const PIVOT_TABLE_PTM_DEFAULTS = {};
 
+// An empty cell means "no volume in the period" in some datasets and "this
+// combination does not exist in the calendar" in others. Defaulting to a
+// placeholder would mislabel the first case, so each chart opts in.
+const ptmEmptyCellControls: ControlSetRow = [
+  {
+    name: 'ptm_empty_cell_label',
+    config: {
+      type: 'TextControl',
+      label: t('Empty cell placeholder'),
+      description: t(
+        'Text shown in metric cells that have no value. Leave blank to keep the cell empty.',
+      ),
+      default: '',
+      renderTrigger: true,
+    },
+  },
+];
+
 function wrapPivotTableTransformProps(
   base: (chartProps: ChartProps) => Record<string, unknown>,
 ) {
@@ -39,6 +58,8 @@ function wrapPivotTableTransformProps(
     const formData = chartProps.formData as Record<string, unknown>;
     result.ptmTableTextCase =
       formData.ptm_table_text_case ?? formData.ptmTableTextCase ?? 'none';
+    result.ptmEmptyCellLabel =
+      formData.ptm_empty_cell_label ?? formData.ptmEmptyCellLabel ?? '';
     return result;
   };
 }
@@ -62,7 +83,7 @@ const PtmPivotTableChartPlugin = createPtmPlugin({
   },
   transforms: PIVOT_TABLE_TRANSFORM_CONFIG,
   ptmDefaults: PIVOT_TABLE_PTM_DEFAULTS,
-  additionalPtmControls: [ptmTextCasingControls],
+  additionalPtmControls: [ptmTextCasingControls, ptmEmptyCellControls],
 });
 
 export default PtmPivotTableChartPlugin;
