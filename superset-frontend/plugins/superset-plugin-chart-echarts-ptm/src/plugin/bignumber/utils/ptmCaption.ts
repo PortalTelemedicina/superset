@@ -31,8 +31,7 @@ export function resolvePtmCaption(
     };
   }
 
-  const caption =
-    (additionalText || '').trim() || (subheader || '').trim();
+  const caption = (additionalText || '').trim() || (subheader || '').trim();
 
   return {
     title: '',
