@@ -17,10 +17,7 @@
  * under the License.
  */
 
-import {
-  inferPtmAutoconvert,
-  isPtmAutoconvertEnabled,
-} from './ptmChartMapping';
+import { isPtmAutoconvertEnabled } from './ptmChartMapping';
 
 describe('ptmChartMapping PTM autoconvert helpers', () => {
   test('isPtmAutoconvertEnabled requires strict true', () => {
@@ -31,27 +28,5 @@ describe('ptmChartMapping PTM autoconvert helpers', () => {
       isPtmAutoconvertEnabled({ metadata: { ptm_autoconvert: false } }),
     ).toBe(false);
     expect(isPtmAutoconvertEnabled({ metadata: {} })).toBe(false);
-  });
-
-  test('inferPtmAutoconvert respects explicit false', () => {
-    expect(
-      inferPtmAutoconvert({ ptm_autoconvert: false }, [{ name: 'PTM' }], {}),
-    ).toBe(false);
-  });
-
-  test('inferPtmAutoconvert from PTM tag when unset', () => {
-    expect(inferPtmAutoconvert({}, [{ name: 'PTM' }], {})).toBe(true);
-  });
-
-  test('inferPtmAutoconvert from PTM charts when unset', () => {
-    expect(
-      inferPtmAutoconvert({}, [], {
-        '1': { form_data: { viz_type: 'ptm_table' } },
-      }),
-    ).toBe(true);
-  });
-
-  test('inferPtmAutoconvert false when no PTM signals', () => {
-    expect(inferPtmAutoconvert({}, [{ name: 'owner' }], {})).toBe(false);
   });
 });

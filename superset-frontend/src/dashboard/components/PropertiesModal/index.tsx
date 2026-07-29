@@ -68,7 +68,10 @@ import {
 import { areObjectsEqual } from 'src/reduxUtils';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
 import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
-import { revertPtmChartsForDashboard } from 'src/ptm/extensions/dashboardSaveRegistry';
+import {
+  convertPtmChartsForDashboard,
+  revertPtmChartsForDashboard,
+} from 'src/ptm/extensions/dashboardSaveRegistry';
 
 const StyledJsonEditor = styled(JsonEditor)`
   /* Border is already applied by AceEditor itself */
@@ -465,17 +468,37 @@ const PropertiesModal = ({
       certificationDetails,
       ...moreOnSubmitProps,
     };
+    // Chart PTM<->legacy conversion happens ONLY through this explicit Properties
+    // save/apply action, scoped to THIS dashboard's own charts (server-side via the
+    // dashboard charts endpoint), and never when any of its charts are shared with
+    // another dashboard. Routine layout saves and the PTM tag never convert/revert
+    // charts. Conversion is reconciling (idempotent): when PTM is on we ensure this
+    // dashboard's legacy charts are converted, which also self-heals dashboards whose
+    // flag was turned on without their charts being converted (e.g. through the Apply
+    // flow). Reversion stays tied to turning PTM off, matching the toggle's documented
+    // behavior.
+    const reconcilePtmCharts = async () => {
+      if (!isPtmExtensionEnabled() || hasSharedCharts) {
+        return;
+      }
+      if (ptmAutoconvert === true) {
+        await convertPtmChartsForDashboard(dashboardId);
+      } else if (initialPtmAutoconvert.current === true) {
+        await revertPtmChartsForDashboard(dashboardId);
+      }
+    };
+
     if (onlyApply) {
-      onSubmit({ ...onSubmitProps, persisted: false });
-      onHide();
-      addSuccessToast(t('Dashboard properties updated'));
+      const applyProperties = async () => {
+        await reconcilePtmCharts();
+        onSubmit({ ...onSubmitProps, persisted: false });
+        onHide();
+        addSuccessToast(t('Dashboard properties updated'));
+      };
+      applyProperties().catch(handleErrorResponse);
     } else {
       const saveDashboard = async () => {
-        const turnedOffPtmAutoconvert =
-          initialPtmAutoconvert.current === true && !ptmAutoconvert;
-        if (isPtmExtensionEnabled() && turnedOffPtmAutoconvert) {
-          await revertPtmChartsForDashboard(dashboardId);
-        }
+        await reconcilePtmCharts();
         return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${dashboardId}`,
           headers: { 'Content-Type': 'application/json' },
