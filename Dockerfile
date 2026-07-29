@@ -209,13 +209,6 @@ RUN rm superset/translations/*/*/*.po
 COPY --from=superset-node /app/superset/translations superset/translations
 COPY --from=python-translation-compiler /app/translations_mo superset/translations
 
-# PTM: immunization BI bootstrap scripts, baked so the Airflow DAG
-# imm_bootstrap_superset_dashboard can run patch_bi_feedback_inpod.py in-pod
-# (via `kubectl exec`) to (re)create the per-municipality dashboards. Secrets,
-# PDFs and __pycache__ are excluded via .dockerignore. The Python scripts ship
-# in via merging feature/immunization-bi-feedback into the deployed branch.
-COPY dashboards_ptm /app/dashboards_ptm
-
 HEALTHCHECK CMD /app/docker/docker-healthcheck.sh
 CMD ["/app/docker/entrypoints/run-server.sh"]
 EXPOSE ${SUPERSET_PORT}

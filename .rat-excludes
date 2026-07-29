@@ -102,13 +102,3 @@ PTM_DASHBOARD_CSS.md
 ptm-dashboard.css
 header-custom.css
 STYLING.md
-
-# PTM dashboard specs and their delivery docs (dashboards_ptm/)
-CHART_CHOICE_MATRIX.md
-DOD_CHECKLIST.md
-extract_xlsx.py
-FEEDBACK_LOG.md
-ONBOARDING.md
-PILOT_3_MUNICIPALITIES.md
-apply_bi_feedback.sh
-EXPLICACAO_DASHBOARD.md
