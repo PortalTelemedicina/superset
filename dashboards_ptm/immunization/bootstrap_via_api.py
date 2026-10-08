@@ -867,6 +867,18 @@ _PROGRAMMED_ONLY_FILTER: dict = {
     "filterOptionName": "filter_programmed_only",
 }
 
+# Overdue-band chart: without it, overdue_bucket 'not_overdue' ("No Prazo")
+# lumps applied, future, due and not_applicable doses into one column that
+# dwarfs the actual bands.
+_OVERDUE_ONLY_FILTER: dict = {
+    "expressionType": "SIMPLE",
+    "subject": "status_bucket",
+    "operator": "IN",
+    "comparator": ["overdue"],
+    "clause": "WHERE",
+    "filterOptionName": "filter_overdue_only",
+}
+
 # Forward-looking window: current month through +12 months. Schedule rules
 # project some adolescent doses years ahead, so an unbounded axis flattens the
 # near-term demand that matters for procurement.
@@ -2698,7 +2710,7 @@ CHARTS_V2: list[dict] = [
             "groupbyColumns": ["overdue_bucket_label"],
             "metrics": [_metric("Doses", "SUM", "child_rule_pairs")],
             "metricsLayout": "COLUMNS",
-            "adhoc_filters": [],
+            "adhoc_filters": [_OVERDUE_ONLY_FILTER],
             **_SNAPSHOT_TIME_RANGE,
             "row_limit": 10000,
             "valueFormat": ",",
@@ -2763,9 +2775,9 @@ CHARTS_V2: list[dict] = [
         "key": "chart.v2.14_dropout_bar",
         "slice_name": "Taxa de abandono por vacina",
         "description": (
-            "Abandono efetivo entre doses consecutivas. N/A quando a base "
-            "de crianças na dose inicial é pequena demais (<30) para um "
-            "percentual confiável — ver display_dropout_rate."
+            "Abandono entre doses consecutivas, sobre o total de crianças "
+            "com a dose inicial (todas as coortes somadas). N/A quando essa "
+            "base é pequena demais (<30) para um percentual confiável."
         ),
         "viz_type": "ptm_pivot_table",
         "dataset_key": "dataset.dropout_by_series_v2",
@@ -2773,9 +2785,33 @@ CHARTS_V2: list[dict] = [
             # July 10 feedback #7: técnico + comercial (vaccine_label).
             "groupbyRows": ["vaccine_label"],
             "groupbyColumns": ["dose_from_label"],
+            # Pooled over birth-year cohorts: an average of per-cohort rates
+            # weights a 33-child cohort like a 399-child one (VIP D1 showed
+            # 20% instead of 12% in Cocal). Same N/A threshold (<30) as
+            # display_dropout_rate, applied to the pooled denominator.
             "metrics": [
-                _metric("Taxa de abandono", "AVG", "display_dropout_rate"),
-                _metric("Adesão", "AVG", "adherence_rate"),
+                {
+                    "expressionType": "SQL",
+                    "label": "Taxa de abandono",
+                    "sqlExpression": (
+                        "CASE WHEN SUM(applied_from_count) < 30 THEN NULL "
+                        "ELSE 1 - SAFE_DIVIDE(SUM(applied_to_count), "
+                        "SUM(applied_from_count)) END"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_dropout_pooled_rate",
+                },
+                {
+                    "expressionType": "SQL",
+                    "label": "Adesão",
+                    "sqlExpression": (
+                        "CASE WHEN SUM(applied_from_count) < 30 THEN NULL "
+                        "ELSE SAFE_DIVIDE(SUM(applied_to_count), "
+                        "SUM(applied_from_count)) END"
+                    ),
+                    "hasCustomLabel": True,
+                    "optionName": "metric_adherence_pooled_rate",
+                },
             ],
             "metricsLayout": "COLUMNS",
             "adhoc_filters": [],
