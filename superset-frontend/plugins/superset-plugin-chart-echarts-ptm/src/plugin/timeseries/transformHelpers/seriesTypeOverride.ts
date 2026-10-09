@@ -109,8 +109,41 @@ function applyStackAwareBorderRadius(
   });
 
   const radiusByIndex: Record<number, [number, number, number, number]> = {};
+  const dataBySeries: Record<number, unknown[]> = {};
 
   for (const indices of groups.values()) {
+    // Stacked group: round the outermost non-empty segment of each bar, not of each series.
+    // Rounding by series leaves the top of a bar square whenever the last series is zero there.
+    if (indices.length > 1) {
+      indices.forEach(i => {
+        radiusByIndex[i] = [0, 0, 0, 0];
+        dataBySeries[i] = [...((series[i].data as unknown[]) || [])];
+      });
+      const length = Math.max(...indices.map(i => dataBySeries[i].length));
+      for (let j = 0; j < length; j += 1) {
+        const filled = indices.filter(i => {
+          const value = getPointValue(dataBySeries[i][j], horizontal);
+          return value !== null && value !== 0;
+        });
+        if (filled.length > 0) {
+          const bottom = filled[0];
+          const top = filled[filled.length - 1];
+          new Set([bottom, top]).forEach(i => {
+            dataBySeries[i][j] = withItemRadius(
+              dataBySeries[i][j],
+              getBarRadiusArray(
+                radius,
+                horizontal,
+                roundTop && i === top,
+                roundBottom && i === bottom,
+              ),
+            );
+          });
+        }
+      }
+      continue;
+    }
+
     const first = indices[0];
     const last = indices[indices.length - 1];
 
@@ -146,11 +179,40 @@ function applyStackAwareBorderRadius(
 
   return series.map((s, idx) => ({
     ...s,
+    ...(dataBySeries[idx] ? { data: dataBySeries[idx] } : {}),
     itemStyle: {
       ...((s.itemStyle as Record<string, unknown>) || {}),
       borderRadius: radiusByIndex[idx] ?? [0, 0, 0, 0],
     },
   }));
+}
+
+function getPointValue(item: unknown, horizontal: boolean): number | null {
+  const raw =
+    item && typeof item === 'object' && !Array.isArray(item)
+      ? (item as Record<string, unknown>).value
+      : item;
+  const value = Array.isArray(raw) ? raw[horizontal ? 0 : 1] : raw;
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isNaN(number) ? null : number;
+}
+
+function withItemRadius(
+  item: unknown,
+  borderRadius: [number, number, number, number],
+): Record<string, unknown> {
+  const point =
+    item && typeof item === 'object' && !Array.isArray(item)
+      ? (item as Record<string, unknown>)
+      : { value: item };
+  return {
+    ...point,
+    itemStyle: {
+      ...((point.itemStyle as Record<string, unknown>) || {}),
+      borderRadius,
+    },
+  };
 }
 
 export function applyBarBorderRadius(
