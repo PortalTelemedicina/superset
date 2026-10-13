@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "lib",
+    "outDir": "lib",
+    "rootDir": "..",
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "lib",
+    "esm",
+    "test",
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*",
+    "types/**/*",
+    "../plugin-chart-table/src/**/*",
+    "../plugin-chart-table/types/**/*",
+    "../plugin-chart-pivot-table/src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../packages/superset-ui-chart-controls"
+    },
+    {
+      "path": "../../packages/superset-ui-core"
+    },
+    {
+      "path": "../plugin-chart-table"
+    },
+    {
+      "path": "../plugin-chart-pivot-table"
+    }
+  ]
+}

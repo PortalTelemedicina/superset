@@ -1,0 +1,160 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import {
+  extractTimegrain,
+  GenericDataType,
+  getMetricLabel,
+  Metric,
+  QueryFormData,
+  getNumberFormatter,
+  getValueFormatter,
+} from '@superset-ui/core';
+import { getColorFormatters } from '@superset-ui/chart-controls';
+import type { ColorFormatters } from '@superset-ui/chart-controls';
+import { parseMetricValue, getDateFormatter } from '../utils';
+import { resolvePtmCaption } from '../utils/ptmCaption';
+import { BigNumberTotalChartProps, BigNumberVizProps } from '../types';
+
+export default function transformProps(
+  chartProps: BigNumberTotalChartProps,
+): BigNumberVizProps {
+  const {
+    width,
+    height,
+    queriesData,
+    formData,
+    rawFormData,
+    hooks,
+    datasource: { currencyFormats = {}, columnFormats = {} },
+    theme,
+  } = chartProps;
+  const {
+    headerFontSize,
+    metric = 'value',
+    subheader = '',
+    subheaderFontSize,
+    titleFontSize = 14,
+    forceTimestampFormatting,
+    timeFormat,
+    yAxisFormat,
+    conditionalFormatting,
+    currencyFormat,
+    layoutMode = 'ptm',
+    showIcon = false,
+    iconName = 'Activity',
+    iconSize = 24,
+    iconColor = '#666666',
+    iconBackgroundColor = '#F5F5F5',
+    additionalText = '',
+    additionalTextFontSize = 12,
+    infoText = '',
+    autofit = true,
+  } = formData;
+  // `subheader_metric` is a custom PTM control. `chartProps.formData` is the
+  // camelCased form data, so the snake_case key is absent here (it survives on
+  // `rawFormData`, which is also what buildQuery reads). Read it from there so
+  // the secondary metric actually renders.
+  const {
+    subheader_metric: subheaderMetric,
+    subheader_metric_format: subheaderMetricFormat = '.1%',
+  } = (rawFormData ?? {}) as {
+    subheader_metric?: typeof metric;
+    subheader_metric_format?: string;
+  };
+  const refs: Record<string, any> = {};
+  const { data = [], coltypes = [] } = queriesData[0];
+  const granularity = extractTimegrain(rawFormData as QueryFormData);
+  const metricName = getMetricLabel(metric);
+  const caption = resolvePtmCaption(layoutMode, subheader, additionalText);
+  const bigNumber =
+    data.length === 0 ? null : parseMetricValue(data[0][metricName]);
+
+  let secondaryMetricText = '';
+  if (subheaderMetric && data.length > 0) {
+    const secondaryName = getMetricLabel(subheaderMetric);
+    const secondaryRaw = parseMetricValue(data[0][secondaryName]);
+    if (secondaryRaw !== null && secondaryRaw !== undefined) {
+      secondaryMetricText = getNumberFormatter(subheaderMetricFormat)(
+        Number(secondaryRaw),
+      );
+    }
+  }
+
+  let metricEntry: Metric | undefined;
+  if (chartProps.datasource?.metrics) {
+    metricEntry = chartProps.datasource.metrics.find(
+      metricItem => metricItem.metric_name === metric,
+    );
+  }
+
+  const formatTime = getDateFormatter(
+    timeFormat,
+    granularity,
+    metricEntry?.d3format,
+  );
+
+  const numberFormatter = getValueFormatter(
+    metric,
+    currencyFormats,
+    columnFormats,
+    metricEntry?.d3format || yAxisFormat,
+    currencyFormat,
+  );
+
+  const headerFormatter =
+    coltypes[0] === GenericDataType.Temporal ||
+    coltypes[0] === GenericDataType.String ||
+    forceTimestampFormatting
+      ? formatTime
+      : numberFormatter;
+
+  const { onContextMenu } = hooks;
+
+  const defaultColorFormatters = [] as ColorFormatters;
+
+  const colorThresholdFormatters =
+    getColorFormatters(conditionalFormatting, data, theme, false) ??
+    defaultColorFormatters;
+
+  return {
+    width,
+    height,
+    bigNumber,
+    headerFormatter,
+    headerFontSize,
+    subheaderFontSize,
+    subheader: caption.subheader,
+    title: caption.title,
+    titleFontSize,
+    onContextMenu,
+    refs,
+    colorThresholdFormatters,
+    layoutMode,
+    showIcon,
+    iconName,
+    iconSize,
+    iconColor,
+    iconBackgroundColor,
+    additionalText: caption.additionalText,
+    additionalTextFontSize,
+    infoText,
+    secondaryMetricText,
+    autofit,
+  };
+}
