@@ -383,6 +383,10 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "superset/utils/json.py" = ["TID251"]
 "docker/*" = ["I"]  # Docker config files have non-standard imports that vary by environment
 "superset/db_engine_specs/lib.py" = ["E501"]  # Database config file with long description strings
+# Marshmallow fields use frontend JSON camelCase names
+"superset/extensions/portal/schemas/*.py" = ["N815"]
+# BigQuery __TABLES__ metadata query uses escaped table_id literals (not user SQL)
+"superset/extensions/portal/services/dashboard_freshness.py" = ["S608"]
 
 [tool.ruff.lint.isort]
 case-sensitive = false
@@ -441,6 +445,7 @@ authorized_licenses = [
     "bsd",
     "bsd-2-clause",
     "bsd-3-clause",
+    "3-clause bsd",
     "isc license (iscl)",
     "isc license",
     "mit",
@@ -460,6 +465,12 @@ authorized_licenses = [
 # Seems ok, might need legal review
 # https://github.com/urschrei/pypolyline/blob/master/LICENSE.md
 polyline = "2"
+# Apache 2.0 https://github.com/hkwi/python-geohash
+python-geohash = "0"
+# Apache 2.0 https://github.com/googleapis/python-crc32c/blob/main/LICENSE
+# google-cloud-storage stack (uv-pip-compile)
+google-crc32c = "1"  # Apache 2.0; liccheck reports UNKNOWN
+protobuf = "7"  # 3-Clause BSD (google-cloud-storage transitive)
 # --------------------------------------------------------------
 
 # TODO REMOVE THESE DEPS FROM CODEBASE

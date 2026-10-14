@@ -23,6 +23,7 @@ from urllib.parse import urlparse
 
 from flask import current_app as app, Flask, request, Response, session
 from flask_login import login_user
+from flask_wtf.csrf import generate_csrf
 from selenium.webdriver.remote.webdriver import WebDriver
 from werkzeug.http import parse_cookie
 
@@ -124,6 +125,8 @@ class MachineAuthProvider:
         # Login with the user specified to get the reports
         with app.test_request_context("/login"):
             login_user(user)
+            if app.config.get("WTF_CSRF_ENABLED", True):
+                generate_csrf()
             # A mock response object to get the cookie information from
             response = Response()
             # To ensure all `after_request` functions are called i.e Websockets JWT Auth

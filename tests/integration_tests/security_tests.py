@@ -1663,6 +1663,10 @@ class TestRolePermission(SupersetTestCase):
             ["SupersetRegisterUserView", "register"],
             ["SupersetRegisterUserView", "activation"],
             ["RedirectView", "redirect_warning"],
+            ["SupersetForgotPasswordView", "forgot_password"],
+            ["SupersetResetPasswordView", "reset_password"],
+            ["ForgotPasswordRestApi", "request_reset"],
+            ["ForgotPasswordRestApi", "reset_password"],
         ]
         unsecured_views = []
         for view_class in appbuilder.baseviews:

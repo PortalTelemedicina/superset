@@ -233,8 +233,10 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
         "add_favorite",
         "remove_favorite",
         "get_charts",
+        "get_has_shared_charts",
         "get_datasets",
         "get_tabs",
+        "get_freshness",
         "get_embedded",
         "set_embedded",
         "delete_embedded",
@@ -246,6 +248,7 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
         "put_chart_customizations",
         "put_colors",
         "export_as_example",
+        "upload_header_image",
     }
     resource_name = "dashboard"
     allow_browser_login = True
@@ -570,6 +573,61 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
         except (TypeError, ValueError) as err:
             raise DatasetValidationError(err) from err
 
+    @expose("/<id_or_slug>/freshness", methods=("GET",))
+    @protect()
+    @permission_name("read")
+    @handle_api_exception
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get_freshness",
+        log_to_statsd=False,
+    )
+    @with_dashboard
+    def get_freshness(self, dash: Dashboard) -> Response:
+        """Get dashboard data freshness metadata.
+        ---
+        get:
+          summary: Get dashboard data freshness metadata
+          parameters:
+          - in: path
+            schema:
+              type: string
+            name: id_or_slug
+            description: Either the id of the dashboard, or its slug
+          responses:
+            200:
+              description: Dashboard freshness metadata
+              content:
+                application/json:
+                  schema:
+                    type: object
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            403:
+              $ref: '#/components/responses/403'
+            404:
+              $ref: '#/components/responses/404'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        # [PORTAL_EXTENSION] Use isolated handler from extension
+        try:
+            from superset.extensions.portal.api.dashboard_freshness import (
+                dashboard_freshness_handler,
+            )
+
+            status_code, result, message = dashboard_freshness_handler(dash)
+            if status_code == 200:
+                return self.response(status_code, result=result, message=message)
+            if status_code == 400:
+                return self.response_400(message=message)
+            return self.response_500(message=message)
+        except ImportError:
+            logger.warning("Portal extension not available for dashboard freshness")
+            return self.response_400(message="Dashboard freshness not available")
+
     @expose("/<id_or_slug>/tabs", methods=("GET",))
     @protect()
     @safe
@@ -675,6 +733,54 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
             charts = DashboardDAO.get_charts_for_dashboard(id_or_slug)
             result = [self.chart_entity_response_schema.dump(chart) for chart in charts]
             return self.response(200, result=result)
+        except DashboardAccessDeniedError:
+            return self.response_403()
+        except DashboardNotFoundError:
+            return self.response_404()
+
+    @expose("/<id_or_slug>/has_shared_charts", methods=("GET",))
+    @protect()
+    @safe
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: (
+            f"{self.__class__.__name__}.get_has_shared_charts"
+        ),
+        log_to_statsd=False,
+    )
+    def get_has_shared_charts(self, id_or_slug: str) -> Response:
+        """Whether the dashboard has any chart shared with another dashboard.
+        ---
+        get:
+          summary: Check if dashboard has shared charts
+          description: >-
+            Returns true if any chart on this dashboard is also on another
+            dashboard. When true, PTM autoconvert is blocked and the dashboard
+            is locked (cannot be unlocked) until charts are duplicated or
+            the dashboard is copied with duplicate charts.
+          parameters:
+          - in: path
+            schema:
+              type: string
+            name: id_or_slug
+          responses:
+            200:
+              description: Has shared charts
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      result:
+                        type: boolean
+            403:
+              $ref: '#/components/responses/403'
+            404:
+              $ref: '#/components/responses/404'
+        """
+        try:
+            has_shared = DashboardDAO.get_has_shared_charts(id_or_slug)
+            return self.response(200, result=has_shared)
         except DashboardAccessDeniedError:
             return self.response_403()
         except DashboardNotFoundError:
@@ -2191,3 +2297,71 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
                 ).timestamp(),
             },
         )
+
+    @expose("/upload_header_image/", methods=("POST",))
+    @protect()
+    @safe
+    @permission_name("write")
+    @statsd_metrics
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}"
+        ".upload_header_image",
+        log_to_statsd=False,
+    )
+    @requires_form_data
+    def upload_header_image(self) -> Response:
+        """
+        Upload an image for dashboard header customization.
+        ---
+        post:
+          summary: Upload header image
+          description: Upload an image file to be used in dashboard header customization
+          requestBody:
+            required: true
+            content:
+              multipart/form-data:
+                schema:
+                  type: object
+                  properties:
+                    file:
+                      type: string
+                      format: binary
+                      description: Image file (PNG, JPG, SVG, max 2MB)
+          responses:
+            200:
+              description: Image uploaded successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        description: URL to access the uploaded image
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        # [PORTAL_EXTENSION] Use isolated handler from extension
+        # This allows extension logic to be separated from core API
+        # See: superset/extensions/portal/api/dashboard_header.py
+        try:
+            from superset.extensions.portal.api.dashboard_header import (
+                upload_header_image_handler,
+            )
+
+            status_code, result, message = upload_header_image_handler()
+
+            if status_code == 200:
+                return self.response(status_code, result=result, message=message)
+            elif status_code == 400:
+                return self.response_400(message=message)
+            else:
+                return self.response_500(message=message)
+        except ImportError:
+            # Extension not available, return error
+            logger.warning("Portal extension not available for header image upload")
+            return self.response_400(message="Header image upload not available")

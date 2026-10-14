@@ -785,6 +785,10 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     # @lifecycle: stable
     # @category: internal
     "ENABLE_FACTORY_RESET_COMMAND": False,
+    # Enable self-service password reset via email for DB/LDAP auth
+    # @lifecycle: stable
+    # @category: runtime_config
+    "ENABLE_FORGOT_PASSWORD": False,
     # =================================================================
     # DEPRECATED
     # =================================================================
@@ -1097,6 +1101,30 @@ SCREENSHOT_TILED_VIEWPORT_HEIGHT = 2000  # Height of each tile in pixels
 # The file upload folder, when using models with files
 UPLOAD_FOLDER = BASE_DIR + "/static/uploads/"
 UPLOAD_CHUNK_SIZE = 4096
+
+# GCP Cloud Storage bucket for dashboard logo uploads (secure rehosting)
+#
+# If set, dashboard logos will be uploaded to this GCP bucket and the returned
+# GCP public URL will be used directly in HTML for rendering.
+#
+# If not set (None), logos are stored in local static files (/static/uploads/)
+# and the static file URL is used in HTML.
+#
+# Only file uploads are supported (no URL downloads). Users must upload image
+# files directly. The returned URL is ready to use in dashboard header HTML.
+#
+# Requires: pip install google-cloud-storage
+# Uses default GCP credentials or GOOGLE_APPLICATION_CREDENTIALS env var
+# Example: DASHBOARD_LOGO_GCP_BUCKET = "my-superset-logos-bucket"
+DASHBOARD_LOGO_GCP_BUCKET = os.environ.get("DASHBOARD_LOGO_GCP_BUCKET", None)
+
+# Optional subfolder for dashboard logo uploads
+# If empty string or not set, images are stored directly in uploads root
+# If set (e.g., "dashboard_logos"), images are stored in uploads/dashboard_logos/
+# Applies to both GCP bucket and local filesystem storage
+# Example: DASHBOARD_LOGO_SUBFOLDER = ""  # uploads root
+# Example: DASHBOARD_LOGO_SUBFOLDER = "dashboard_logos"  # uploads/dashboard_logos/
+DASHBOARD_LOGO_SUBFOLDER = ""
 
 # ---------------------------------------------------
 # Cache configuration
@@ -1620,6 +1648,15 @@ SMTP_MAIL_FROM = "superset@superset.com"
 # If True creates a default SSL context with ssl.Purpose.CLIENT_AUTH using the
 # default system root CA certificates.
 SMTP_SSL_SERVER_AUTH = False
+
+# Forgot password configuration
+# Token expiration time in seconds (default: 1 hour)
+FORGOT_PASSWORD_TOKEN_EXPIRATION = 3600
+# Secret salt for token generation (must be unique per deployment)
+FORGOT_PASSWORD_TOKEN_SALT = "forgot-password-salt"  # noqa: S105
+# Base URL for reset links in emails. If None, auto-detected from request
+FORGOT_PASSWORD_BASE_URL: str | None = None
+
 ENABLE_CHUNK_ENCODING = False
 
 # Whether to bump the logging level to ERROR on the flask_appbuilder package
@@ -1957,7 +1994,11 @@ ALERT_REPORTS_DEFAULT_RETENTION = 90
 ALERT_REPORTS_DEFAULT_CRON_VALUE = "0 0 * * *"  # every day
 # If set to true no notification is sent, the worker will just log a message.
 # Useful for debugging
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+# Optional webhook URL to notify on report failure (e.g. Slack incoming webhook).
+# Sends a JSON payload with report name, id, error, and retry instructions.
+# Fires on every failure (not subject to grace period).
+ALERT_REPORTS_FAILURE_WEBHOOK_URL: str | None = None
 # Max tries to run queries to prevent false errors caused by transient errors
 # being returned to users. Set to a value >1 to enable retries.
 ALERT_REPORTS_QUERY_EXECUTION_MAX_TRIES = 1
@@ -2124,11 +2165,19 @@ TALISMAN_CONFIG = {
             "'self'",
             "blob:",
             "data:",
+            # GCP Cloud Storage for dashboard logos (secure rehosting)
+            # Wildcard allows all GCP storage buckets
+            "https://storage.googleapis.com",
+            "https://*.storage.googleapis.com",
+            # Existing Superset services
             "https://apachesuperset.gateway.scarf.sh",
             "https://static.scarf.sh/",
             # "https://cdn.brandfolder.io", # Uncomment when SLACK_ENABLE_AVATARS is True  # noqa: E501
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
@@ -2138,6 +2187,9 @@ TALISMAN_CONFIG = {
             "https://tile.openstreetmap.org",
             "https://tile.osm.ch",
             "https://a.basemaps.cartocdn.com",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [
@@ -2164,11 +2216,19 @@ TALISMAN_DEV_CONFIG = {
             "'self'",
             "blob:",
             "data:",
+            # GCP Cloud Storage for dashboard logos (secure rehosting)
+            # Wildcard allows all GCP storage buckets
+            "https://storage.googleapis.com",
+            "https://*.storage.googleapis.com",
+            # Existing Superset services
             "https://apachesuperset.gateway.scarf.sh",
             "https://static.scarf.sh/",
             "https://cdn.brandfolder.io",
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
@@ -2178,6 +2238,9 @@ TALISMAN_DEV_CONFIG = {
             "https://tile.openstreetmap.org",
             "https://tile.osm.ch",
             "https://a.basemaps.cartocdn.com",
+            # CARTO basemaps for MapLibre (PTM plugins)
+            "https://basemaps.cartocdn.com",
+            "https://*.basemaps.cartocdn.com",
         ],
         "object-src": "'none'",
         "style-src": [

@@ -204,6 +204,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.dynamic_plugins import DynamicPluginsView
         from superset.views.error_handling import set_app_error_handlers
         from superset.views.explore import ExplorePermalinkView, ExploreView
+        from superset.views.forgot_password.api import ForgotPasswordRestApi
         from superset.views.groups import GroupsListView
         from superset.views.log.api import LogRestApi
         from superset.views.logs import ActionLogView
@@ -252,6 +253,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(UserRestApi)
         appbuilder.add_api(DashboardFilterStateRestApi)
         appbuilder.add_api(DashboardPermalinkRestApi)
+        appbuilder.add_api(ForgotPasswordRestApi)
         appbuilder.add_api(DashboardRestApi)
         appbuilder.add_api(DatabaseRestApi)
         appbuilder.add_api(DatasetRestApi)
@@ -624,6 +626,9 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         self.init_views()
 
         self.init_all_dependencies_and_extensions()
+        # Dashboard extension schema registration (runs after all models/views
+        # are loaded to avoid "App not initialized" and duplicate table defs)
+        self.configure_dashboard_extensions()
 
     def check_secret_key(self) -> None:
         def log_default_secret_key_warning() -> None:
@@ -811,6 +816,14 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 
     def configure_feature_flags(self) -> None:
         feature_flag_manager.init_app(self.superset_app)
+
+    def configure_dashboard_extensions(self) -> None:
+        try:
+            from superset.extensions.portal import register_dashboard_extension_fields
+
+            register_dashboard_extension_fields(self.superset_app)
+        except Exception as ex:
+            logger.warning("Dashboard extension registration skipped: %s", ex)
 
     def configure_sqlglot_dialects(self) -> None:
         extensions = self.config["SQLGLOT_DIALECTS_EXTENSIONS"]

@@ -3178,7 +3178,12 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
     # temporal change to remove the roles view from the security menu,
     # after migrating all views to frontend, we will set FAB_ADD_SECURITY_VIEWS = False
     def register_views(self) -> None:
-        from superset.views.auth import SupersetAuthView, SupersetRegisterUserView
+        from superset.views.auth import (
+            SupersetAuthView,
+            SupersetForgotPasswordView,
+            SupersetRegisterUserView,
+            SupersetResetPasswordView,
+        )
 
         if self.register_superset_auth_view:
             self.auth_view = self.appbuilder.add_view_no_menu(SupersetAuthView)
@@ -3200,6 +3205,8 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
             self.limiter.limit(self.auth_rate_limit, methods=["POST"])(
                 self.auth_view.blueprint
             )
+        self.appbuilder.add_view_no_menu(SupersetForgotPasswordView)
+        self.appbuilder.add_view_no_menu(SupersetResetPasswordView)
 
         # Temporarily disable AUTH_RATE_LIMITED to prevent parent from trying to
         # apply rate limiting to a potentially None blueprint
