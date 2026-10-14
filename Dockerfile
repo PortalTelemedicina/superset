@@ -24,7 +24,7 @@ ARG PY_VER=3.11.14-slim-trixie
 ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
 
 # Include translations in the final build
-ARG BUILD_TRANSLATIONS="false"
+ARG BUILD_TRANSLATIONS="true"
 
 ######################################################################
 # superset-node-ci used as a base for building frontend assets and CI
@@ -148,7 +148,8 @@ ENV SUPERSET_HOME="/app/superset_home" \
     SUPERSET_ENV="production" \
     FLASK_APP="superset.app:create_app()" \
     PYTHONPATH="/app/pythonpath" \
-    SUPERSET_PORT="8088"
+    SUPERSET_PORT="8088" \
+    PLAYWRIGHT_BROWSERS_PATH="/usr/local/share/playwright-browsers"
 
 # Copy the entrypoints, make them executable in userspace
 COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
@@ -165,9 +166,7 @@ RUN mkdir -p \
     && touch superset/static/version_info.json
 
 # Install Playwright and optionally setup headless browsers
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
-
-ARG INCLUDE_CHROMIUM="false"
+ARG INCLUDE_CHROMIUM="true"
 ARG INCLUDE_FIREFOX="false"
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     if [ "${INCLUDE_CHROMIUM}" = "true" ] || [ "${INCLUDE_FIREFOX}" = "true" ]; then \

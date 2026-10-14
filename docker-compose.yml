@@ -43,7 +43,7 @@ x-common-build: &common-build
     DEV_MODE: "true"
     INCLUDE_CHROMIUM: ${INCLUDE_CHROMIUM:-false}
     INCLUDE_FIREFOX: ${INCLUDE_FIREFOX:-false}
-    BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-false}
+    BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-true}
 
 services:
   nginx:
@@ -166,7 +166,7 @@ services:
         # and build it on startup while firing docker-frontend.sh in dev mode, where
         # it'll mount and watch local files and rebuild as you update them
         DEV_MODE: "true"
-        BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-false}
+        BUILD_TRANSLATIONS: ${BUILD_TRANSLATIONS:-true}
     environment:
       # set this to false if you have perf issues running the npm i; npm run dev in-docker
       # if you do so, you have to run this manually on the host, which should perform better!
@@ -177,6 +177,10 @@ services:
       superset: "http://superset:8088"
       # Webpack dev server must bind to 0.0.0.0 to be accessible from outside the container
       WEBPACK_DEVSERVER_HOST: "0.0.0.0"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - "127.0.0.1:${NODE_PORT:-9000}:9000"  # exposing the dynamic webpack dev server
     command: ["/app/docker/docker-frontend.sh"]
