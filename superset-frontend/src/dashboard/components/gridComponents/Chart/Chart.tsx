@@ -26,7 +26,11 @@ import {
   memo,
   RefObject,
 } from 'react';
-import type { ChartCustomization, JsonObject } from '@superset-ui/core';
+import type {
+  ChartCustomization,
+  ChartDataReliabilityOverlayProps,
+  JsonObject,
+} from '@superset-ui/core';
 import { styled } from '@apache-superset/core/theme';
 import { t } from '@apache-superset/core/translation';
 import { debounce } from 'lodash';
@@ -57,9 +61,10 @@ import {
 } from '../../../util/chartStateConverter';
 import { useIsAutoRefreshing } from 'src/dashboard/contexts/AutoRefreshContext';
 
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import SliceHeader from '../../SliceHeader';
 import MissingChart from '../../MissingChart';
-
+import { DefaultChartDataReliabilityOverlay } from './DefaultChartDataReliabilityOverlay';
 import {
   addDangerToast,
   addSuccessToast,
@@ -166,6 +171,9 @@ const Chart = (props: ChartProps) => {
   const dispatch = useDispatch();
   const descriptionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const { chartDataReliabilityOverlayComponent } = useDashboardExtensions();
+  const DataReliabilityOverlayComponent =
+    chartDataReliabilityOverlayComponent ?? DefaultChartDataReliabilityOverlay;
 
   const boundActionCreators = useMemo(
     () =>
@@ -731,6 +739,16 @@ const Chart = (props: ChartProps) => {
             }}
           />
         )}
+
+        {(formData as JsonObject)?.show_data_reliability &&
+          (formData as JsonObject)?.data_reliability_message && (
+            <DataReliabilityOverlayComponent
+              formData={
+                formData as unknown as ChartDataReliabilityOverlayProps['formData']
+              }
+              context="dashboard"
+            />
+          )}
 
         <ChartContainer
           width={width}

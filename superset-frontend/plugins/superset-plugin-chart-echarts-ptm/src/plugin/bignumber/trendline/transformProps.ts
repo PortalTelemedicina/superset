@@ -20,12 +20,10 @@ import {
   extractTimegrain,
   getNumberFormatter,
   NumberFormats,
-  GenericDataType,
   getMetricLabel,
   getXAxisLabel,
   Metric,
   getValueFormatter,
-  t,
   tooltipHtml,
 } from '@superset-ui/core';
 import { EChartsCoreOption, graphic } from 'echarts/core';
@@ -38,6 +36,8 @@ import {
 } from '../types';
 import { getDateFormatter, parseMetricValue } from '../utils';
 import { resolvePtmCaption } from '../utils/ptmCaption';
+import { GenericDataType } from '@apache-superset/core/common';
+import { t } from '@apache-superset/core/translation';
 
 const formatPercentChange = getNumberFormatter(
   NumberFormats.PERCENT_SIGNED_1_POINT,

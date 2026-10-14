@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, ChartMetadata, ChartPlugin, ChartProps } from '@superset-ui/core';
+import { ChartMetadata, ChartPlugin, ChartProps } from '@superset-ui/core';
 import { ControlPanelConfig, ControlSetRow } from '@superset-ui/chart-controls';
 import { ComponentType } from 'react';
 import { createPtmControlSection } from './ptmControlSection';
@@ -25,6 +25,7 @@ import {
   type TransformConfig,
   resolveTransformConfig,
 } from './transformHelpers';
+import { t } from '@apache-superset/core/translation';
 
 export interface PtmPluginConfig {
   name: string;

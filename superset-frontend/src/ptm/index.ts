@@ -21,7 +21,7 @@
  * PTM extension system — single entry point.
  *
  * Registers all PTM UI extensions and chart plugins when PTM is enabled.
- * Core only calls this from setupExtensions(); no other core file imports PTM.
+ * Core only calls this from setupCodeOverrides(); no other core file imports PTM.
  */
 
 import {

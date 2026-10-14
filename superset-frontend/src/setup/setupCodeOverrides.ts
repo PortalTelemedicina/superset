@@ -17,6 +17,10 @@
  * under the License.
  */
 
+// PTM: ponto único de integração — só este arquivo importa src/ptm e chama applyPTMExtensions().
+import getBootstrapData from 'src/utils/getBootstrapData';
+import { applyPTMExtensions } from 'src/ptm';
+
 /**
  * Configuration options for setting up code overrides in different contexts.
  */
@@ -27,8 +31,35 @@ interface CodeOverrideOptions {
   embedded?: boolean;
 }
 
+let ptmInitialized = false;
+
 /**
  * Hook for individual deployments to add custom overrides
  * @param options - Configuration options for the setup process
  */
-export default function setupCodeOverrides(options: CodeOverrideOptions = {}) {}
+export default function setupCodeOverrides(options: CodeOverrideOptions = {}) {
+  // O embedded não carrega as extensões PTM (a 6.0 só chamava no app principal)
+  if (ptmInitialized || options.embedded) {
+    return;
+  }
+
+  const bootstrapData = getBootstrapData();
+  const flags = bootstrapData?.common?.feature_flags as
+    | Record<string, boolean>
+    | undefined;
+
+  if (flags?.PTM_EXTENSION_ENABLED === true) {
+    try {
+      applyPTMExtensions();
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[Setup Code Overrides] PTM extensions applied');
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Setup Code Overrides] PTM extensions failed:', error);
+      }
+    }
+  }
+
+  ptmInitialized = true;
+}

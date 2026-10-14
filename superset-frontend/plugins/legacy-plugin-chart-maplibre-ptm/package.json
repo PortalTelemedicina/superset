@@ -34,6 +34,7 @@
     "supercluster": "^8.0.1"
   },
   "peerDependencies": {
+    "@apache-superset/core": "*",
     "@superset-ui/chart-controls": "*",
     "@superset-ui/core": "*",
     "react": "^17.0.2",

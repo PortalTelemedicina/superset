@@ -263,6 +263,8 @@ export const getColorFunction = (
   }
 
   return (value: number | string | boolean | null) => {
+    // Célula vazia não tem o que comparar: sem isso, operadores relacionais
+    // coagem null/undefined para 0 e "<= 0.05" pintaria todo vazio.
     if (isBlank(value) && operator !== Comparator.IsNull) {
       return undefined;
     }

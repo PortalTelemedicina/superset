@@ -15,7 +15,7 @@
  * License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ChartProps, t } from '@superset-ui/core';
+import { ChartProps } from '@superset-ui/core';
 import { ControlSetRow } from '@superset-ui/chart-controls';
 import { createPtmPlugin, ptmTextCasingControls } from '../../shared';
 import { PIVOT_TABLE_TRANSFORM_CONFIG } from './pivotTableTransformConfig';
@@ -29,6 +29,7 @@ import PivotTableBuildQuery from '../../../../plugin-chart-pivot-table/src/plugi
 // @ts-ignore - importing from external source directory
 import PivotTableControlPanel from '../../../../plugin-chart-pivot-table/src/plugin/controlPanel';
 import PtmPivotTableChart from './PtmPivotTableChart';
+import { t } from '@apache-superset/core/translation';
 
 const PIVOT_TABLE_PTM_DEFAULTS = {};
 

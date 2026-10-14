@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
 import {
   ControlPanelSectionConfig,
   ControlSetRow,
 } from '@superset-ui/chart-controls';
 import { type TransformConfig } from './transformHelpers/transformRegistry';
+import { t } from '@apache-superset/core/translation';
 
 export const ptmColorPaletteChoices: [string, string][] = [
   ['blue', t('Azul (Padrão)')],

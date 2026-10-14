@@ -194,6 +194,8 @@ export type DashboardInfo = {
     refresh_frequency?: number;
     positions?: JsonObject;
     filter_scopes?: JsonObject;
+    ptm_locked?: boolean;
+    ptm_autoconvert?: boolean;
   };
   crossFiltersEnabled: boolean;
   filterBarOrientation: FilterBarOrientation;
@@ -393,4 +395,6 @@ export enum MenuKeys {
   ManageEmailReports = 'manage_email_reports',
   ExportPivotXlsx = 'export_pivot_xlsx',
   EmbedCode = 'embed_code',
+  PtmLock = 'ptm_lock',
+  PtmUnlock = 'ptm_unlock',
 }

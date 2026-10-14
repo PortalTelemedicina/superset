@@ -21,7 +21,6 @@ import {
   formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import {
-  t,
   validateNonEmpty,
   legacyValidateNumber,
   legacyValidateInteger,
@@ -37,6 +36,7 @@ import {
   spatial,
   viewport,
 } from '../../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 const INTENSITY_OPTIONS = Array.from(
   { length: 10 },

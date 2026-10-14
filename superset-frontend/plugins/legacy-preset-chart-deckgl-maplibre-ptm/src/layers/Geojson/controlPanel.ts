@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ControlPanelConfig } from '@superset-ui/chart-controls';
-import { t, legacyValidateInteger } from '@superset-ui/core';
+import { legacyValidateInteger } from '@superset-ui/core';
 import { formatSelectOptions } from '../../utilities/utils';
 import {
   filterNulls,
@@ -36,6 +36,7 @@ import {
   lineWidth,
 } from '../../utilities/Shared_DeckGL';
 import { dndGeojsonColumn } from '../../utilities/sharedDndControls';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

@@ -60,6 +60,12 @@
       "@superset-ui/plugin-chart-*": ["./plugins/plugin-chart-*/src"],
       "@superset-ui/legacy-plugin-chart-*": ["./plugins/legacy-plugin-chart-*/src"],
       "@superset-ui/legacy-preset-chart-*": ["./plugins/legacy-preset-chart-*/src"],
+      "@superset-ui/superset-plugin-chart-echarts-ptm": [
+        "./plugins/superset-plugin-chart-echarts-ptm/src"
+      ],
+      "@superset-ui/superset-extension-portal": [
+        "./packages/superset-extension-portal/src"
+      ],
       "echarts/types/src/*": ["./node_modules/echarts/types/src/*"]
     }
   },

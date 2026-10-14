@@ -18,12 +18,13 @@
  */
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
 import { Position, Color } from '@deck.gl/core';
-import { t, getSequentialSchemeRegistry, JsonObject } from '@superset-ui/core';
+import { getSequentialSchemeRegistry, JsonObject } from '@superset-ui/core';
 import { commonLayerProps } from '../common';
 import sandboxedEval from '../../utils/sandbox';
 import { hexToRGB } from '../../utils/colors';
 import { createDeckGLComponent, getLayerType } from '../../factory';
 import TooltipRow from '../../TooltipRow';
+import { t } from '@apache-superset/core/translation';
 
 function setTooltipContent(o: JsonObject) {
   return (

@@ -122,6 +122,7 @@ const Select = forwardRef(
       oneLine,
       maxTagCount: propsMaxTagCount,
       virtual = undefined,
+      dropdownStyle,
       ...props
     }: SelectProps,
     ref: Ref<RefSelectProps>,
@@ -798,6 +799,27 @@ const Select = forwardRef(
           css={props.css}
           dropdownAlign={DROPDOWN_ALIGN_BOTTOM}
           {...props}
+          styles={
+            dropdownStyle
+              ? {
+                  ...props.styles,
+                  popup: {
+                    ...(typeof props.styles?.popup === 'object' &&
+                    props.styles?.popup !== null
+                      ? props.styles.popup
+                      : {}),
+                    root: {
+                      ...(typeof props.styles?.popup === 'object' &&
+                      props.styles?.popup !== null &&
+                      props.styles?.popup?.root != null
+                        ? props.styles.popup.root
+                        : {}),
+                      ...dropdownStyle,
+                    },
+                  },
+                }
+              : props.styles
+          }
           showSearch={shouldShowSearch}
           ref={ref}
         />

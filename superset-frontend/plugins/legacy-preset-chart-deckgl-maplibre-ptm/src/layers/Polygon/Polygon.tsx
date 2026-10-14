@@ -27,7 +27,6 @@ import {
   JsonObject,
   JsonValue,
   QueryFormData,
-  t,
 } from '@superset-ui/core';
 
 import { PolygonLayer } from '@deck.gl/layers';
@@ -45,6 +44,7 @@ import {
   DeckGLContainerStyledWrapper,
 } from '../../DeckGLContainer';
 import { TooltipProps } from '../../components/Tooltip';
+import { t } from '@apache-superset/core/translation';
 
 const DOUBLE_CLICK_THRESHOLD = 250; // milliseconds
 

@@ -18,12 +18,12 @@
  */
 import { ContourLayer } from '@deck.gl/aggregation-layers';
 import { Position } from '@deck.gl/core';
-import { t } from '@superset-ui/core';
 import { commonLayerProps } from '../common';
 import sandboxedEval from '../../utils/sandbox';
 import { createDeckGLComponent, getLayerType } from '../../factory';
 import { ColorType } from '../../types';
 import TooltipRow from '../../TooltipRow';
+import { t } from '@apache-superset/core/translation';
 
 function setTooltipContent(o: any) {
   return (

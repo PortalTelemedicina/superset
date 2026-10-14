@@ -754,8 +754,8 @@ export class ThemeController {
     )
       return this.initialMode;
 
-    // Default to system preference when both themes are available
-    return ThemeMode.SYSTEM;
+    // Default to light mode on first load when both themes are available
+    return ThemeMode.DEFAULT;
   }
 
   /**

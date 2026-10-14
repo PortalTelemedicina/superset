@@ -31,7 +31,7 @@ import {
 
 /**
  * Registers all PTM chart plugins and presets with the global chart registry.
- * Must be called after MainPreset has been registered (e.g. from setupExtensions).
+ * Must be called after MainPreset has been registered (e.g. from setupCodeOverrides).
  */
 export function registerPtmPlugins(): void {
   new DeckGLChartPresetPTM().register();

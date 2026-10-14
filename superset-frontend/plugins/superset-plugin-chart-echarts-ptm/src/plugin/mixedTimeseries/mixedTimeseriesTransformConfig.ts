@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import { t } from '@superset-ui/core';
 import { ControlSetRow } from '@superset-ui/chart-controls';
 import type { TransformConfig } from '../../shared/transformHelpers';
+import { t } from '@apache-superset/core/translation';
 
 export const MIXED_TIMESERIES_TRANSFORM_CONFIG: TransformConfig = {
   defaults: true,

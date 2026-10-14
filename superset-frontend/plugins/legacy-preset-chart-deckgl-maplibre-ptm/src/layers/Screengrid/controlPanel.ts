@@ -20,7 +20,7 @@ import {
   ControlPanelConfig,
   getStandardizedControls,
 } from '@superset-ui/chart-controls';
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { validateNonEmpty } from '@superset-ui/core';
 import timeGrainSqlaAnimationOverrides from '../../utilities/controls';
 import {
   filterNulls,
@@ -34,6 +34,7 @@ import {
   spatial,
   mapStyle,
 } from '../../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

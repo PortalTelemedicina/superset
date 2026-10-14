@@ -46,6 +46,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isEqual, isEqualWith } from 'lodash';
 import { getChartDataRequest } from 'src/components/Chart/chartAction';
 import { ErrorAlert, ErrorMessageWithStackTrace } from 'src/components';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { Loading, Constants, Flex } from '@superset-ui/core/components';
 import { waitForAsyncData } from 'src/middleware/asyncEvent';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
@@ -121,6 +122,8 @@ const FilterValue: FC<FilterValueProps> = ({
   const dependencies = useFilterDependencies(id, dataMaskSelected);
   const transitiveParentIds = useTransitiveParentIds(id);
   const shouldRefresh = useShouldFilterRefresh();
+  const { filterValueLoadingComponent: FilterValueLoading } =
+    useDashboardExtensions();
 
   const behaviors = useMemo(
     () => [
@@ -412,12 +415,16 @@ const FilterValue: FC<FilterValueProps> = ({
       overflow={overflow}
     >
       {isLoading ? (
-        <Flex align="center">
-          <Loading position="inline" size="s" muted />
-          {hasDepsFilterValue
-            ? t('Awaiting filter selection')
-            : t('Loading filter values')}
-        </Flex>
+        FilterValueLoading ? (
+          <FilterValueLoading />
+        ) : (
+          <Flex align="center">
+            <Loading position="inline" size="s" muted />
+            {hasDepsFilterValue
+              ? t('Awaiting filter selection')
+              : t('Loading filter values')}
+          </Flex>
+        )
       ) : (
         <SuperChart
           height={HEIGHT}

@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ControlPanelConfig } from '@superset-ui/chart-controls';
-import { t, validateNonEmpty, legacyValidateInteger } from '@superset-ui/core';
+import { validateNonEmpty, legacyValidateInteger } from '@superset-ui/core';
 import timeGrainSqlaAnimationOverrides, {
   columnChoices,
   PRIMARY_COLOR,
@@ -36,6 +36,7 @@ import {
   viewport,
   mapStyle,
 } from '../../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

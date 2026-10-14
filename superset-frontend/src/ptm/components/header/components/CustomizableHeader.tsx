@@ -17,10 +17,10 @@
  * under the License.
  */
 import { type FC, useMemo } from 'react';
-import { styled } from '@superset-ui/core';
 import { getThemeTokens } from 'src/ptm/shared/themeTokens';
 import { HeaderLayout, SlotPosition, getSlotsByPosition } from '../types';
 import SlotRenderer from './SlotRenderer';
+import { styled } from '@apache-superset/core/theme';
 
 const HeaderContainer = styled.div<{ globalStyle?: any }>`
   display: flex;

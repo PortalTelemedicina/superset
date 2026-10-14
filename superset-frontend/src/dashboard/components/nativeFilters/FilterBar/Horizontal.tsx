@@ -21,6 +21,7 @@ import { FC, memo, useMemo } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { DataMaskStateWithId } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/theme';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { Loading } from '@superset-ui/core/components';
 import { RootState } from 'src/dashboard/types';
 import { useChartLayoutItems } from 'src/dashboard/util/useChartLayoutItems';
@@ -39,6 +40,7 @@ const HorizontalBar = styled.div`
     }px ${theme.sizeUnit * 4}px;
     background: ${theme.colorBgBase};
     box-shadow: inset 0px -2px 2px -1px ${theme.colorSplit};
+    position: relative;
   `}
 `;
 
@@ -65,7 +67,11 @@ const FilterBarEmptyStateContainer = styled.div`
   `}
 `;
 
-const HorizontalFilterBar: FC<HorizontalBarProps> = ({
+/**
+ * Minimal default horizontal filter bar (no collapsible, no chips).
+ * Extension (e.g. PTM FilterBarAdapter) can register as replacement with full UI.
+ */
+export const DefaultHorizontalFilterBar: FC<HorizontalBarProps> = ({
   actions,
   dataMaskSelected,
   filterValues,
@@ -131,4 +137,16 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
     </HorizontalBar>
   );
 };
+
+const HorizontalFilterBar: FC<HorizontalBarProps> = props => {
+  const { filterBarComponent: HorizontalFilterBarExtension } =
+    useDashboardExtensions();
+
+  return HorizontalFilterBarExtension ? (
+    <HorizontalFilterBarExtension {...props} />
+  ) : (
+    <DefaultHorizontalFilterBar {...props} />
+  );
+};
+
 export default memo(HorizontalFilterBar);

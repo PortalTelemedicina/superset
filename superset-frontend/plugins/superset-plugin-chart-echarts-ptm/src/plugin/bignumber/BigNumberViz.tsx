@@ -18,13 +18,11 @@
  */
 import { PureComponent, MouseEvent } from 'react';
 import {
-  t,
   getNumberFormatter,
   getTimeFormatter,
   SMART_DATE_VERBOSE_ID,
   computeMaxFontSize,
   BRAND_COLOR,
-  styled,
   BinaryQueryObjectFilterClause,
 } from '@superset-ui/core';
 import * as LucideIcons from 'lucide-react';
@@ -33,6 +31,8 @@ import { InfoTooltip } from '@superset-ui/core/components';
 import { getThemeTokens } from '../../shared/themeTokens';
 import Echart from './EchartWrapper';
 import { BigNumberVizProps } from './types';
+import { t } from '@apache-superset/core/translation';
+import { styled } from '@apache-superset/core/theme';
 
 const defaultNumberFormatter = getNumberFormatter();
 
@@ -458,7 +458,7 @@ class BigNumberVis extends PureComponent<BigNumberVizProps> {
     const hasInfoText = Boolean(infoText && infoText.trim() !== '');
     const hasTrendBadge = Boolean(
       this.props.subheader &&
-        (className.includes('positive') || className.includes('negative')),
+      (className.includes('positive') || className.includes('negative')),
     );
     const needsHeaderRow = hasInfoText || hasTrendBadge;
     const headerRowHeight = needsHeaderRow ? 20 + responsiveGap : 0;

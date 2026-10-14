@@ -115,10 +115,18 @@ use([
   LabelLayout,
 ]);
 
+const ECHARTS_LOCALE_MAP: Record<string, string> = {
+  PT_BR: 'PT-br',
+};
+
+const getEchartsLocaleModuleName = (locale: string): string =>
+  ECHARTS_LOCALE_MAP[locale] ?? locale;
+
 const loadLocale = async (locale: string) => {
+  const echartsLocale = getEchartsLocaleModuleName(locale);
   let lang;
   try {
-    lang = await import(`echarts/lib/i18n/lang${locale}`);
+    lang = await import(`echarts/lib/i18n/lang${echartsLocale}`);
   } catch {
     // Locale not supported in ECharts
   }

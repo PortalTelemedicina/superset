@@ -39,6 +39,7 @@ import {
   QueryFormData,
 } from '@superset-ui/core';
 import { css, useTheme, styled } from '@apache-superset/core/theme';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { useSelector } from 'react-redux';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import {
@@ -163,6 +164,10 @@ const queueChartResize = () => {
 const SliceHeaderControls = (
   props: SliceHeaderControlsPropsWithRouter | SliceHeaderControlsProps,
 ) => {
+  const {
+    sliceHeaderControlsClassNamesFn: sliceHeaderControlsClassNamesExtension,
+    sliceHeaderControlsTriggerFn: sliceHeaderControlsTriggerExtension,
+  } = useDashboardExtensions();
   const [drillModalIsOpen, setDrillModalIsOpen] = useState(false);
   // setting openKeys undefined falls back to uncontrolled behaviour
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -373,6 +378,7 @@ const SliceHeaderControls = (
     isCached = [],
   } = props;
   const isTable = slice.viz_type === VizType.Table;
+  const isPtmTable = slice.viz_type === 'ptm_table';
   const isPivotTable = slice.viz_type === VizType.PivotTable;
   const cachedWhen = (cachedDttm || []).map(itemCachedDttm =>
     (extendedDayjs.utc(itemCachedDttm) as any).fromNow(),
@@ -461,6 +467,12 @@ const SliceHeaderControls = (
       'data-test-edit-chart-name': slice.slice_name,
     } as any);
   }
+
+  const extensionClassNames = sliceHeaderControlsClassNamesExtension?.({
+    slice,
+  });
+  const extensionTriggerNode = sliceHeaderControlsTriggerExtension?.({ slice });
+  const triggerNode = extensionTriggerNode ?? <VerticalDotsTrigger />;
 
   if (canEditCrossFilters) {
     newMenuItems.push({
@@ -586,7 +598,7 @@ const SliceHeaderControls = (
         },
         ...(isFeatureEnabled(FeatureFlag.AllowFullCsvExport) &&
         props.supersetCanCSV &&
-        isTable
+        (isTable || isPtmTable)
           ? [
               {
                 key: MenuKeys.ExportFullCsv,
@@ -642,24 +654,31 @@ const SliceHeaderControls = (
         />
       )}
       <NoAnimationDropdown
-        popupRender={() => (
-          <Menu
-            onClick={handleMenuClick}
-            data-test={`slice_${slice.slice_id}-menu`}
-            id={`slice_${slice.slice_id}-menu`}
-            selectable={false}
-            items={newMenuItems}
-          />
-        )}
+        // Cast to any to stay compatible across AntD typings during upgrade.
+        {...({
+          popupRender: () => (
+            <Menu
+              {...({
+                onClick: handleMenuClick,
+                'data-test': `slice_${slice.slice_id}-menu`,
+                id: `slice_${slice.slice_id}-menu`,
+                selectable: false,
+                items: newMenuItems,
+                className: extensionClassNames?.menu,
+              } as any)}
+            />
+          ),
+        } as any)}
         overlayStyle={dropdownOverlayStyle}
         trigger={['click']}
         placement="bottomRight"
         open={isDropdownVisible}
-        onOpenChange={visible => setIsDropdownVisible(visible)}
+        onOpenChange={(visible: boolean) => setIsDropdownVisible(visible)}
       >
         <Button
           id={`slice_${slice.slice_id}-controls`}
           buttonStyle="link"
+          className={extensionClassNames?.controls}
           aria-label={t('More Options')}
           aria-haspopup="true"
           css={theme => css`
@@ -667,7 +686,7 @@ const SliceHeaderControls = (
             padding-right: 0px;
           `}
         >
-          <VerticalDotsTrigger />
+          {triggerNode}
         </Button>
       </NoAnimationDropdown>
       <DrillDetailModal

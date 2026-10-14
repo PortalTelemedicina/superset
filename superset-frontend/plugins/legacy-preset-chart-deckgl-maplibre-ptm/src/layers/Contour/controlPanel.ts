@@ -20,7 +20,7 @@ import {
   ControlPanelConfig,
   getStandardizedControls,
 } from '@superset-ui/chart-controls';
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { validateNonEmpty } from '@superset-ui/core';
 import {
   autozoom,
   filterNulls,
@@ -32,6 +32,7 @@ import {
   spatial,
   viewport,
 } from '../../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

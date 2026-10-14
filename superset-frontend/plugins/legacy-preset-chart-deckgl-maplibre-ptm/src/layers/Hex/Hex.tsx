@@ -19,7 +19,6 @@
 import { Color } from '@deck.gl/core';
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import {
-  t,
   CategoricalColorNamespace,
   QueryFormData,
   JsonObject,
@@ -31,6 +30,7 @@ import { hexToRGB } from '../../utils/colors';
 import { createDeckGLComponent } from '../../factory';
 import TooltipRow from '../../TooltipRow';
 import { TooltipProps } from '../../components/Tooltip';
+import { t } from '@apache-superset/core/translation';
 
 function setTooltipContent(o: JsonObject) {
   return (

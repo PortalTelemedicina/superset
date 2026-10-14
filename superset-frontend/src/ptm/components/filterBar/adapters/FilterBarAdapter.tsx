@@ -22,9 +22,6 @@ import {
   DataMaskStateWithId,
   isDefined,
   isNativeFilter,
-  styled,
-  t,
-  useTheme,
 } from '@superset-ui/core';
 import { Icons, Loading } from '@superset-ui/core/components';
 import { useSelector } from 'react-redux';
@@ -40,6 +37,8 @@ import { extractLabel } from 'src/dashboard/components/nativeFilters/selectors';
 import { RootState } from 'src/dashboard/types';
 import { useChartIds } from 'src/dashboard/util/charts/useChartIds';
 import { useChartLayoutItems } from 'src/dashboard/util/useChartLayoutItems';
+import { styled, useTheme } from '@apache-superset/core/theme';
+import { t } from '@apache-superset/core/translation';
 
 const HorizontalBar = styled.div`
   ${({ theme }) => `
@@ -142,8 +141,10 @@ export const FilterBarAdapter: FC<HorizontalBarProps> = ({
   actions,
   dataMaskSelected,
   filterValues,
+  chartCustomizationValues,
   isInitialized,
   onSelectionChange,
+  onPendingCustomizationDataMaskChange,
   clearAllTriggers,
   onClearAllComplete,
 }) => {
@@ -257,6 +258,10 @@ export const FilterBarAdapter: FC<HorizontalBarProps> = ({
               <FilterControls
                 dataMaskSelected={dataMaskSelected}
                 onFilterSelectionChange={onSelectionChange}
+                onPendingCustomizationDataMaskChange={
+                  onPendingCustomizationDataMaskChange
+                }
+                chartCustomizationValues={chartCustomizationValues}
                 clearAllTriggers={clearAllTriggers}
                 onClearAllComplete={onClearAllComplete}
               />

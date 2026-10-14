@@ -23,6 +23,9 @@ import {
   Form,
   Collapse,
   CollapseLabelInModal,
+  FormItem,
+  Switch,
+  Typography,
 } from '@superset-ui/core/components';
 import { useJsonValidation } from '@superset-ui/core/components/AsyncAceEditor';
 import { type TagType } from 'src/components';
@@ -56,6 +59,11 @@ import {
 import { dashboardInfoChanged } from 'src/dashboard/actions/dashboardInfo';
 import { areObjectsEqual } from 'src/reduxUtils';
 import { StandardModal, useModalValidation } from 'src/components/Modal';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
+import {
+  convertPtmChartsForDashboard,
+  revertPtmChartsForDashboard,
+} from 'src/ptm/extensions/dashboardSaveRegistry';
 import { validateRefreshFrequency } from '../RefreshFrequency';
 import {
   BasicInfoSection,
@@ -73,7 +81,7 @@ type PropertiesModalProps = {
   show?: boolean;
   onHide?: () => void;
   colorScheme?: string;
-  onSubmit?: (params: Record<string, any>) => void;
+  onSubmit?: (params: Record<string, any> & { persisted?: boolean }) => void;
   addSuccessToast: (message: string) => void;
   addDangerToast: (message: string) => void;
   onlyApply?: boolean;
@@ -135,6 +143,9 @@ const PropertiesModal = ({
   const [refreshFrequency, setRefreshFrequency] = useState(0);
   const [selectedThemeId, setSelectedThemeId] = useState<number | null>(null);
   const [showChartTimestamps, setShowChartTimestamps] = useState(false);
+  const [ptmAutoconvert, setPtmAutoconvert] = useState(false);
+  const [ptmLocked, setPtmLocked] = useState(false);
+  const [hasSharedCharts, setHasSharedCharts] = useState(false);
   const [themes, setThemes] = useState<
     Array<{
       id: number;
@@ -146,6 +157,7 @@ const PropertiesModal = ({
   const originalDashboardMetadata = useRef<Record<string, any>>({});
   const originalCss = useRef<string | null>(null);
   const cssDebounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initialPtmAutoconvert = useRef<boolean | null>(null);
 
   const handleErrorResponse = async (response: Response) => {
     const { error, statusText, message } = await getClientErrorObject(response);
@@ -193,7 +205,11 @@ const PropertiesModal = ({
         metadata,
       };
 
-      form.setFieldsValue(dashboardInfo);
+      const ptmAutoconvertValue = metadata?.ptm_autoconvert === true;
+      form.setFieldsValue({
+        ...dashboardInfo,
+        ptmAutoconvert: ptmAutoconvertValue,
+      });
       setDashboardInfo(dashboardInfo);
       setOwners(owners);
       setRoles(roles);
@@ -216,6 +232,13 @@ const PropertiesModal = ({
       setRefreshFrequency(metadata?.refresh_frequency || 0);
       setShowChartTimestamps(metadata?.show_chart_timestamps ?? false);
       originalDashboardMetadata.current = metadata;
+      setPtmAutoconvert(ptmAutoconvertValue);
+      initialPtmAutoconvert.current = ptmAutoconvertValue;
+      setPtmLocked(metadata?.ptm_locked === true);
+      setHasSharedCharts(
+        metadata?.has_shared_charts === true ||
+          metadata?.ptm_locked_reason === 'shared_charts',
+      );
     },
     [form],
   );
@@ -225,17 +248,27 @@ const PropertiesModal = ({
     // that renders this component have all the values we need.
     // At some point when we have a more consistent frontend
     // datamodel, the dashboard could probably just be passed as a prop.
-    SupersetClient.get({
-      endpoint: `/api/v1/dashboard/${dashboardId}`,
-    }).then(response => {
-      const dashboard = response.json.result;
+    Promise.all([
+      SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboardId}`,
+      }),
+      SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboardId}/has_shared_charts`,
+      }).catch(() => ({ json: { result: false } })),
+    ]).then(([dashboardResponse, hasSharedResponse]) => {
+      const dashboard = dashboardResponse.json.result;
       const jsonMetadataObj = dashboard.json_metadata?.length
         ? JSON.parse(dashboard.json_metadata)
         : {};
+      const hasSharedChartsResult =
+        (hasSharedResponse.json as { result?: boolean })?.result === true;
 
       handleDashboardData({
         ...dashboard,
-        metadata: jsonMetadataObj,
+        metadata: {
+          ...jsonMetadataObj,
+          has_shared_charts: hasSharedChartsResult,
+        },
       });
 
       setIsLoading(false);
@@ -379,7 +412,28 @@ const PropertiesModal = ({
       updateMetadata: false,
     });
 
-    currentJsonMetadata = jsonStringify(jsonMetadataObj);
+    // Mescla com o metadata completo para preservar native_filters, positions e
+    // demais chaves que o editor de JSON esconde
+    const completeMetadata: Record<string, unknown> = {
+      ...originalDashboardMetadata.current,
+      ...jsonMetadataObj,
+      label_colors: customLabelColors,
+      color_scheme: updatedColorScheme,
+    };
+    // Only include PTM flags when the extension is enabled (avoid persisting in production)
+    if (isPtmExtensionEnabled()) {
+      completeMetadata.ptm_autoconvert = hasSharedCharts
+        ? false
+        : ptmAutoconvert;
+      completeMetadata.ptm_locked = hasSharedCharts
+        ? true
+        : (originalDashboardMetadata.current?.ptm_locked ?? ptmLocked);
+      if (hasSharedCharts) {
+        completeMetadata.ptm_locked_reason = 'shared_charts';
+      }
+    }
+
+    currentJsonMetadata = jsonStringify(completeMetadata);
 
     const moreOnSubmitProps: { roles?: Roles; tags?: TagType[] } = {};
     const morePutProps: {
@@ -410,17 +464,37 @@ const PropertiesModal = ({
       css: customCss,
       ...moreOnSubmitProps,
     };
+    // Chart PTM<->legacy conversion happens ONLY through this explicit Properties
+    // save/apply action, scoped to THIS dashboard's own charts (server-side via the
+    // dashboard charts endpoint), and never when any of its charts are shared with
+    // another dashboard. Routine layout saves and the PTM tag never convert/revert
+    // charts. Conversion is reconciling (idempotent): when PTM is on we ensure this
+    // dashboard's legacy charts are converted, which also self-heals dashboards whose
+    // flag was turned on without their charts being converted (e.g. through the Apply
+    // flow). Reversion stays tied to turning PTM off, matching the toggle's documented
+    // behavior.
+    const reconcilePtmCharts = async () => {
+      if (!isPtmExtensionEnabled() || hasSharedCharts) {
+        return;
+      }
+      if (ptmAutoconvert === true) {
+        await convertPtmChartsForDashboard(dashboardId);
+      } else if (initialPtmAutoconvert.current === true) {
+        await revertPtmChartsForDashboard(dashboardId);
+      }
+    };
+
     if (onlyApply) {
-      setIsApplying(true);
-      try {
-        onSubmit(onSubmitProps);
+      const applyProperties = async () => {
+        await reconcilePtmCharts();
+        onSubmit({ ...onSubmitProps, persisted: false });
         onHide();
         addSuccessToast(t('Dashboard properties updated'));
-      } catch (error) {
-        console.error('Apply failed:', error);
-      } finally {
-        setIsApplying(false);
-      }
+      };
+      setIsApplying(true);
+      applyProperties()
+        .catch(handleErrorResponse)
+        .finally(() => setIsApplying(false));
     } else {
       const saveData = {
         dashboard_title: title,
@@ -435,12 +509,16 @@ const PropertiesModal = ({
         ...morePutProps,
       };
 
-      SupersetClient.put({
-        endpoint: `/api/v1/dashboard/${dashboardId}`,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(saveData),
-      }).then(() => {
-        onSubmit(onSubmitProps);
+      const saveDashboard = async () => {
+        await reconcilePtmCharts();
+        return SupersetClient.put({
+          endpoint: `/api/v1/dashboard/${dashboardId}`,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(saveData),
+        });
+      };
+      saveDashboard().then(() => {
+        onSubmit({ ...onSubmitProps, persisted: true });
         onHide();
         addSuccessToast(t('The dashboard has been saved'));
       }, handleErrorResponse);
@@ -532,10 +610,15 @@ const PropertiesModal = ({
   }, [dashboardId]);
 
   const handleChangeTags = (tags: { label: string; value: number }[]) => {
-    const parsedTags: TagType[] = ensureIsArray(tags).map(r => ({
+    let parsedTags: TagType[] = ensureIsArray(tags).map(r => ({
       id: r.value,
       name: r.label,
     }));
+    if (ptmLocked) {
+      parsedTags = parsedTags.filter(
+        tag => String(tag.name || '').toUpperCase() !== 'PTM',
+      );
+    }
     setTags(parsedTags);
   };
 
@@ -830,6 +913,52 @@ const PropertiesModal = ({
                 />
               ),
             },
+            ...(isPtmExtensionEnabled()
+              ? [
+                  {
+                    key: 'ptm',
+                    label: (
+                      <CollapseLabelInModal
+                        title={t('PTM Settings')}
+                        subtitle={t('Use PTM chart versions on this dashboard')}
+                        validateCheckStatus
+                        testId="ptm-section"
+                      />
+                    ),
+                    children: hasSharedCharts ? (
+                      <Typography.Text type="secondary">
+                        {t(
+                          'This dashboard has charts shared with other dashboards. PTM is locked and cannot be unlocked. To use PTM, create charts exclusive to this dashboard or copy the dashboard with "Duplicate charts" selected.',
+                        )}
+                      </Typography.Text>
+                    ) : ptmLocked ? (
+                      <Typography.Text type="secondary">
+                        {t(
+                          'PTM changes are locked for this dashboard. Unlock from the dashboard Actions menu to change.',
+                        )}
+                      </Typography.Text>
+                    ) : (
+                      <FormItem
+                        name="ptmAutoconvert"
+                        valuePropName="checked"
+                        label={t('Use PTM chart versions (new UI)')}
+                        extra={t(
+                          'On: charts use the PTM (new) versions on save. Off: use original (legacy) versions; existing PTM charts are reverted only when you turn this off and save. Layout saves no longer revert charts automatically.',
+                        )}
+                      >
+                        <Switch
+                          checked={ptmAutoconvert}
+                          onChange={checked => {
+                            setPtmAutoconvert(checked);
+                            form.setFieldsValue({ ptmAutoconvert: checked });
+                          }}
+                          disabled={isLoading}
+                        />
+                      </FormItem>
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
       </Form>

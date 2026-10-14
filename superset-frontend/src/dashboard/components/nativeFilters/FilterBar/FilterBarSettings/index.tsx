@@ -17,10 +17,11 @@
  * under the License.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { t } from '@apache-superset/core/translation';
 import { styled, useTheme, css } from '@apache-superset/core/theme';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { MenuProps } from '@superset-ui/core/components/Menu';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
@@ -56,7 +57,7 @@ const CHART_CUSTOMIZATION_MENU_KEY = 'chart-customization-menu-key';
 const isOrientation = (o: SelectedKey): o is FilterBarOrientation =>
   o === FilterBarOrientation.Vertical || o === FilterBarOrientation.Horizontal;
 
-const FilterBarSettings = () => {
+export const DefaultFilterBarSettings = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
@@ -164,7 +165,7 @@ const FilterBarSettings = () => {
   );
 
   const menuItems = useMemo(() => {
-    const items: MenuProps['items'] = [];
+    const items: any[] = [];
 
     if (canEdit) {
       items.push({
@@ -255,7 +256,7 @@ const FilterBarSettings = () => {
           selectedKeys: [selectedFilterBarOrientation],
         }}
         trigger={['click']}
-        popupRender={menu => (
+        popupRender={(menu: ReactNode) => (
           <div
             css={css`
               .filter-bar-orientation-submenu.ant-dropdown-menu-submenu-selected
@@ -284,6 +285,17 @@ const FilterBarSettings = () => {
       {scopingModal}
       {FilterConfigModalComponent}
     </>
+  );
+};
+
+const FilterBarSettings = () => {
+  const { filterBarSettingsComponent: FilterBarSettingsExtension } =
+    useDashboardExtensions();
+
+  return FilterBarSettingsExtension ? (
+    <FilterBarSettingsExtension />
+  ) : (
+    <DefaultFilterBarSettings />
   );
 };
 

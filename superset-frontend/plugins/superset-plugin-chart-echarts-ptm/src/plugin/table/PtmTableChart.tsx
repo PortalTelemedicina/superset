@@ -33,25 +33,22 @@ import {
   Row,
 } from 'react-table';
 import { extent as d3Extent, max as d3Max } from 'd3-array';
-import { FaSort } from '@react-icons/all-files/fa/FaSort';
-import { FaSortDown as FaSortDesc } from '@react-icons/all-files/fa/FaSortDown';
-import { FaSortUp as FaSortAsc } from '@react-icons/all-files/fa/FaSortUp';
+import {
+  FaSort,
+  FaSortDown as FaSortDesc,
+  FaSortUp as FaSortAsc,
+} from 'react-icons/fa';
 import cx from 'classnames';
 import {
   DataRecord,
   DataRecordValue,
   DTTM_ALIAS,
   ensureIsArray,
-  GenericDataType,
   getSelectedText,
   getTimeFormatterForGranularity,
   BinaryQueryObjectFilterClause,
-  styled,
-  css,
-  t,
-  useTheme,
 } from '@superset-ui/core';
-import { Dropdown, Menu } from '@superset-ui/chart-controls';
+import { Dropdown, Menu, ColorSchemeEnum } from '@superset-ui/chart-controls';
 import { Tooltip } from '@superset-ui/core/components/Tooltip';
 import {
   CheckOutlined,
@@ -65,7 +62,6 @@ import {
 import { isEmpty } from 'lodash';
 import { getThemeTokens } from '../../shared/themeTokens';
 import {
-  ColorSchemeEnum,
   DataColumnMeta,
   TableChartTransformedProps,
 } from '../../../../plugin-chart-table/src/types';
@@ -83,6 +79,9 @@ import { formatColumnValue } from '../../../../plugin-chart-table/src/utils/form
 import { PAGE_SIZE_OPTIONS } from '../../../../plugin-chart-table/src/consts';
 import { updateExternalFormData } from '../../../../plugin-chart-table/src/DataTable/utils/externalAPIs';
 import getScrollBarSize from '../../../../plugin-chart-table/src/DataTable/utils/getScrollBarSize';
+import { GenericDataType } from '@apache-superset/core/common';
+import { styled, css, useTheme } from '@apache-superset/core/theme';
+import { t } from '@apache-superset/core/translation';
 
 type ValueRange = [number, number];
 
@@ -609,6 +608,8 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     const headers: any = [];
     let currentColumnIndex = 0;
 
+    // groupHeaderColumns é um useMemo declarado abaixo; esta função só roda depois, no render do DataTable
+    // eslint-disable-next-line no-use-before-define
     Object.entries(groupHeaderColumns || {}).forEach(([key, value]) => {
       // Calculate the number of placeholder columns needed before the current header
       const startPosition = value[0];
@@ -895,12 +896,12 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           };
           if (html) {
             if (truncateLongCells) {
-              // eslint-disable-next-line react/no-danger
               return (
                 <StyledCell {...cellProps}>
                   <div
                     className="dt-truncate-cell"
                     style={columnWidth ? { width: columnWidth } : undefined}
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={html}
                   />
                 </StyledCell>

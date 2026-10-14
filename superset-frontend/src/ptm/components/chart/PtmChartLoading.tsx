@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled } from '@superset-ui/core';
 import { Loading } from '@superset-ui/core/components';
+import { styled } from '@apache-superset/core/theme';
 
 const LoadingContainer = styled.div`
   position: absolute;

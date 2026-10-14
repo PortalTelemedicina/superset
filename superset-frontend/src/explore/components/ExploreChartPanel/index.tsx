@@ -52,12 +52,16 @@ import type { ChartState, Datasource } from 'src/explore/types';
 import type { ExploreState } from 'src/explore/reducers/exploreReducer';
 import type { Slice } from 'src/types/Chart';
 import LastQueriedLabel from 'src/components/LastQueriedLabel';
+import { DefaultChartDataReliabilityOverlay } from 'src/dashboard/components/gridComponents/Chart/DefaultChartDataReliabilityOverlay';
 import { DataTablesPane } from '../DataTablesPane';
 import { ChartPills } from '../ChartPills';
 import { ExploreAlert } from '../ExploreAlert';
 import useResizeDetectorByObserver from './useResizeDetectorByObserver';
 
 const extensionsRegistry = getExtensionsRegistry();
+const ChartDataReliabilityOverlayExtension =
+  extensionsRegistry.get('explore.chart.dataReliabilityOverlay') ??
+  DefaultChartDataReliabilityOverlay;
 const DefaultHeader: React.FC = ({ children }) => <>{children}</>;
 
 export interface ExploreChartPanelProps {
@@ -306,38 +310,48 @@ const ExploreChartPanel = ({
           min-height: 0;
           flex: 1;
           overflow: auto;
+          position: relative;
         `}
         ref={chartPanelRef}
       >
         {chartPanelWidth && chartPanelHeight && (
-          <ChartContainer
-            width={Math.floor(chartPanelWidth)}
-            height={chartPanelHeight}
-            ownState={mergedOwnState}
-            annotationData={chart.annotationData}
-            chartId={chart.id}
-            triggerRender={triggerRender}
-            force={force}
-            datasource={datasource}
-            errorMessage={errorMessage}
-            formData={formData}
-            latestQueryFormData={chart.latestQueryFormData}
-            onQuery={onQuery}
-            queriesResponse={chart.queriesResponse}
-            chartIsStale={chartIsStale}
-            setControlValue={(name, value) =>
-              actions.setControlValue(name, value, chart.id)
-            }
-            timeout={timeout}
-            triggerQuery={chart.triggerQuery}
-            vizType={vizType}
-            onChartStateChange={handleChartStateChange}
-            {...(chart.chartAlert && { chartAlert: chart.chartAlert })}
-            {...(chart.chartStackTrace && {
-              chartStackTrace: chart.chartStackTrace,
-            })}
-            {...(chart.chartStatus && { chartStatus: chart.chartStatus })}
-          />
+          <>
+            <ChartContainer
+              width={Math.floor(chartPanelWidth)}
+              height={chartPanelHeight}
+              ownState={mergedOwnState}
+              annotationData={chart.annotationData}
+              chartId={chart.id}
+              triggerRender={triggerRender}
+              force={force}
+              datasource={datasource}
+              errorMessage={errorMessage}
+              formData={formData}
+              latestQueryFormData={chart.latestQueryFormData}
+              onQuery={onQuery}
+              queriesResponse={chart.queriesResponse}
+              chartIsStale={chartIsStale}
+              setControlValue={(name, value) =>
+                actions.setControlValue(name, value, chart.id)
+              }
+              timeout={timeout}
+              triggerQuery={chart.triggerQuery}
+              vizType={vizType}
+              onChartStateChange={handleChartStateChange}
+              {...(chart.chartAlert && { chartAlert: chart.chartAlert })}
+              {...(chart.chartStackTrace && {
+                chartStackTrace: chart.chartStackTrace,
+              })}
+              {...(chart.chartStatus && { chartStatus: chart.chartStatus })}
+            />
+            {formData?.show_data_reliability &&
+              formData?.data_reliability_message && (
+                <ChartDataReliabilityOverlayExtension
+                  formData={formData}
+                  context="explore"
+                />
+              )}
+          </>
         )}
       </div>
     ),

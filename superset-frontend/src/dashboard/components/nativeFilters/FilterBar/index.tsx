@@ -62,6 +62,7 @@ import { logEvent } from 'src/logger/actions';
 import { LOG_ACTIONS_CHANGE_DASHBOARD_FILTER } from 'src/logger/LogUtils';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
+import { DashboardStandaloneMode } from 'src/dashboard/util/constants';
 import { isChartCustomization } from '../FiltersConfigModal/utils';
 import { checkIsApplyDisabled, getFiltersToApply } from './utils';
 import { extractLabel } from '../selectors';
@@ -194,6 +195,10 @@ const FilterBar: FC<FiltersBarProps> = ({
     RootState,
     UserWithPermissionsAndRoles
   >(state => state.user);
+
+  const isReportMode =
+    Number(getUrlParam(URL_PARAMS.standalone)) ===
+    DashboardStandaloneMode.Report;
 
   const [filtersInScope] = useSelectFiltersInScope(nativeFilterValues);
   const inScopeFilterIds = useMemo(
@@ -391,12 +396,20 @@ const FilterBar: FC<FiltersBarProps> = ({
   }, [dataMaskApplied, setDataMaskSelected, dashboardId, previousDashboardId]);
 
   useEffect(() => {
-    // embedded users can't persist filter combinations
-    if (user?.userId) {
+    // Skip persisting filter state in report mode (standalone=3); reports do
+    // not need native_filters_key URL updates.
+    if (user?.userId && !isReportMode) {
       publishDataMask(history, dashboardId, updateKey, dataMaskApplied, tabId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
+  }, [
+    dashboardId,
+    dataMaskAppliedText,
+    history,
+    updateKey,
+    tabId,
+    isReportMode,
+  ]);
 
   const pendingChartCustomizations = useSelector<
     RootState,

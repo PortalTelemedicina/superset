@@ -17,12 +17,7 @@
  * under the License.
  */
 import { type FC, useState, useCallback } from 'react';
-import {
-  styled,
-  t,
-  SupersetClient,
-  getClientErrorObject,
-} from '@superset-ui/core';
+import { SupersetClient, getClientErrorObject } from '@superset-ui/core';
 import {
   Button,
   Modal,
@@ -61,6 +56,8 @@ import {
   BadgeSlot,
 } from '../types';
 import CustomizableHeader from './CustomizableHeader';
+import { styled } from '@apache-superset/core/theme';
+import { t } from '@apache-superset/core/translation';
 
 const EditorContainer = styled.div`
   padding: 24px;

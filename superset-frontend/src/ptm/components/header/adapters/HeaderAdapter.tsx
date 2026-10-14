@@ -17,7 +17,6 @@
  */
 
 import { type FC, useMemo, useCallback, useState } from 'react';
-import { css, useTheme, t } from '@superset-ui/core';
 import { Button } from '@superset-ui/core/components';
 import { Icons } from '@superset-ui/core/components/Icons';
 import {
@@ -36,6 +35,8 @@ import { useStandaloneMode } from '../hooks/useStandaloneMode';
 import { useHeaderPreview } from '../hooks/useHeaderPreview';
 import { HeaderLayout, getDefaultHeaderLayout } from '../types';
 import '../styles/header-custom.css';
+import { css, useTheme } from '@apache-superset/core/theme';
+import { t } from '@apache-superset/core/translation';
 
 export interface HeaderAdapterProps extends PageHeaderWithActionsProps {
   dashboardInfo?: {

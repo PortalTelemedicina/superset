@@ -18,9 +18,9 @@
  */
 
 import cls from 'classnames';
+import { Spin } from 'antd';
 import { t } from '@apache-superset/core/translation';
 import { styled, useTheme } from '@apache-superset/core/theme';
-import { Loading as LoaderSvg } from '../assets';
 import type { LoadingProps, SizeOption } from './types';
 
 const SIZE_MAP: Record<SizeOption, string> = {
@@ -61,6 +61,30 @@ const LoaderWrapper = styled.div<{
     transform: translate(-50%, -50%);
   }
 `;
+
+const SpinWrapper = styled.div`
+  z-index: 99;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  &.inline {
+    margin: 0;
+  }
+  &.inline-centered {
+    margin: 0 auto;
+  }
+  &.floating {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
+
 export function Loading({
   position = 'floating',
   image,
@@ -70,28 +94,31 @@ export function Loading({
 }: LoadingProps) {
   const theme = useTheme();
 
-  // Determine size from size prop
+  // Spinner do antd no lugar do logo animado, exceto quando há imagem
+  // explícita ou spinner de marca configurado no tema.
+  const customImage =
+    image ||
+    (theme.brandSpinnerSvg
+      ? `data:image/svg+xml;base64,${btoa(theme.brandSpinnerSvg)}`
+      : theme.brandSpinnerUrl);
+
+  if (!customImage) {
+    const isInline = position === 'inline' || position === 'inline-centered';
+    return (
+      <SpinWrapper
+        className={cls('loading', position, className)}
+        role="status"
+        aria-live="polite"
+        aria-label={t('Loading')}
+        data-test="loading-indicator"
+      >
+        <Spin size={isInline ? 'small' : 'default'} />
+      </SpinWrapper>
+    );
+  }
+
   const spinnerSize = SIZE_MAP[size];
-
-  // Opacity - muted reduces to 0.25, otherwise full opacity
   const opacity = muted ? 0.25 : 1.0;
-
-  // Render spinner content
-  const renderSpinner = () => {
-    // Precedence: explicit image prop > brandSpinnerSvg > brandSpinnerUrl > default SVG
-    if (image) {
-      return <img src={image} alt={`${t('Loading')}...`} />;
-    }
-    if (theme.brandSpinnerSvg) {
-      const svgDataUri = `data:image/svg+xml;base64,${btoa(theme.brandSpinnerSvg)}`;
-      return <img src={svgDataUri} alt={`${t('Loading')}...`} />;
-    }
-    if (theme.brandSpinnerUrl) {
-      return <img src={theme.brandSpinnerUrl} alt={`${t('Loading')}...`} />;
-    }
-    // Default: use the imported SVG component
-    return <LoaderSvg />;
-  };
 
   return (
     <LoaderWrapper
@@ -104,7 +131,7 @@ export function Loading({
       aria-label={t('Loading')}
       data-test="loading-indicator"
     >
-      {renderSpinner()}
+      <img src={customImage} alt={`${t('Loading')}...`} />
     </LoaderWrapper>
   );
 }

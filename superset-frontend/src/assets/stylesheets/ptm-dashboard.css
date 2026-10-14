@@ -1,0 +1,471 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/**
+ * Portal Telemedicina - Global Dashboard Styles
+ *
+ * Automatically applied to all dashboards.
+ * No need to add CSS manually to each dashboard.
+ */
+
+/* === FILTER DROPDOWN IMPROVEMENTS === */
+[aria-label='Grupo'] .ant-select-dropdown {
+  min-width: 500px !important;
+  white-space: normal !important;
+  word-wrap: break-word;
+}
+
+/* =========
+  Dashboard CSS Template
+  Cor alvo: #4B5563
+  ========= */
+
+/* === CSS VARIABLES === */
+:root {
+  --ptm-primary: #2c9fe5;
+  --ptm-primary-dark: #2075ac;
+  --ptm-secondary: #33a7b5;
+  --ptm-success: #5ad7a5;
+  --ptm-error: #ec4b60;
+  --ptm-attention: #f5c451;
+
+  --ptm-neutral-white: #ffffff;
+  --ptm-neutral-100: #f7f7f6;
+  --ptm-neutral-200: #f1f1f1;
+  --ptm-neutral-300: #cacaca;
+  --ptm-neutral-400: #979797;
+  --ptm-neutral-500: #666666;
+  --ptm-neutral-600: #222222;
+
+  --ptm-font-title:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  --ptm-font-body:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+
+  --ptm-radius-sm: 8px;
+  --ptm-radius-md: 12px;
+  --ptm-radius-lg: 16px;
+
+  --ptm-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --ptm-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --dash-gutter: clamp(12px, 2vw, 32px);
+
+  /* === FIGMA MODERN ANALYTICS THEME VARIABLES === */
+  /* Based on Figma Make: Modern Analytics Dashboard Design */
+  --ptm-figma-background: #f3f3f5;
+  --ptm-figma-primary: #030213;
+  --ptm-figma-card: #ffffff;
+  --ptm-figma-border: rgba(0, 0, 0, 0.1);
+  --ptm-figma-muted: #ececf0;
+  --ptm-figma-muted-foreground: #717182;
+  --ptm-figma-accent: #e9ebef;
+  --ptm-figma-radius: 0.625rem; /* 10px */
+  --ptm-figma-card-padding: 1.5rem; /* 24px */
+  --ptm-figma-grid-gap: 1.5rem; /* 24px */
+  --ptm-figma-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ptm-figma-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --ptm-figma-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --ptm-figma-shadow-hover: 0 10px 15px rgba(3, 2, 19, 0.05);
+}
+
+div[data-test-id='96'] + div {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.dashboard-header {
+  box-shadow: none !important;
+  border-bottom: 0px !important;
+}
+
+.editable-title {
+  color: #4b5563 !important;
+}
+
+.dashboard-header-container {
+  border-bottom: 0px !important;
+}
+
+.portal-header-custom {
+  border-bottom: 0px !important;
+}
+
+.ptm-icon-container {
+  background-color: #eff6ff !important;
+}
+
+.ptm-title {
+  color: #4b5563 !important;
+}
+
+.additional-text {
+  color: #6b7280 !important;
+}
+
+/* === DASHBOARD BACKGROUND === */
+.dashboard {
+  background-color: #f9fafb !important;
+}
+
+/* === CHART CARDS === */
+.dashboard-component-chart-holder {
+  background: var(--ptm-neutral-white) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: var(--ptm-radius-md) !important;
+  overflow: visible;
+  transition: box-shadow 0.2s ease !important;
+}
+
+/* =================================================
+   PTM TABLE: full-bleed inside chart card (Dashboard only)
+   Superset adds horizontal padding to chart cards; for the table we want the
+   table + footer to reach the card edges.
+
+   IMPORTANT: adjust --ptm-chart-card-pad-x if your card padding changes.
+   ================================================= */
+.dashboard-component-chart-holder {
+  --ptm-chart-card-pad-x: 16px; /* Superset default (theme.gridUnit * 4) */
+}
+
+/* Expand the whole slice to the card edges */
+div.chart-slice[data-test-viz-type='ptm_table'] {
+  margin-left: -16px !important;
+  margin-right: -16px !important;
+  width: calc(100% + (2 * 16px)) !important;
+  max-width: none !important;
+}
+
+/* Ensure the PTM table wrapper doesn't keep a fixed inline width */
+[data-test-viz-type='ptm_table'] .ptm_table,
+[data-test-viz-type='ptm_table'] .ptm_table > div,
+[data-test-viz-type='ptm_table'] .ptm_table > div > div,
+[data-test-viz-type='ptm_table'] .ptm_table > div > div > div,
+[data-test-viz-type='ptm_table'] .ptm_table div[role='table'] {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Table toolbar/search/footer styles live in the PTM table plugin (Styles.tsx). */
+
+.dashboard-component-chart-holder:hover {
+  box-shadow: 0 10px 15px rgba(3, 2, 19, 0.05) !important;
+}
+
+/* === CHART TITLE === */
+.editable-title input,
+.header-medium {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 300 !important;
+  color: #717182 !important;
+}
+
+.dashboard-component-header {
+  font-family: var(--ptm-font-title) !important;
+  font-weight: 400 !important;
+  color: #717182 !important;
+  padding-bottom: 0px !important;
+}
+
+/* === PTM TABLE CHART: Maintain header-title left spacing === */
+[data-test-viz-type='ptm_table'] .dashboard-component-header,
+[data-test-viz-type='ptm_table'] .header-title {
+  padding-left: 16px !important;
+}
+
+/* === HIDE BIG NUMBER PTM HEADERS === */
+/* Remove all header space for BigNumber PTM charts */
+/* Target the editable title input and header */
+[data-test-viz-type='ptm_big_number_trendline'] [data-test='slice-header'],
+[data-test-viz-type='ptm_big_number_trendline'] .header-title,
+[data-test-viz-type='ptm_big_number_trendline']
+  [data-test='editable-title-input'],
+[data-test-viz-type='ptm_big_number_trendline'] [data-test='editable-title'],
+[data-test-viz-type='ptm_big_number_total'] [data-test='slice-header'],
+[data-test-viz-type='ptm_big_number_total'] .header-title,
+[data-test-viz-type='ptm_big_number_total'] [data-test='editable-title-input'],
+[data-test-viz-type='ptm_big_number_total'] [data-test='editable-title'] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  font-family: 'Inter';
+}
+
+/* Hide the entire slice-header container for PTM charts */
+[data-test-viz-type^='ptm_big_number'] [data-test='slice-header'] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* PTM BigNumber: don't vertically center content (use default/normal) */
+[data-test-viz-type^='ptm_big_number'] .superset-legacy-chart-big-number,
+[data-test-viz-type^='ptm_big_number']
+  .superset-legacy-chart-big-number
+  .text-container {
+  justify-content: normal !important;
+}
+
+/* PTM BigNumber: ensure card and chart fill available height */
+[data-test-viz-type^='ptm_big_number'] .dashboard-component-chart-holder,
+[data-test-viz-type^='ptm_big_number'] .dashboard-chart,
+[data-test-viz-type^='ptm_big_number'] .chart-container,
+[data-test-viz-type^='ptm_big_number'] .slice_container,
+[data-test-viz-type^='ptm_big_number'] .superset-legacy-chart-big-number {
+  height: 100% !important;
+  max-height: none !important;
+}
+
+/* === HIDE UI ELEMENTS === */
+.filter-counts {
+  display: none !important;
+}
+
+.header-controls {
+  display: none !important;
+}
+
+/* === PTM TABLE: show slice header controls (3-dots) === */
+[data-test-viz-type='ptm_table'] .header-controls {
+  display: flex !important;
+  margin-left: auto !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  height: auto !important; /* default header-controls is height: 24px */
+  padding-right: 16px !important;
+}
+
+/* PTM TABLE: hide applied-filters badge in header controls */
+[data-test-viz-type='ptm_table'] .header-controls .filter-counts {
+  display: none !important;
+}
+
+/* PTM TABLE: ensure header uses full width and right padding */
+[data-test-viz-type='ptm_table'] .dashboard-component-header {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-right: 16px !important;
+  align-items: center !important;
+}
+
+/* === PTM TABLE: keep only Share + Download entries in the 3-dots menu ===
+   We add a class hook on the menu in `SliceHeaderControls`:
+   - `.ptm-slice-menu--ptm_table`
+*/
+.ptm-slice-menu--ptm_table > li.ant-dropdown-menu-item,
+.ptm-slice-menu--ptm_table > li.ant-dropdown-menu-item-divider,
+.ptm-slice-menu--ptm_table > li.ant-menu-item,
+.ptm-slice-menu--ptm_table > li.ant-menu-item-divider {
+  display: none !important;
+}
+
+/* Keep the Share/Download submenus */
+.ptm-slice-menu--ptm_table > li.ant-dropdown-menu-submenu,
+.ptm-slice-menu--ptm_table > li.ant-menu-submenu {
+  display: block !important;
+}
+
+/* === PTM TABLE: restyle the 3-dots trigger button === */
+[data-test-viz-type='ptm_table'] .ptm-slice-controls {
+  height: 44px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 1px 0 1px !important;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease !important;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-slice-controls > div {
+  /* This inner div is the default VerticalDotsContainer (it has its own padding) */
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-slice-controls:hover {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+/* Remove extra dot margins from the default trigger */
+[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot:first-child {
+  margin-top: 0 !important;
+}
+[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Header Title */
+.dashboard--standalone .dashboard-title {
+  text-align: center;
+  padding: 1.5rem;
+  font-family: var(--ptm-font-title);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ptm-neutral-600);
+}
+
+/* === PTM TABLE: "Actions" trigger ===
+   NOTE: Avoid using ::before/::after on AntD Button triggers because AntD uses
+   pseudo-elements internally (wave/interaction). Injecting labels that way can
+   result in missing content. Instead, keep the real icon visible and style it.
+*/
+
+/* Keep the trigger as a small pill */
+[data-test-viz-type='ptm_table'] .ptm-slice-controls {
+  height: 36px !important;
+  min-width: 44px !important;
+  width: auto !important;
+  border-radius: 10px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 10px !important;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease !important;
+}
+
+/* Ensure the icon is visible (it's an SVG, not 3 div dots anymore) */
+[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot {
+  display: inline-flex !important;
+  color: #6b7280 !important;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-slice-controls .dot svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-slice-controls:hover {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+[data-test-viz-type='ptm_table'] .ptm-slice-controls:focus-visible {
+  outline: 2px solid rgba(44, 159, 229, 0.35);
+  outline-offset: 2px;
+}
+
+/* Nuclear option - override all fonts in dashboard */
+.dashboard-component-chart-holder * {
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif !important;
+}
+
+.grid-row {
+  margin-top: 20px;
+  margin-bottom: 0px !important;
+}
+
+/* Center the dashboard and keep consistent max width */
+.grid-container {
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+/* NOTE: don't force .dashboard-content to flex; it breaks Superset layout */
+
+/* =================================================
+   PTM: HEADER SLOTS - NO LINE BREAKING
+   ================================================= */
+
+/* Prevent header slot groups from wrapping content */
+.dashboard-header-container > div,
+.dashboard-header > div {
+  flex-wrap: nowrap !important;
+}
+
+/* Ensure badges and text elements don't break */
+.dashboard-header .ant-badge,
+.dashboard-header-container .ant-badge {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* Badge text should stay on one line */
+.dashboard-header .ant-badge-status-text,
+.dashboard-header-container .ant-badge-status-text {
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Header slot containers should not wrap */
+.dashboard-header [class*='SlotContainer'],
+.dashboard-header-container [class*='SlotContainer'] {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Text elements in header slots */
+.dashboard-header [class*='TextContent'],
+.dashboard-header [class*='DateText'],
+.dashboard-header-container [class*='TextContent'],
+.dashboard-header-container [class*='DateText'] {
+  white-space: nowrap !important;
+}
+
+/* Center slot should be able to scroll if content is too wide */
+.dashboard-header [class*='SlotGroup'],
+.dashboard-header-container [class*='SlotGroup'] {
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+/* Allow center content to have controlled alignment */
+[class*='SlotGroup'] > div[data-align='start'] {
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
+[class*='SlotGroup'] > div[data-align='center'] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+[class*='SlotGroup'] > div[data-align='end'] {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}

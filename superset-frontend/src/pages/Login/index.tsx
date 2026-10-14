@@ -18,7 +18,11 @@
  */
 
 import { t } from '@apache-superset/core/translation';
-import { SupersetClient } from '@superset-ui/core';
+import {
+  SupersetClient,
+  FeatureFlag,
+  isFeatureEnabled,
+} from '@superset-ui/core';
 import { styled, css } from '@apache-superset/core/theme';
 import {
   Button,
@@ -109,6 +113,9 @@ export default function Login() {
   const providers: Provider[] = bootstrapData.common.conf.AUTH_PROVIDERS;
   const authRegistration: boolean =
     bootstrapData.common.conf.AUTH_USER_REGISTRATION;
+  const enableForgotPassword = isFeatureEnabled(
+    FeatureFlag.EnableForgotPassword,
+  );
 
   // TODO: This is a temporary solution for showing login errors after form submission.
   // Should be replaced with proper SPA-style authentication (JSON API with error responses)
@@ -263,6 +270,17 @@ export default function Login() {
                 </Flex>
               </Form.Item>
             </Form>
+            {enableForgotPassword && (
+              <Flex justify="center">
+                <Button
+                  type="link"
+                  href="/forgot-password/"
+                  data-test="forgot-password-link"
+                >
+                  {t('Esqueceu sua senha?')}
+                </Button>
+              </Flex>
+            )}
           </Flex>
         )}
       </StyledCard>

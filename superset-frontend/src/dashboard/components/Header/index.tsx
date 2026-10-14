@@ -25,6 +25,7 @@ import {
 } from '@superset-ui/core';
 import { styled, css, SupersetTheme } from '@apache-superset/core/theme';
 import { t } from '@apache-superset/core/translation';
+import { useDashboardExtensions } from 'src/dashboard/components/DashboardExtensionsContext';
 import { Global } from '@emotion/react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -61,6 +62,8 @@ import {
 } from 'src/features/reports/ReportModal/actions';
 import { PageHeaderWithActions } from '@superset-ui/core/components/PageHeaderWithActions';
 import { useUnsavedChangesPrompt } from 'src/hooks/useUnsavedChangesPrompt';
+import { PtmLockedBadge } from 'src/dashboard/components/PtmLockedBadge';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 import DashboardEmbedModal from '../EmbeddedModal';
 import OverwriteConfirm from '../OverwriteConfirm';
 import {
@@ -110,6 +113,7 @@ type DashboardPropertiesUpdate = {
   theme?: { id: number; theme_name: string; json_data: string } | null;
   css?: string;
   title?: string;
+  persisted?: boolean;
 };
 
 type DashboardLayoutStateWithHistory = RootState['dashboardLayout'] & {
@@ -567,7 +571,9 @@ const Header = (): JSX.Element => {
         ...(updates.theme !== undefined && { theme: updates.theme }),
         css: updates.css,
       });
-      boundActionCreators.setUnsavedChanges(true);
+      if (updates.persisted !== true) {
+        boundActionCreators.setUnsavedChanges(true);
+      }
 
       if (updates.title && dashboardTitle !== updates.title) {
         boundActionCreators.updateDashboardTitle(updates.title);
@@ -628,6 +634,7 @@ const Header = (): JSX.Element => {
     ],
   );
 
+  const ptmLocked = dashboardInfo?.metadata?.ptm_locked === true;
   const titlePanelAdditionalItems = useMemo(
     () => [
       !editMode && (
@@ -649,15 +656,27 @@ const Header = (): JSX.Element => {
           userCanSave={userCanSaveAs}
         />
       ),
+      !editMode && !isEmbedded && isPtmExtensionEnabled() && ptmLocked && (
+        <span css={{ marginLeft: 6 }}>
+          <PtmLockedBadge
+            tooltipId="header-ptm-locked-tooltip"
+            tooltipTitle={t(
+              'Este dashboard está bloqueado para conversão automática de estilo PTM.',
+            )}
+          />
+        </span>
+      ),
       !editMode && !isEmbedded && metadataBar,
     ],
     [
       boundActionCreators.savePublished,
       dashboardInfo.id,
+      dashboardInfo.metadata?.ptm_locked,
       editMode,
       metadataBar,
       isEmbedded,
       isPublished,
+      ptmLocked,
       userCanEdit,
       userCanSaveAs,
       handlePauseToggle,
@@ -767,11 +786,14 @@ const Header = (): JSX.Element => {
     ),
     [
       NavExtension,
+      boundActionCreators.addDangerToast,
+      boundActionCreators.addSuccessToast,
       boundActionCreators.onRedo,
       boundActionCreators.onUndo,
       editMode,
       emphasizeRedo,
       emphasizeUndo,
+      forceRefresh,
       handleCtrlY,
       handleCtrlZ,
       handleEnterEditMode,
@@ -820,6 +842,24 @@ const Header = (): JSX.Element => {
     lastModifiedTime: actualLastModifiedTime,
     logEvent: boundActionCreators.logEvent,
   });
+
+  const { headerComponent: DashboardHeaderExtension } =
+    useDashboardExtensions();
+  const headerProps = {
+    editableTitleProps,
+    certificatiedBadgeProps: certifiedBadgeProps,
+    faveStarProps,
+    titlePanelAdditionalItems,
+    rightPanelAdditionalItems,
+    menuDropdownProps: {
+      open: isDropdownVisible,
+      onOpenChange: setIsDropdownVisible,
+    },
+    additionalActionsMenu: menu,
+    showFaveStar: Boolean(user?.userId && dashboardInfo?.id),
+    showTitlePanelItems: true,
+  };
+
   return (
     <div
       css={headerContainerStyle}
@@ -827,20 +867,16 @@ const Header = (): JSX.Element => {
       data-test-id={dashboardInfo.id}
       className="dashboard-header-container"
     >
-      <PageHeaderWithActions
-        editableTitleProps={editableTitleProps}
-        certificatiedBadgeProps={certifiedBadgeProps}
-        faveStarProps={faveStarProps}
-        titlePanelAdditionalItems={titlePanelAdditionalItems}
-        rightPanelAdditionalItems={rightPanelAdditionalItems}
-        menuDropdownProps={{
-          open: isDropdownVisible,
-          onOpenChange: setIsDropdownVisible,
-        }}
-        additionalActionsMenu={menu}
-        showFaveStar={Boolean(user?.userId && dashboardInfo?.id)}
-        showTitlePanelItems
-      />
+      {DashboardHeaderExtension ? (
+        <DashboardHeaderExtension
+          {...headerProps}
+          dashboardInfo={dashboardInfo}
+          editMode={editMode}
+          isEmbedded={isEmbedded}
+        />
+      ) : (
+        <PageHeaderWithActions {...headerProps} />
+      )}
       {showingPropertiesModal && (
         <PropertiesModal
           dashboardId={dashboardInfo.id}

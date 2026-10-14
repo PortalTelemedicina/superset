@@ -22,7 +22,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { ScreenGridLayer } from '@deck.gl/aggregation-layers';
-import { JsonObject, JsonValue, QueryFormData, t } from '@superset-ui/core';
+import { JsonObject, JsonValue, QueryFormData } from '@superset-ui/core';
 import { noop } from 'lodash';
 import sandboxedEval from '../../utils/sandbox';
 import { commonLayerProps } from '../common';
@@ -34,6 +34,7 @@ import {
   DeckGLContainerStyledWrapper,
 } from '../../DeckGLContainer';
 import { TooltipProps } from '../../components/Tooltip';
+import { t } from '@apache-superset/core/translation';
 
 export function getPoints(data: JsonObject[]) {
   return data.map(d => d.position);

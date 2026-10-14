@@ -17,7 +17,6 @@
  * under the License.
  */
 import { type FC, useMemo } from 'react';
-import { styled } from '@superset-ui/core';
 import { Badge, Divider } from 'antd';
 import moment from 'moment';
 import { getThemeTokens } from 'src/ptm/shared/themeTokens';
@@ -34,6 +33,7 @@ import {
   DividerSlot,
 } from '../types';
 import DataFreshnessElement from './DataFreshnessElement';
+import { styled } from '@apache-superset/core/theme';
 
 const SlotContainer = styled.div<{
   customStyle?: any;

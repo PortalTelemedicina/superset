@@ -29,6 +29,7 @@ import {
   getCategoricalSchemeRegistry,
   promiseTimeout,
   JsonObject,
+  getExtensionsRegistry,
 } from '@superset-ui/core';
 import {
   addChart,
@@ -86,6 +87,11 @@ import {
   getDynamicLabelsColors,
 } from '../../utils/colorScheme';
 import type { DashboardState, GetState, RootState, Slice } from '../types';
+
+// O tipo do state.common na 6.1 so declara conf; feature_flags vem do bootstrap em runtime.
+const isPtmEnabledInState = (state: unknown): boolean =>
+  (state as { common?: { feature_flags?: Record<string, unknown> } }).common
+    ?.feature_flags?.PTM_EXTENSION_ENABLED === true;
 
 // Dashboard dispatch type. The base ThunkDispatch handles dashboard-specific
 // thunks. The intersection with a generic function-accepting overload allows
@@ -507,6 +513,19 @@ export function saveDashboardRequest(
         cross_filters_enabled: isCrossFiltersEnabled(
           metadataCrossFiltersEnabled as boolean | undefined,
         ),
+        // Preserve extension-owned header layout so it persists across save
+        ...(data.metadata?.headerLayout != null && {
+          headerLayout: data.metadata.headerLayout,
+        }),
+        ...(data.metadata?.ptm_autoconvert != null && {
+          ptm_autoconvert: data.metadata.ptm_autoconvert,
+        }),
+        ...(data.metadata?.ptm_locked != null && {
+          ptm_locked: data.metadata.ptm_locked,
+        }),
+        ...(data.metadata?.ptm_locked_reason != null && {
+          ptm_locked_reason: data.metadata.ptm_locked_reason,
+        }),
       },
     };
 
@@ -523,12 +542,60 @@ export function saveDashboardRequest(
       );
     };
 
-    const onCopySuccess = (response: JsonObject): JsonObject => {
-      const lastModifiedTime = (response.json as JsonObject).result
-        ?.last_modified_time as number;
+    // Call dashboard save extension hooks (e.g., PTM auto-convert)
+    const callDashboardSaveHooks = async (
+      mode: 'update' | 'copy' = 'update',
+    ) => {
+      const registry = getExtensionsRegistry();
+      const hook = registry.get('dashboard.save.before');
+      if (hook) {
+        const state = getState();
+        const { sliceEntities } = state;
+        try {
+          await hook({
+            dashboard: {
+              tags: data.tags || [],
+              metadata: data.metadata || {},
+            },
+            slices: sliceEntities?.slices || {},
+            mode,
+            dashboardId: mode === 'update' ? id : undefined,
+          });
+        } catch (error) {
+          console.warn('Dashboard save hook failed:', error);
+          // Don't throw - allow save to continue
+        }
+      }
+    };
+
+    const onCopySuccess = async (response: JsonObject): Promise<JsonObject> => {
+      const copyResult = (response.json as JsonObject).result as JsonObject;
+      const lastModifiedTime = copyResult?.last_modified_time as number;
+      const newDashboardId = copyResult?.id;
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
       }
+
+      // Call dashboard save extension hooks (e.g., PTM auto-convert) for copy mode
+      const registry = getExtensionsRegistry();
+      const hook = registry.get('dashboard.save.before');
+      if (hook) {
+        try {
+          await hook({
+            dashboard: {
+              tags: data.tags || [],
+              metadata: data.metadata || {},
+            },
+            slices: {}, // Empty for copy mode - hook will fetch slices itself
+            mode: 'copy',
+            newDashboardId,
+          });
+        } catch (error) {
+          console.warn('Dashboard save hook failed during copy:', error);
+          // Continue anyway - don't block dashboard creation
+        }
+      }
+
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
       dispatch(
@@ -538,9 +605,7 @@ export function saveDashboardRequest(
         }),
       );
       dispatch(saveDashboardFinished());
-      navigateTo(
-        `/superset/dashboard/${(response.json as JsonObject).result?.id}/`,
-      );
+      navigateTo(`/superset/dashboard/${newDashboardId}/`);
       dispatch(addSuccessToast(t('This dashboard was saved successfully.')));
       return response;
     };
@@ -555,7 +620,16 @@ export function saveDashboardRequest(
         const parsedMetadata: JsonObject = JSON.parse(
           updatedDashboard.json_metadata as string,
         );
-        dispatch(setDashboardMetadata(parsedMetadata));
+
+        // Preserve client headerLayout if server omitted it (e.g. when extension flag is off)
+        const clientHeaderLayout = (
+          getState().dashboardInfo?.metadata as JsonObject | undefined
+        )?.headerLayout;
+        const mergedMetadata =
+          clientHeaderLayout != null && parsedMetadata.headerLayout == null
+            ? { ...parsedMetadata, headerLayout: clientHeaderLayout }
+            : parsedMetadata;
+        dispatch(setDashboardMetadata(mergedMetadata));
         if (parsedMetadata.chart_configuration) {
           dispatch({
             type: SAVE_CHART_CONFIG_COMPLETE,
@@ -570,23 +644,39 @@ export function saveDashboardRequest(
         }
 
         // fetch datasets to make sure they are up to date
-        SupersetClient.get({
-          endpoint: `/api/v1/dashboard/${id}/datasets`,
-          headers: { 'Content-Type': 'application/json' },
-        })
-          .then(({ json }: { json: JsonObject }) => {
-            const datasources = json?.result ?? [];
-            if ((datasources as JsonObject[]).length) {
-              dispatch(
-                setDatasources(
-                  datasources as Parameters<typeof setDatasources>[0],
-                ),
-              );
-            }
+        // A 6.1.0 ja trata o catch; mantemos o silencio do PTM para 404
+        // (dashboard sem datasets) e logamos so os demais erros.
+        try {
+          SupersetClient.get({
+            endpoint: `/api/v1/dashboard/${id}/datasets`,
+            headers: { 'Content-Type': 'application/json' },
           })
-          .catch((error: Error) => {
-            logging.error('Error fetching dashboard datasets:', error);
-          });
+            .then(({ json }: { json: JsonObject }) => {
+              const datasources = json?.result ?? [];
+              if ((datasources as JsonObject[]).length) {
+                dispatch(
+                  setDatasources(
+                    datasources as Parameters<typeof setDatasources>[0],
+                  ),
+                );
+              }
+            })
+            .catch((error: unknown) => {
+              const err = error as JsonObject | undefined;
+              const status =
+                error instanceof Response
+                  ? error.status
+                  : err?.status ||
+                    (err?.response as JsonObject | undefined)?.status ||
+                    err?.statusCode;
+
+              if (status !== 404 && status !== undefined) {
+                logging.error('Error fetching dashboard datasets:', error);
+              }
+            });
+        } catch (error) {
+          logging.error('Error setting up datasets fetch:', error);
+        }
       }
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
@@ -624,6 +714,19 @@ export function saveDashboardRequest(
     ) {
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
+      const metadataToSend: JsonObject = {
+        ...(cleanedData?.metadata as JsonObject),
+        default_filters: safeStringify(serializedFilters),
+        filter_scopes: serializedFilterScopes,
+        chart_configuration: chartConfiguration,
+        global_chart_configuration: globalChartConfiguration,
+      };
+      // Do not persist PTM keys when extension is disabled (e.g. production).
+      // Prevents ptm_autoconvert/ptm_locked from being written when using same build against prod DB.
+      if (!isPtmEnabledInState(getState())) {
+        delete metadataToSend.ptm_autoconvert;
+        delete metadataToSend.ptm_locked;
+      }
       const updatedDashboard: JsonObject =
         saveType === SAVE_TYPE_OVERWRITE_CONFIRMED
           ? data
@@ -637,23 +740,21 @@ export function saveDashboardRequest(
               roles: cleanedData.roles,
               tags: cleanedData.tags || [],
               theme_id: cleanedData.theme_id,
-              json_metadata: safeStringify({
-                ...(cleanedData?.metadata as JsonObject),
-                default_filters: safeStringify(serializedFilters),
-                filter_scopes: serializedFilterScopes,
-                chart_configuration: chartConfiguration,
-                global_chart_configuration: globalChartConfiguration,
-              }),
+              json_metadata: safeStringify(metadataToSend),
             };
 
-      const updateDashboard = (): Promise<JsonObject | void> =>
-        SupersetClient.put({
+      const updateDashboard = async (): Promise<JsonObject | void> => {
+        // Call dashboard save extension hooks (e.g., PTM auto-convert)
+        await callDashboardSaveHooks('update');
+
+        return SupersetClient.put({
           endpoint: `/api/v1/dashboard/${id}`,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedDashboard),
         })
           .then(response => onUpdateSuccess(response))
           .catch(response => onError(response));
+      };
       return new Promise<void>((resolve, reject) => {
         if (
           !isFeatureEnabled(FeatureFlag.ConfirmDashboardDiff) ||
@@ -715,11 +816,22 @@ export function saveDashboardRequest(
     (cleanedData.metadata as JsonObject).default_filters =
       safeStringify(serializedFilters);
     (cleanedData.metadata as JsonObject).filter_scopes = serializedFilterScopes;
+    const copyMetadata: JsonObject = {
+      ...(cleanedData.metadata as JsonObject),
+    };
+    if (!isPtmEnabledInState(getState())) {
+      delete copyMetadata.ptm_autoconvert;
+      delete copyMetadata.ptm_locked;
+    }
+    // Never inherit PTM locked state when copying; backend will set it from
+    // has_shared_charts on the new dashboard (which is false when duplicate_slices).
+    delete copyMetadata.ptm_locked;
+    delete copyMetadata.ptm_locked_reason;
     const copyPayload = {
       dashboard_title: cleanedData.dashboard_title,
       css: cleanedData.css,
       duplicate_slices: cleanedData.duplicate_slices,
-      json_metadata: JSON.stringify(cleanedData.metadata),
+      json_metadata: JSON.stringify(copyMetadata),
     };
 
     return SupersetClient.post({

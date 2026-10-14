@@ -18,10 +18,11 @@
  */
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import { t } from '@apache-superset/core/translation';
+import { SupersetClient } from '@superset-ui/core';
 import { isEmpty } from 'lodash';
 import { URL_PARAMS } from 'src/constants';
 import { useShareMenuItems } from 'src/dashboard/components/menu/ShareMenuItems';
@@ -36,6 +37,8 @@ import { getActiveFilters } from 'src/dashboard/util/activeDashboardFilters';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { MenuKeys, RootState } from 'src/dashboard/types';
 import { HeaderDropdownProps } from 'src/dashboard/components/Header/types';
+import { setDashboardMetadata } from 'src/dashboard/actions/dashboardState';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 
 export const useHeaderActionsMenu = ({
   customCss,
@@ -73,9 +76,19 @@ export const useHeaderActionsMenu = ({
 ] => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const history = useHistory();
+  const dispatch = useDispatch();
   const directPathToChild = useSelector(
     (state: RootState) => state.dashboardState.directPathToChild,
   );
+  const currentMetadata = useSelector(
+    (state: RootState) => state.dashboardInfo?.metadata ?? {},
+  );
+  const ptmLocked = currentMetadata.ptm_locked === true;
+  // Use Record cast: these fields are set at runtime by DashboardPage but may
+  // not be present in the static DashboardInfo['metadata'] type yet.
+  const md = currentMetadata as Record<string, unknown>;
+  const isLockedBySharedCharts =
+    md.has_shared_charts === true || md.ptm_locked_reason === 'shared_charts';
 
   useEffect(() => {
     if (customCss) {
@@ -84,7 +97,8 @@ export const useHeaderActionsMenu = ({
   }, [customCss]);
 
   const handleMenuClick = useCallback(
-    ({ key }: { key: string }) => {
+    (info: { key: string; keyPath?: string[] }) => {
+      const key = info.keyPath?.[0] ?? info.key;
       switch (key) {
         case MenuKeys.RefreshDashboard:
           forceRefreshAllCharts();
@@ -111,18 +125,63 @@ export const useHeaderActionsMenu = ({
         case MenuKeys.ManageEmbedded:
           manageEmbedded();
           break;
+        case MenuKeys.PtmLock:
+        case MenuKeys.PtmUnlock: {
+          if (isLockedBySharedCharts) break;
+          const locked = key === MenuKeys.PtmLock;
+          const metadata = { ...currentMetadata, ptm_locked: locked };
+          SupersetClient.get({
+            endpoint: `/api/v1/dashboard/${dashboardId}`,
+          })
+            .then(({ json }) => {
+              const dash = json.result;
+              const existing = dash.json_metadata
+                ? JSON.parse(dash.json_metadata)
+                : {};
+              const merged = { ...existing, ptm_locked: locked };
+              return SupersetClient.put({
+                endpoint: `/api/v1/dashboard/${dashboardId}`,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  dashboard_title: dash.dashboard_title,
+                  slug: dash.slug,
+                  json_metadata: JSON.stringify(merged),
+                  owners: (dash.owners ?? []).map((o: { id: number }) => o.id),
+                  certified_by: dash.certified_by,
+                  certification_details: dash.certification_details,
+                }),
+              });
+            })
+            .then(() => {
+              dispatch(setDashboardMetadata(metadata));
+              addSuccessToast(
+                locked
+                  ? t('PTM changes locked for this dashboard')
+                  : t('PTM changes unlocked'),
+              );
+            })
+            .catch(err => {
+              addDangerToast(err?.message || t('Failed to update dashboard'));
+            });
+          break;
+        }
         default:
           break;
       }
-      setIsDropdownVisible(false);
+      setTimeout(() => setIsDropdownVisible(false), 0);
     },
     [
       forceRefreshAllCharts,
       addSuccessToast,
+      addDangerToast,
       showPropertiesModal,
       showRefreshModal,
       manageEmbedded,
       history,
+      dashboardId,
+      currentMetadata,
+      dispatch,
+      isLockedBySharedCharts,
     ],
   );
 
@@ -305,6 +364,24 @@ export const useHeaderActionsMenu = ({
       );
     }
 
+    // PTM Lock / Unlock (when extension enabled and user can edit)
+    if (isPtmExtensionEnabled() && userCanEdit) {
+      if (isLockedBySharedCharts) {
+        menuItems.push({
+          key: 'ptm_locked_shared_charts',
+          label: t(
+            'PTM locked (dashboard has charts shared with other dashboards)',
+          ),
+          disabled: true,
+        });
+      } else {
+        menuItems.push({
+          key: ptmLocked ? MenuKeys.PtmUnlock : MenuKeys.PtmLock,
+          label: ptmLocked ? t('Unlock PTM changes') : t('Lock PTM changes'),
+        });
+      }
+    }
+
     return (
       <Menu
         selectable={false}
@@ -321,6 +398,7 @@ export const useHeaderActionsMenu = ({
     customCss,
     dashboardId,
     dashboardInfo,
+    forceRefreshAllCharts,
     dashboardTitle,
     downloadMenuItem,
     editMode,
@@ -330,6 +408,8 @@ export const useHeaderActionsMenu = ({
     lastModifiedTime,
     layout,
     onSave,
+    ptmLocked,
+    isLockedBySharedCharts,
     refreshFrequency,
     reportMenuItem,
     shareMenuItems,

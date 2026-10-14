@@ -17,11 +17,11 @@
  * under the License.
  */
 
-import { t } from '@superset-ui/core';
 import {
   CustomControlItem,
   defineSavedMetrics,
 } from '@superset-ui/chart-controls';
+import { t } from '@apache-superset/core/translation';
 
 export const titleFontSize: CustomControlItem = {
   name: 'title_font_size',

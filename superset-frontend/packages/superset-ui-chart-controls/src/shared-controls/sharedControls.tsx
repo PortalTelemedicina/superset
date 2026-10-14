@@ -467,6 +467,61 @@ const echart_options: SharedControlConfig<'JSEditorControl'> = {
   validators: [],
 };
 
+const show_data_reliability: SharedControlConfig<'CheckboxControl'> = {
+  type: 'CheckboxControl',
+  label: t('Show Data Reliability'),
+  description: t(
+    'Display an info icon with data reliability information in the chart header',
+  ),
+  default: false,
+  renderTrigger: true,
+};
+
+const data_reliability_message: SharedControlConfig<'TextAreaControl'> = {
+  type: 'TextAreaControl',
+  label: t('Data Reliability Details'),
+  description: t(
+    'Describe the data source, refresh cadence, completeness, and any limitations.',
+  ),
+  default: '',
+  language: 'markdown',
+  renderTrigger: true,
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
+};
+
+const data_reliability_icon: SharedControlConfig<'SelectControl'> = {
+  type: 'SelectControl',
+  label: t('Data Reliability Icon'),
+  description: t('Choose the icon style for the data reliability indicator.'),
+  default: 'info',
+  choices: [
+    ['info', t('Info')],
+    ['warning', t('Warning')],
+    ['alert', t('Alert')],
+  ],
+  clearable: false,
+  renderTrigger: true,
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
+};
+
+const data_reliability_position: SharedControlConfig<'SelectControl'> = {
+  type: 'SelectControl',
+  label: t('Data Reliability Icon Position'),
+  description: t(
+    'Position of the data reliability icon overlay in the chart area.',
+  ),
+  default: 'top_right',
+  choices: [
+    ['top_left', t('Top Left')],
+    ['top_right', t('Top Right')],
+    ['bottom_left', t('Bottom Left')],
+    ['bottom_right', t('Bottom Right')],
+  ],
+  clearable: false,
+  renderTrigger: true,
+  visibility: ({ controls }) => Boolean(controls?.show_data_reliability?.value),
+};
+
 const sharedControls: Record<string, SharedControlConfig<any>> = {
   metrics: dndAdhocMetricsControl,
   metric: dndAdhocMetricControl,
@@ -517,6 +572,10 @@ const sharedControls: Record<string, SharedControlConfig<any>> = {
 
   // Add all Matrixify controls
   ...matrixifyControls,
+  show_data_reliability,
+  data_reliability_icon,
+  data_reliability_position,
+  data_reliability_message,
 };
 
 export default sharedControls;

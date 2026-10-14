@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
 import {
   columnChoices,
   ControlPanelConfig,
@@ -24,6 +23,7 @@ import {
   sharedControls,
   getStandardizedControls,
 } from '@superset-ui/chart-controls';
+import { t } from '@apache-superset/core/translation';
 
 const columnsConfig = sharedControls.entity;
 

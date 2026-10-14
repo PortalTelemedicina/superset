@@ -17,7 +17,6 @@
  * under the License.
  */
 import { useRef, useEffect } from 'react';
-import { styled } from '@superset-ui/core';
 import { use, init, EChartsType } from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -27,6 +26,7 @@ import {
   AriaComponent,
 } from 'echarts/components';
 import type { EChartsCoreOption } from 'echarts/core';
+import { styled } from '@apache-superset/core/theme';
 
 use([
   CanvasRenderer,

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, ChartMetadata, ChartPlugin, Behavior } from '@superset-ui/core';
+import { ChartMetadata, ChartPlugin, Behavior } from '@superset-ui/core';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import buildQuery from './buildQuery';
@@ -25,6 +25,7 @@ import {
   BigNumberWithTrendlineChartProps,
   BigNumberWithTrendlineFormData,
 } from '../types';
+import { t } from '@apache-superset/core/translation';
 
 const metadata = new ChartMetadata({
   category: t('KPI'),

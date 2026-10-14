@@ -30,6 +30,7 @@ import {
   type FilterState,
   type JsonObject,
   type AgGridChartState,
+  getExtensionsRegistry,
 } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/theme';
 import type { ChartState, Datasource, ChartStatus } from 'src/explore/types';
@@ -359,10 +360,11 @@ class Chart extends PureComponent<ChartProps, {}> {
       chartIsStale,
       queriesResponse = [],
       width,
+      chartId,
+      dashboardId,
     } = this.props;
 
     const databaseName = datasource?.database?.name as string | undefined;
-
     const isLoading = chartStatus === 'loading';
     // Suppress spinner during auto-refresh to avoid visual flicker
     const showSpinner = isLoading && !this.props.suppressLoadingSpinner;
@@ -426,8 +428,32 @@ class Chart extends PureComponent<ChartProps, {}> {
           height={height}
           width={width}
         >
-          {showSpinner
-            ? this.renderSpinner(databaseName)
+          {isLoading
+            ? (() => {
+                const registry = getExtensionsRegistry();
+                const LoadingComponent = (
+                  dashboardId
+                    ? registry.get('dashboard.chart.loading')
+                    : registry.get('explore.chart.loading')
+                ) as
+                  | React.ComponentType<{
+                      chartId: number;
+                      chartStatus?: string;
+                    }>
+                  | undefined;
+                if (LoadingComponent) {
+                  return (
+                    <LoadingComponent
+                      chartId={chartId}
+                      chartStatus={chartStatus}
+                    />
+                  );
+                }
+                // O loading customizado do PTM ignora suppressLoadingSpinner (como na 6.0)
+                return showSpinner
+                  ? this.renderSpinner(databaseName)
+                  : this.renderChartContainer();
+              })()
             : this.renderChartContainer()}
         </Styles>
       </ErrorBoundary>

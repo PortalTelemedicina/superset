@@ -163,6 +163,12 @@ fetchMock.get('glob:*/api/v1/theme/*', {
   },
 });
 
+fetchMock.get('glob:*/api/v1/dashboard/26/has_shared_charts', {
+  body: {
+    result: false,
+  },
+});
+
 const createProps = () => ({
   certified_by: 'John Doe',
   certification_details: 'Sample certification',
@@ -385,6 +391,7 @@ describe('PropertiesModal', () => {
       const submitCall = props.onSubmit.mock.calls[0][0];
       expect(submitCall.id).toBe(26);
       expect(submitCall.title).toBe('COVID Vaccine Dashboard');
+      expect(submitCall.persisted).toBe(true);
       // certifiedBy and certificationDetails come from dashboardInfo, not props
     });
   });

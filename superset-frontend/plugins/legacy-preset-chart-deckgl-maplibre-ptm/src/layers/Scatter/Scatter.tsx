@@ -22,13 +22,13 @@ import {
   getMetricLabel,
   JsonObject,
   QueryFormData,
-  t,
 } from '@superset-ui/core';
 import { commonLayerProps } from '../common';
 import { createCategoricalDeckGLComponent } from '../../factory';
 import TooltipRow from '../../TooltipRow';
 import { unitToRadius } from '../../utils/geo';
 import { TooltipProps } from '../../components/Tooltip';
+import { t } from '@apache-superset/core/translation';
 
 export function getPoints(data: JsonObject[]) {
   return data.map(d => d.position);

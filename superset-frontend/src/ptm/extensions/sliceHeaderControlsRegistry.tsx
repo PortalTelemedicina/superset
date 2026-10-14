@@ -17,8 +17,10 @@
  * under the License.
  */
 
-import { css, getExtensionsRegistry, t, useTheme } from '@superset-ui/core';
+import { getExtensionsRegistry } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
+import { css, useTheme } from '@apache-superset/core/theme';
+import { t } from '@apache-superset/core/translation';
 
 const sanitizeVizType = (vizType: string) =>
   String(vizType || '').replace(/[^a-zA-Z0-9_-]/g, '-');

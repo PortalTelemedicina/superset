@@ -33,10 +33,11 @@ import { isEqual } from 'lodash';
 import { Map } from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
 import type { Layer } from '@deck.gl/core';
-import { JsonObject, JsonValue, styled, usePrevious } from '@superset-ui/core';
+import { JsonObject, JsonValue, usePrevious } from '@superset-ui/core';
 import Tooltip, { TooltipProps } from './components/Tooltip';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Viewport } from './utils/fitViewport';
+import { styled } from '@apache-superset/core/theme';
 
 const TICK = 250; // milliseconds
 

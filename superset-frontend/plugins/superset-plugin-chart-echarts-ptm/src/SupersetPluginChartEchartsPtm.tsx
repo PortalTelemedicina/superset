@@ -17,12 +17,12 @@
  * under the License.
  */
 import { useEffect, createRef } from 'react';
-import { styled } from '@superset-ui/core';
 import { getThemeTokens } from './shared/themeTokens';
 import {
   SupersetPluginChartEchartsPtmProps,
   SupersetPluginChartEchartsPtmStylesProps,
 } from './types';
+import { styled } from '@apache-superset/core/theme';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
 // For docs, visit https://emotion.sh/docs/styled

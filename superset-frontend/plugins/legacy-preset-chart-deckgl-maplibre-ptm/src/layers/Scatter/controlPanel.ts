@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ControlPanelConfig } from '@superset-ui/chart-controls';
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { validateNonEmpty } from '@superset-ui/core';
 import timeGrainSqlaAnimationOverrides from '../../utilities/controls';
 import {
   filterNulls,
@@ -35,6 +35,7 @@ import {
   multiplier,
   mapStyle,
 } from '../../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   onInit: controlState => ({

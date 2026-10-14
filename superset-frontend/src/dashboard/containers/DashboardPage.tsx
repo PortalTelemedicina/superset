@@ -21,6 +21,12 @@ import { Global } from '@emotion/react';
 import { useHistory } from 'react-router-dom';
 import { t } from '@apache-superset/core/translation';
 import { useTheme } from '@apache-superset/core/theme';
+import { getExtensionsRegistry, SupersetClient } from '@superset-ui/core';
+import {
+  DashboardExtensionsContext,
+  type DashboardExtensionsValue,
+} from 'src/dashboard/components/DashboardExtensionsContext';
+import { DefaultDashboardCssInjector } from 'src/dashboard/components/DashboardCssInjector';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
@@ -32,7 +38,6 @@ import {
 } from 'src/hooks/apiResources';
 import { hydrateDashboard } from 'src/dashboard/actions/hydrate';
 import { setDatasources } from 'src/dashboard/actions/datasources';
-import injectCustomCss from 'src/dashboard/util/injectCustomCss';
 import {
   getAllActiveFilters,
   getRelevantDataMask,
@@ -51,6 +56,7 @@ import CrudThemeProvider from 'src/components/CrudThemeProvider';
 import type { DashboardChartStates } from 'src/dashboard/types/chartState';
 
 import { nanoid } from 'nanoid';
+import { isPtmExtensionEnabled } from 'src/ptm/config/featureFlags';
 import type { ActiveFilters } from '../types';
 import { RootState } from '../types';
 import {
@@ -64,6 +70,7 @@ import SyncDashboardState, {
   getDashboardContextLocalStorage,
 } from '../components/SyncDashboardState';
 import { AutoRefreshProvider } from '../contexts/AutoRefreshContext';
+import OverwriteConfirm from '../components/OverwriteConfirm';
 
 export const DashboardPageIdContext = createContext('');
 
@@ -116,13 +123,6 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const dashboardPageId = useMemo(() => nanoid(), []);
-  const hasDashboardInfoInitiated = useSelector<RootState, boolean>(
-    ({ dashboardInfo }) =>
-      dashboardInfo && Object.keys(dashboardInfo).length > 0,
-  );
-  const reduxTheme = useSelector(
-    (state: RootState) => state.dashboardInfo.theme,
-  );
   const { addDangerToast } = useToasts();
   const { result: dashboard, error: dashboardApiError } =
     useDashboard(idOrSlug);
@@ -134,6 +134,25 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
     status,
   } = useDashboardDatasets(idOrSlug);
   const isDashboardHydrated = useRef(false);
+
+  const hasDashboardInfoInitiated = useSelector<RootState, boolean>(
+    ({ dashboardInfo }) => {
+      if (!dashboardInfo || Object.keys(dashboardInfo).length === 0) {
+        return false;
+      }
+      // Ensure Redux has the CURRENT dashboard, not a previous one
+      const dashId = String(dashboardInfo.id);
+      return dashId === idOrSlug || dashId === String(dashboard?.id || '');
+    },
+  );
+  const dashboardTheme = useSelector(
+    (state: RootState) => state.dashboardInfo.theme,
+  );
+
+  // Reset hydration flag when navigating to a different dashboard
+  useEffect(() => {
+    isDashboardHydrated.current = false;
+  }, [idOrSlug]);
 
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);
@@ -195,14 +214,33 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
         dataMask = isOldRison;
       }
 
-      if (readyToRender) {
+      if (readyToRender && dashboard) {
         if (!isDashboardHydrated.current) {
           isDashboardHydrated.current = true;
+        }
+        let dashboardToHydrate = dashboard;
+        if (isPtmExtensionEnabled()) {
+          try {
+            const { json } = await SupersetClient.get({
+              endpoint: `/api/v1/dashboard/${idOrSlug}/has_shared_charts`,
+            });
+            const hasSharedCharts =
+              (json as { result?: boolean })?.result === true;
+            dashboardToHydrate = {
+              ...dashboard,
+              metadata: {
+                ...dashboard.metadata,
+                has_shared_charts: hasSharedCharts,
+              },
+            };
+          } catch {
+            // Non-fatal: proceed without has_shared_charts
+          }
         }
         dispatch(
           hydrateDashboard({
             history,
-            dashboard: dashboard!,
+            dashboard: dashboardToHydrate,
             charts: charts!,
             activeTabs: activeTabs ?? null,
             dataMask,
@@ -249,14 +287,39 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
     [originalTitle, theme?.brandAppName, theme?.brandLogoAlt],
   );
 
-  useEffect(() => {
-    if (typeof css === 'string') {
-      // returning will clean up custom css
-      // when dashboard unmounts or changes
-      return injectCustomCss(css);
-    }
-    return () => {};
-  }, [css]);
+  // Dashboard extensions: read registry once at root and provide via context
+  const dashboardExtensions = useMemo((): DashboardExtensionsValue => {
+    const registry = getExtensionsRegistry();
+    return {
+      headerComponent: registry.get('dashboard.header.replacement'),
+      filterBarComponent: registry.get(
+        'dashboard.filterbar.horizontal.replacement',
+      ),
+      filterValueLoadingComponent: registry.get(
+        'dashboard.filterbar.filterValue.loading',
+      ),
+      filterBarSettingsComponent: registry.get(
+        'dashboard.filterbar.settings.replacement',
+      ),
+      sliceHeaderControlsClassNamesFn: registry.get(
+        'dashboard.sliceHeaderControls.classNames',
+      ),
+      sliceHeaderControlsTriggerFn: registry.get(
+        'dashboard.sliceHeaderControls.trigger',
+      ),
+      dashboardCssInjectorComponent: registry.get(
+        'dashboard.css.injector',
+      ) as DashboardExtensionsValue['dashboardCssInjectorComponent'],
+      chartDataReliabilityOverlayComponent: registry.get(
+        'dashboard.chart.dataReliabilityOverlay',
+      ),
+    };
+  }, []);
+
+  const DashboardCssInjector =
+    dashboardExtensions.dashboardCssInjectorComponent ??
+    DefaultDashboardCssInjector;
+  const dashboardCss = typeof css === 'string' ? css : '';
 
   useEffect(() => {
     if (datasetsApiError) {
@@ -293,19 +356,30 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
       {readyToRender && hasDashboardInfoInitiated ? (
         <>
           <SyncDashboardState dashboardPageId={dashboardPageId} />
+          <OverwriteConfirm />
           <DashboardPageIdContext.Provider value={dashboardPageId}>
-            <CrudThemeProvider
-              theme={reduxTheme !== undefined ? reduxTheme : dashboard?.theme}
-            >
-              <AutoRefreshProvider>
-                <DashboardContainer
-                  activeFilters={activeFilters as ActiveFilters}
-                  ownDataCharts={relevantDataMask}
-                >
-                  {DashboardBuilderComponent}
-                </DashboardContainer>
-              </AutoRefreshProvider>
-            </CrudThemeProvider>
+            <DashboardExtensionsContext.Provider value={dashboardExtensions}>
+              <DashboardCssInjector
+                dashboardCss={dashboardCss}
+                dashboard={dashboard}
+              />
+              <CrudThemeProvider
+                theme={
+                  dashboardTheme !== undefined
+                    ? dashboardTheme
+                    : dashboard?.theme
+                }
+              >
+                <AutoRefreshProvider>
+                  <DashboardContainer
+                    activeFilters={activeFilters as ActiveFilters}
+                    ownDataCharts={relevantDataMask}
+                  >
+                    {DashboardBuilderComponent}
+                  </DashboardContainer>
+                </AutoRefreshProvider>
+              </CrudThemeProvider>
+            </DashboardExtensionsContext.Provider>
           </DashboardPageIdContext.Provider>
         </>
       ) : (

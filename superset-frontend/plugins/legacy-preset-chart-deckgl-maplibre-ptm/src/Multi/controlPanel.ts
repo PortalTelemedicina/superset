@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { validateNonEmpty } from '@superset-ui/core';
 import { viewport, mapStyle } from '../utilities/Shared_DeckGL';
+import { t } from '@apache-superset/core/translation';
 
 export default {
   controlPanelSections: [

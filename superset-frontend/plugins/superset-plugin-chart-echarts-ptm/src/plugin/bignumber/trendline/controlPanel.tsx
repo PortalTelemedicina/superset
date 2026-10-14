@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SMART_DATE_ID, t } from '@superset-ui/core';
+import { SMART_DATE_ID } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlSubSectionHeader,
@@ -40,6 +40,7 @@ import {
   infoText,
   autofit,
 } from '../sharedControls';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

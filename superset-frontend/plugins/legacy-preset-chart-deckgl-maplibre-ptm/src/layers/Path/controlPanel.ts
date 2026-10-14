@@ -17,7 +17,6 @@
  * under the License.
  */
 import { ControlPanelConfig } from '@superset-ui/chart-controls';
-import { t } from '@superset-ui/core';
 import {
   filterNulls,
   autozoom,
@@ -32,6 +31,7 @@ import {
   mapStyle,
 } from '../../utilities/Shared_DeckGL';
 import { dndLineColumn } from '../../utilities/sharedDndControls';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [

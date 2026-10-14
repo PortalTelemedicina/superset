@@ -265,7 +265,7 @@ test('ThemeController fallbacks to Superset default theme when BootstrapData the
   );
 });
 
-test('ThemeController handles system theme preference', () => {
+test('ThemeController initializes with default mode when both themes are available', () => {
   mockGetBootstrapData.mockReturnValue(
     createMockBootstrapData({
       default: DEFAULT_THEME,
@@ -275,7 +275,7 @@ test('ThemeController handles system theme preference', () => {
 
   const controller = createController();
 
-  expect(controller.getCurrentMode()).toBe(ThemeMode.SYSTEM);
+  expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
 });
 
 test('ThemeController handles only default theme', () => {
@@ -445,7 +445,7 @@ test('ThemeController does not change mode if already set', () => {
 
   jest.clearAllMocks();
 
-  controller.setThemeMode(ThemeMode.SYSTEM);
+  controller.setThemeMode(controller.getCurrentMode());
 
   expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
 });
@@ -540,7 +540,7 @@ test('ThemeController switches to dark theme when system is dark and mode is SYS
   };
   mockMatchMedia.mockReturnValue(mockMediaQueryDark);
 
-  const controller = createController();
+  const controller = createController({ initialMode: ThemeMode.SYSTEM });
 
   expect(controller.getCurrentMode()).toBe(ThemeMode.SYSTEM);
 
@@ -641,6 +641,7 @@ test('ThemeController preserves algorithm property from dark theme', () => {
 test('ThemeController handles theme without algorithm property', () => {
   const controller = createController();
 
+  controller.setThemeMode(ThemeMode.DARK);
   jest.clearAllMocks();
 
   controller.setThemeMode(ThemeMode.DEFAULT);
@@ -1700,7 +1701,7 @@ test('ThemeController uses initialMode when provided and no saved mode exists', 
   expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
 });
 
-test('ThemeController defaults to SYSTEM when initialMode is not provided', () => {
+test('ThemeController defaults to DEFAULT when initialMode is not provided', () => {
   mockGetBootstrapData.mockReturnValue(
     createMockBootstrapData({
       default: DEFAULT_THEME,
@@ -1710,7 +1711,7 @@ test('ThemeController defaults to SYSTEM when initialMode is not provided', () =
 
   const controller = createController();
 
-  expect(controller.getCurrentMode()).toBe(ThemeMode.SYSTEM);
+  expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
 });
 
 test('ThemeController saved mode takes precedence over initialMode', () => {
@@ -1782,7 +1783,7 @@ test('ThemeController initialMode is ignored when no dark theme exists', () => {
   expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
 });
 
-test('ThemeController invalid initialMode falls back to SYSTEM', () => {
+test('ThemeController invalid initialMode falls back to DEFAULT', () => {
   mockGetBootstrapData.mockReturnValue(
     createMockBootstrapData({
       default: DEFAULT_THEME,
@@ -1795,6 +1796,6 @@ test('ThemeController invalid initialMode falls back to SYSTEM', () => {
   });
 
   // Invalid initialMode should be rejected by isValidThemeMode,
-  // falling through to the default SYSTEM mode
-  expect(controller.getCurrentMode()).toBe(ThemeMode.SYSTEM);
+  // falling through to the default mode
+  expect(controller.getCurrentMode()).toBe(ThemeMode.DEFAULT);
 });

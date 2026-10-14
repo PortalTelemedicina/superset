@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { css, styled } from '@superset-ui/core';
 import { getThemeTokens } from '../../shared/themeTokens';
+import { css, styled } from '@apache-superset/core/theme';
 
 export default styled.div<{ emptyCellLabel?: string }>`
   ${({ theme, emptyCellLabel }) => {

@@ -18,7 +18,6 @@
  */
 import {
   extractTimegrain,
-  GenericDataType,
   getMetricLabel,
   Metric,
   QueryFormData,
@@ -30,6 +29,7 @@ import type { ColorFormatters } from '@superset-ui/chart-controls';
 import { parseMetricValue, getDateFormatter } from '../utils';
 import { resolvePtmCaption } from '../utils/ptmCaption';
 import { BigNumberTotalChartProps, BigNumberVizProps } from '../types';
+import { GenericDataType } from '@apache-superset/core/common';
 
 export default function transformProps(
   chartProps: BigNumberTotalChartProps,
