@@ -284,23 +284,17 @@ test('useDatasetDrillInfo creates new verbose_map from columns and metrics', asy
   expect(result.current.result?.verbose_map).not.toHaveProperty('old_key');
 });
 
-test('useDatasetDrillInfo handles NaN datasource ID from malformed string', async () => {
+test('useDatasetDrillInfo skips the request for a NaN datasource ID from malformed string', async () => {
   mockedCachedSupersetGet.mockResolvedValue({
     json: {
       result: { id: NaN, columns: [], metrics: [] },
     },
   } as any);
 
-  const { result, waitForNextUpdate } = renderHook(() =>
-    useDatasetDrillInfo('abc', 456),
-  );
+  const { result } = renderHook(() => useDatasetDrillInfo('abc', 456));
 
-  await waitForNextUpdate();
-
-  // Verify hook calls endpoint with NaN (API will handle validation)
-  expect(mockedCachedSupersetGet).toHaveBeenCalledWith({
-    endpoint: '/api/v1/dataset/NaN/drill_info/?q=(dashboard_id:456)',
-  });
+  // O PTM nao pede /dataset/NaN/drill_info/: completa com resultado vazio
+  expect(mockedCachedSupersetGet).not.toHaveBeenCalled();
   expect(result.current.status).toBe('complete');
 });
 

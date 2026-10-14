@@ -22,11 +22,11 @@
 import {
   FeatureFlag,
   isFeatureEnabled,
-  t,
   validateNonEmpty,
 } from '@superset-ui/core';
 import { D3_FORMAT_OPTIONS, sharedControls } from '@superset-ui/chart-controls';
 import { columnChoices, PRIMARY_COLOR } from './controls';
+import { t } from '@apache-superset/core/translation';
 
 const DEFAULT_VIEWPORT = {
   longitude: 6.85236157047845,

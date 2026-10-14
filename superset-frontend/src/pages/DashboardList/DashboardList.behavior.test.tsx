@@ -277,6 +277,11 @@ test('can edit dashboard title via properties modal', async () => {
   // Mock themes endpoint (PropertiesModal fetches available themes)
   fetchMock.get('glob:*/api/v1/theme/*', { result: [] });
 
+  // PTM: o modal consulta se o dashboard tem charts compartilhados
+  fetchMock.get('glob:*/api/v1/dashboard/*/has_shared_charts', {
+    result: false,
+  });
+
   // Catch-all must be last — fail hard on unmatched URLs
   fetchMock.get(API_ENDPOINTS.CATCH_ALL, (callLog: any) => {
     const reqUrl =

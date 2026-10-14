@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { ChartMetadata, ChartPlugin } from '@superset-ui/core';
 import thumbnail from './images/thumbnail.png';
 import example1 from './images/MapBox.jpg';
 import example2 from './images/MapBox2.jpg';
 import controlPanel from './controlPanel';
+import { t } from '@apache-superset/core/translation';
 
 const metadata = new ChartMetadata({
   category: t('Map'),

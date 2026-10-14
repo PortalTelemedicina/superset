@@ -84,7 +84,7 @@ const setupFetchMock = ({
   metadata: Record<string, unknown>;
   hasSharedCharts: boolean;
 }) => {
-  fetchMock.hardReset();
+  fetchMock.clearHistory().removeRoutes();
   fetchMock.get('glob:*/api/v1/dashboard/related/owners*', {
     body: { count: 0, result: [] },
   });
@@ -97,6 +97,8 @@ const setupFetchMock = ({
   fetchMock.get(`glob:*/api/v1/dashboard/${DASHBOARD_ID}/has_shared_charts`, {
     body: { result: hasSharedCharts },
   });
+  // o modal da 6.1 busca os temas ao abrir
+  fetchMock.get('glob:*/api/v1/theme/*', { body: { result: [] } });
 };
 
 const createProps = (overrides: Record<string, unknown> = {}) => ({
@@ -120,7 +122,7 @@ beforeEach(() => {
 });
 
 afterAll(() => {
-  fetchMock.hardReset();
+  fetchMock.clearHistory().removeRoutes();
 });
 
 describe('PropertiesModal PTM reconciling conversion', () => {

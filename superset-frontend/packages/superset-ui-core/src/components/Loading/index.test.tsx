@@ -43,10 +43,8 @@ test('uses default spinner when no theme spinner configured', () => {
   render(<Loading />);
   const loading = screen.getByRole('status');
   expect(loading).toBeInTheDocument();
-  // Now renders SVG component instead of img with src
-  expect(
-    loading.querySelector('[data-test="default-loading-svg"]'),
-  ).toBeInTheDocument();
+  // O PTM troca o logo animado pelo Spin do antd quando nao ha spinner de marca
+  expect(loading.querySelector('.ant-spin')).toBeInTheDocument();
 });
 
 test('uses brandSpinnerUrl from theme when configured', () => {
