@@ -36,6 +36,7 @@ import {
   Col,
   Row,
   Checkbox,
+  ColorPicker,
   type FormProps,
 } from '@superset-ui/core/components';
 import { ConditionalFormattingConfig, ColumnOption } from './types';
@@ -45,6 +46,8 @@ import {
   booleanOperatorOptions,
   formattingOptions,
   colorSchemeOptions,
+  CUSTOM_COLOR_SCHEME,
+  DEFAULT_CUSTOM_COLOR,
 } from './constants';
 
 const FullWidthInputNumber = styled(InputNumber)`
@@ -247,15 +250,40 @@ export const FormattingPopoverContent = ({
         config?.colorScheme !== ColorSchemeEnum.Red),
   );
 
+  const hasCustomColor =
+    !!config?.colorScheme &&
+    ![...colorScheme, ...extraColorChoices].some(
+      option => option.value === config.colorScheme,
+    );
+  const [customColor, setCustomColor] = useState<string>(
+    hasCustomColor ? config!.colorScheme! : DEFAULT_CUSTOM_COLOR,
+  );
+  const [selectedColorScheme, setSelectedColorScheme] = useState<
+    string | undefined
+  >(hasCustomColor ? CUSTOM_COLOR_SCHEME : config?.colorScheme);
+  const initialValues = useMemo(
+    () =>
+      hasCustomColor ? { ...config, colorScheme: CUSTOM_COLOR_SCHEME } : config,
+    [config, hasCustomColor],
+  );
+
   const [useGradient, setUseGradient] = useState(() =>
     config?.useGradient !== undefined ? config.useGradient : true,
   );
 
   const handleChange = (event: any) => {
+    setSelectedColorScheme(event);
     setShowOperatorFields(
       !(event === ColorSchemeEnum.Green || event === ColorSchemeEnum.Red),
     );
   };
+
+  const handleFinish = (values: ConditionalFormattingConfig) =>
+    onChange(
+      values.colorScheme === CUSTOM_COLOR_SCHEME
+        ? { ...values, colorScheme: customColor }
+        : values,
+    );
 
   const [column, setColumn] = useState<string>(
     config?.column || columns[0]?.value,
@@ -368,8 +396,8 @@ export const FormattingPopoverContent = ({
   return (
     <Form
       form={form}
-      onFinish={onChange}
-      initialValues={config}
+      onFinish={handleFinish}
+      initialValues={initialValues}
       requiredMark="optional"
       layout="vertical"
     >
@@ -400,11 +428,29 @@ export const FormattingPopoverContent = ({
             <Select
               onChange={event => handleChange(event)}
               ariaLabel={t('Color scheme')}
-              options={[...colorScheme, ...extraColorChoices]}
+              options={[
+                ...colorScheme,
+                ...extraColorChoices,
+                { value: CUSTOM_COLOR_SCHEME, label: t('Custom') },
+              ]}
             />
           </FormItem>
         </Col>
       </Row>
+      {selectedColorScheme === CUSTOM_COLOR_SCHEME && (
+        <Row gutter={12}>
+          <Col span={12} offset={12}>
+            <FormItem label={t('Color')}>
+              <ColorPicker
+                value={customColor}
+                disabledAlpha
+                showText
+                onChangeComplete={color => setCustomColor(color.toHexString())}
+              />
+            </FormItem>
+          </Col>
+        </Row>
+      )}
       {visibleAllColumns && showOperatorFields ? (
         <Row gutter={12}>
           <Col span={12}>

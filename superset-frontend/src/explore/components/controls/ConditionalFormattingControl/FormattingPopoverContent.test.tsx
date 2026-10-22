@@ -292,6 +292,90 @@ test('should hide formatting fields when allColumns is empty', async () => {
   });
 });
 
+test('selecting Custom shows the color picker and saves the picked hex', async () => {
+  const onChange = jest.fn();
+  render(
+    <FormattingPopoverContent
+      onChange={onChange}
+      columns={columns}
+      extraColorChoices={extraColorChoices}
+    />,
+  );
+
+  expect(screen.queryByText('Color')).not.toBeInTheDocument();
+
+  fireEvent.change(screen.getAllByLabelText(/color scheme/i)[0], {
+    target: { value: 'custom' },
+  });
+  fireEvent.click(await screen.findByTitle('Custom'));
+
+  expect(await screen.findByText('Color')).toBeInTheDocument();
+  expect(screen.getByText('#2E7D32')).toBeInTheDocument();
+
+  fireEvent.click(screen.getByText('Apply'));
+
+  await waitFor(() => {
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ colorScheme: '#2e7d32' }),
+    );
+  });
+});
+
+test('reopens a rule saved with a hex color as Custom and keeps the color', async () => {
+  const onChange = jest.fn();
+  render(
+    <FormattingPopoverContent
+      config={{
+        column: 'column1',
+        colorScheme: '#d32f2f',
+        operator: Comparator.LessThan,
+        targetValue: 0.5,
+      }}
+      onChange={onChange}
+      columns={columns}
+      extraColorChoices={extraColorChoices}
+    />,
+  );
+
+  expect(await screen.findByText('Color')).toBeInTheDocument();
+  expect(screen.getByText('#D32F2F')).toBeInTheDocument();
+
+  fireEvent.click(screen.getByText('Apply'));
+
+  await waitFor(() => {
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ colorScheme: '#d32f2f' }),
+    );
+  });
+});
+
+test('keeps theme color tokens as they are', async () => {
+  const onChange = jest.fn();
+  render(
+    <FormattingPopoverContent
+      config={{
+        column: 'column1',
+        colorScheme: 'colorWarning',
+        operator: Comparator.LessThan,
+        targetValue: 0.8,
+      }}
+      onChange={onChange}
+      columns={columns}
+      extraColorChoices={extraColorChoices}
+    />,
+  );
+
+  expect(screen.queryByText('Color')).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByText('Apply'));
+
+  await waitFor(() => {
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ colorScheme: 'colorWarning' }),
+    );
+  });
+});
+
 test('should hide formatting fields when color scheme is Green', async () => {
   render(
     <FormattingPopoverContent

@@ -122,6 +122,7 @@ These files have PTM-related changes that are less critical. They may conflict d
 | `superset-frontend/src/dashboard/components/SliceHeader/index.tsx` | Extension point for slice header |
 | `superset-frontend/src/features/home/SubMenu.tsx` | Minor PTM UI additions |
 | `superset-frontend/src/features/databases/UploadDataModel/index.tsx` | Upload model updates |
+| `superset-frontend/src/explore/components/controls/ConditionalFormattingControl/FormattingPopoverContent.tsx` and `constants.ts` | "Custom" color scheme option with a `ColorPicker`; the rule stores the picked `#rrggbb` in `colorScheme`. If upstream changes the color scheme select, keep the option and the hex mapping in `onFinish`/`initialValues` |
 
 ### Backend files with minor PTM changes
 

@@ -64,6 +64,11 @@ export const formattingOptions = [
   },
 ];
 
+// Selecting this option reveals a color picker; the saved colorScheme is the
+// picked #rrggbb, because getColorFunction appends the alpha to a 6-digit hex.
+export const CUSTOM_COLOR_SCHEME = 'custom';
+export const DEFAULT_CUSTOM_COLOR = '#2e7d32';
+
 // Use theme token names instead of hex values to support theme switching
 export const colorSchemeOptions = () => [
   { value: 'colorSuccess', label: t('success') },
