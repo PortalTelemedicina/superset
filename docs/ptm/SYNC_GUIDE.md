@@ -312,7 +312,10 @@ Procedure used in the 6.0 → 6.1 upgrade.
       `components/Dashboard.tsx`, `components/Header/index.tsx`,
       `components/gridComponents/Chart/Chart.tsx`. The `.jsx`/`.js` paths in
       older docs and branches no longer exist.
-   4. Dockerfile/Playwright, compose override, pt_BR translations.
+   4. Dockerfile/Playwright, compose override, pt_BR translations. Take the
+      upstream `messages.po` and run `python scripts/ptm/apply_pt_br_fixes.py`
+      to re-apply the PTM corrections; it fails if a corrected msgid no
+      longer exists or a placeholder changed.
 3. For each touchpoint file, a 3-way merge helps: base = previous upstream tag,
    ours = file on the old `upgrade/*` branch, theirs = file on the new tag
    (`git merge-file`, see Troubleshooting).
