@@ -128,29 +128,51 @@ docker compose up -d
 
 ---
 
-## C. Post-Sync Specific Checks
+## C. Bulk user import (PTM_USER_IMPORT)
+
+Manual, in DEV only, with a synthetic CSV (never the real users file, which has passwords). Setup and details in [USERS_IMPORT.md](USERS_IMPORT.md). Needs `superset init` to have run after the deploy.
+
+### 13. Flag off (default)
+
+- [ ] Admin: Users list has no "Import" button
+- [ ] `POST /api/v1/security/users/import` as Admin returns 404
+
+### 14. Flag on (`SUPERSET_FEATURE_PTM_USER_IMPORT`, via GitOps)
+
+- [ ] Admin sees the "Import" button; a non-Admin user does not and gets 403 on the endpoint
+- [ ] Synthetic CSV with: CPF with and without leading zero, CPF already registered without the zero, duplicate username and duplicate email in the file, an inactive existing user, a password with accent
+- [ ] Preview shows the right status and reason for each row, and creates nothing
+- [ ] "Confirm" needs the default role chosen and the typed number of users
+- [ ] Commit creates only the "To create" rows; created user logs in with the password without accent
+- [ ] Running the same file again returns "already exists" for all rows
+- [ ] Downloaded report has no password column and keeps the leading zeros of the usernames
+- [ ] Audit event of the preview and of the commit is in the event log, without passwords
+
+---
+
+## D. Post-Sync Specific Checks
 
 Run these only after an upstream sync (in addition to the above):
 
-### 13. New upstream features
+### 15. New upstream features
 
 - [ ] Any new features from upstream CHANGELOG work correctly
 - [ ] New dashboard features don't break PTM extensions
 - [ ] New chart types are accessible
 
-### 14. Database migrations
+### 16. Database migrations
 
 - [ ] `superset db upgrade` runs without errors
 - [ ] Existing dashboards load (no migration-related breakage)
 - [ ] PTM metadata fields preserved in database
 
-### 15. Dependency compatibility
+### 17. Dependency compatibility
 
 - [ ] No npm peer dependency warnings for PTM packages
 - [ ] No Python import errors for portal extensions
 - [ ] Frontend build completes without warnings in PTM code
 
-### 16. Extension registry
+### 18. Extension registry
 
 - [ ] All PTM extension keys still exist in ExtensionsRegistry
 - [ ] No runtime errors from extension registry lookups
