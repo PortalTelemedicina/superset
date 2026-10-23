@@ -41,6 +41,8 @@ import {
 } from 'src/features/users/UserListModal';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import { deleteUser } from 'src/features/users/utils';
+import UserImportModal from 'src/features/users/UserImportModal';
+import { isPtmUserImportEnabled } from 'src/ptm/config/featureFlags';
 import { fetchPaginatedData } from 'src/utils/fetchOptions';
 import type { UsersListProps, Group, Role, UserObject } from './types';
 
@@ -87,6 +89,8 @@ function UsersList({ user }: UsersListProps) {
     setModalState(prev => ({ ...prev, [type]: true }));
   const closeModal = (type: ModalType) =>
     setModalState(prev => ({ ...prev, [type]: false }));
+
+  const [showImport, setShowImport] = useState(false);
 
   const [currentUser, setCurrentUser] = useState<UserObject | null>(null);
   const [userCurrentlyDeleting, setUserCurrentlyDeleting] =
@@ -387,6 +391,15 @@ function UsersList({ user }: UsersListProps) {
         'data-test': 'add-user-button',
       },
     );
+    if (isPtmUserImportEnabled()) {
+      subMenuButtons.push({
+        icon: <Icons.UploadOutlined iconSize="m" />,
+        name: t('Import'),
+        buttonStyle: 'secondary',
+        onClick: () => setShowImport(true),
+        'data-test': 'import-users-button',
+      });
+    }
   }
 
   const filters: ListViewFilters = useMemo(
@@ -537,6 +550,13 @@ function UsersList({ user }: UsersListProps) {
         roles={roles}
         groups={groups}
       />
+      {showImport && (
+        <UserImportModal
+          show
+          onHide={() => setShowImport(false)}
+          onImported={refreshData}
+        />
+      )}
       {modalState.edit && currentUser && (
         <UserListEditModal
           user={currentUser}
