@@ -70,6 +70,13 @@
         "description": "Expand nested types in Presto into extra columns/arrays. Experimental, doesn't work with all nested types."
       },
       {
+        "name": "PTM_USER_IMPORT",
+        "default": false,
+        "lifecycle": "development",
+        "description": "Importa\u00e7\u00e3o em massa de usu\u00e1rios (CSV/XLSX) na Lista de Usu\u00e1rios. S\u00f3 Admin com a permiss\u00e3o can_import_users (criada pelo superset init).",
+        "category": "runtime_config"
+      },
+      {
         "name": "TABLE_V2_TIME_COMPARISON_ENABLED",
         "default": false,
         "lifecycle": "development",
@@ -303,6 +310,13 @@
         "lifecycle": "stable",
         "description": "Enable factory reset CLI command",
         "category": "internal"
+      },
+      {
+        "name": "ENABLE_FORGOT_PASSWORD",
+        "default": false,
+        "lifecycle": "stable",
+        "description": "Enable self-service password reset via email for DB/LDAP auth",
+        "category": "runtime_config"
       },
       {
         "name": "ENABLE_TEMPLATE_PROCESSING",
