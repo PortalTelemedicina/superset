@@ -131,6 +131,7 @@ These files have PTM-related changes that are less critical. They may conflict d
 | `superset/viz.py` | PTM Deck.gl and MapLibre viz classes |
 | `superset/commands/report/execute.py` | Alert notification PTM adjustments |
 | `superset/models/dashboard.py` | Dashboard model extensions |
+| `superset/translations/pt_BR/LC_MESSAGES/messages.po` | PTM corrections to fuzzy/empty entries on the screens the team uses. Source of truth is `scripts/ptm/pt_br_fixes.py`; re-apply with `scripts/ptm/apply_pt_br_fixes.py` |
 
 ---
 
