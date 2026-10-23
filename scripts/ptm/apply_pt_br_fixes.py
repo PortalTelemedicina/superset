@@ -24,6 +24,10 @@ Only the entries listed in pt_br_fixes.py change: their msgstr is replaced and
 the fuzzy flag removed. Every other line of messages.po stays byte-for-byte,
 so the diff against upstream stays small. The script fails, without writing,
 when a msgid is missing from the catalog or a placeholder does not match.
+
+ADDITIONS holds the fork's own msgids, which upstream does not have: the ones
+missing from the catalog are appended at the end, the ones already there are
+rewritten like FIXES, so the script stays idempotent.
 """
 
 from __future__ import annotations
@@ -36,7 +40,7 @@ from pathlib import Path
 from babel.messages.pofile import read_po
 
 sys.path.insert(0, str(Path(__file__).parent))
-from pt_br_fixes import FIXES  # noqa: E402
+from pt_br_fixes import ADDITIONS, FIXES  # noqa: E402
 
 PO_PATH = Path("superset/translations/pt_BR/LC_MESSAGES/messages.po")
 PLACEHOLDER = re.compile(r"%\([a-zA-Z_]+\)[sd]|%[sd]|\{\{[^}]+\}\}")
@@ -120,11 +124,11 @@ def main() -> int:
         message = messages[0]
         msgid = message.id[0] if isinstance(message.id, tuple) else message.id
         msgid_plural = message.id[1] if isinstance(message.id, tuple) else None
-        if msgid not in FIXES:
+        if msgid not in FIXES and msgid not in ADDITIONS:
             out.append(block)
             continue
         seen.add(msgid)
-        new = FIXES[msgid]
+        new = FIXES[msgid] if msgid in FIXES else ADDITIONS[msgid]
         if error := check(msgid, msgid_plural, new):
             errors.append(f"{msgid!r}: {error}")
             out.append(block)
@@ -132,13 +136,23 @@ def main() -> int:
         out.append(rewrite(block, new))
 
     errors += [f"{m!r}: not found in the catalog" for m in sorted(set(FIXES) - seen)]
+    appended = 0
+    for msgid in ADDITIONS:
+        if msgid in seen or msgid in FIXES:
+            continue
+        new = ADDITIONS[msgid]
+        if error := check(msgid, None, new):
+            errors.append(f"{msgid!r}: {error}")
+            continue
+        out.append("\n".join(po_lines("msgid", msgid) + po_lines("msgstr", new)))
+        appended += 1
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
     PO_PATH.write_text(
         "\n\n".join(out) + ("\n" if trailing_newline else ""), encoding="utf-8"
     )
-    print(f"{len(seen)} pt_BR entries applied")
+    print(f"{len(seen)} pt_BR entries applied, {appended} appended")
     return 0
 
 
