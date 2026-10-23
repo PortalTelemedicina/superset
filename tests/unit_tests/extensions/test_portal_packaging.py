@@ -34,3 +34,25 @@ def test_portal_subpackages_have_init() -> None:
     ]
 
     assert not missing, f"Subpacotes do portal sem __init__.py: {missing}"
+
+
+def test_user_import_package_is_complete() -> None:
+    """
+    O nucleo da importacao de usuarios precisa de __init__.py em services e em
+    services/user_import, senao o import falha so na imagem instalada.
+    """
+    services = PORTAL_ROOT / "services"
+    user_import = services / "user_import"
+    assert (services / "__init__.py").is_file()
+    assert (user_import / "__init__.py").is_file()
+    expected = {
+        "models.py",
+        "normalize.py",
+        "parser.py",
+        "planner.py",
+        "executor.py",
+        "token.py",
+        "fab_repository.py",
+    }
+    present = {p.name for p in user_import.glob("*.py")}
+    assert expected <= present, f"Faltam modulos em user_import: {expected - present}"
