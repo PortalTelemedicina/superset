@@ -79,12 +79,12 @@ def upload_header_image_handler() -> tuple[int, dict[str, Any] | None, str]:
 
         return 200, {"url": url}, "Image uploaded successfully"
     except (PermissionError, RuntimeError) as err:
-        current_app.logger.error(f"Error uploading header image: {str(err)}")
+        current_app.logger.error("Error uploading header image: %s", err)
         return 500, None, f"Error uploading image: {str(err)}"
     except ValueError as err:
         # Validation errors (file type, size, etc.)
-        current_app.logger.warning(f"Image upload validation failed: {str(err)}")
+        current_app.logger.warning("Image upload validation failed: %s", err)
         return 400, None, str(err)
     except Exception as e:
-        current_app.logger.error(f"Unexpected error uploading header image: {str(e)}")
+        current_app.logger.error("Unexpected error uploading header image: %s", e)
         return 500, None, f"Error uploading image: {str(e)}"

@@ -48,7 +48,11 @@ def _get_dashboard_dataset_ids(dashboard: Dashboard) -> set[int]:
 
 
 def _get_datasets(dataset_ids: set[int]) -> tuple[list[SqlaTable], int]:
-    datasets = db.session.query(SqlaTable).filter(SqlaTable.id.in_(dataset_ids)).all()
+    datasets = (
+        db.session.query(SqlaTable)
+        .filter(SqlaTable.id.in_(dataset_ids))  # type: ignore[attr-defined,unused-ignore]
+        .all()
+    )
     datasets_by_id = {dataset.id: dataset for dataset in datasets}
     missing_count = len(dataset_ids - set(datasets_by_id.keys()))
     return datasets, missing_count
