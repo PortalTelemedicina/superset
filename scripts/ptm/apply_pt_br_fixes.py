@@ -141,8 +141,9 @@ def main() -> int:
         if msgid in seen or msgid in FIXES:
             continue
         new = ADDITIONS[msgid]
-        if error := check(msgid, None, new):
-            errors.append(f"{msgid!r}: {error}")
+        error = check(msgid, None, new)
+        if error or not isinstance(new, str):
+            errors.append(f"{msgid!r}: {error or 'singular entry got plural forms'}")
             continue
         out.append("\n".join(po_lines("msgid", msgid) + po_lines("msgstr", new)))
         appended += 1
