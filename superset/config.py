@@ -578,6 +578,11 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     # doesn't work with all nested types.
     # @lifecycle: development
     "PRESTO_EXPAND_DATA": False,
+    # Importação em massa de usuários (CSV/XLSX) na Lista de Usuários. Só Admin
+    # com a permissão can_import_users (criada pelo superset init).
+    # @lifecycle: development
+    # @category: runtime_config
+    "PTM_USER_IMPORT": False,
     # Enable Table V2 time comparison feature
     # @lifecycle: development
     "TABLE_V2_TIME_COMPARISON_ENABLED": False,
@@ -1669,6 +1674,17 @@ FAB_ADD_SECURITY_API = True
 FAB_ADD_SECURITY_PERMISSION_VIEW = False
 FAB_ADD_SECURITY_VIEW_MENU_VIEW = False
 FAB_ADD_SECURITY_PERMISSION_VIEWS_VIEW = False
+
+# Importação em massa de usuários (flag PTM_USER_IMPORT).
+# Tamanho máximo do arquivo e de linhas de dados por importação
+PTM_USER_IMPORT_MAX_BYTES = 1024 * 1024
+PTM_USER_IMPORT_MAX_ROWS = 500
+# Roles que o import pode atribuir. Vazio = todas exceto Admin (sempre barrada);
+# preenchido = somente as listadas.
+PTM_USER_IMPORT_ALLOWED_ROLES: list[str] = []
+PTM_USER_IMPORT_MIN_PASSWORD_LENGTH = 8
+# Validade do plan_token emitido na pré-visualização
+PTM_USER_IMPORT_PLAN_TTL_SECONDS = 900
 
 # The link to a page containing common errors and their resolutions
 # It will be appended at the bottom of sql_lab errors.

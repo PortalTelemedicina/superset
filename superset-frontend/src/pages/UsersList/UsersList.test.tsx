@@ -30,6 +30,7 @@ import {
 import { MemoryRouter } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
+import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 import UsersList from './index';
 
 const mockStore = configureStore([thunk]);
@@ -92,6 +93,13 @@ const mockUser = {
       name: 'Admin',
     },
   ],
+};
+
+// A flag PTM não faz parte do enum FeatureFlag do core, por isso o cast.
+const enableImportFlag = () => {
+  window.featureFlags = {
+    PTM_USER_IMPORT: true,
+  } as unknown as typeof window.featureFlags;
 };
 
 // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
@@ -193,5 +201,48 @@ describe('UsersList', () => {
     expect(editAction).toBeInTheDocument();
     fireEvent.click(editAction);
     expect(screen.queryByTestId('Edit User-modal')).toBeInTheDocument();
+  });
+
+  test('mostra o botão Importar para admin com a flag PTM_USER_IMPORT ligada', async () => {
+    enableImportFlag();
+    try {
+      await renderAndWait();
+      expect(screen.getByTestId('import-users-button')).toBeInTheDocument();
+    } finally {
+      window.featureFlags = {};
+    }
+  });
+
+  test('esconde o botão Importar com a flag desligada', async () => {
+    window.featureFlags = {};
+    await renderAndWait();
+    expect(screen.queryByTestId('import-users-button')).not.toBeInTheDocument();
+  });
+
+  test('esconde o botão Importar para quem não é admin, mesmo com a flag ligada', async () => {
+    enableImportFlag();
+    (isUserAdmin as jest.Mock).mockReturnValue(false);
+    try {
+      await renderAndWait();
+      expect(
+        screen.queryByTestId('import-users-button'),
+      ).not.toBeInTheDocument();
+    } finally {
+      (isUserAdmin as jest.Mock).mockReturnValue(true);
+      window.featureFlags = {};
+    }
+  });
+
+  test('abre o modal de importação ao clicar em Importar', async () => {
+    enableImportFlag();
+    try {
+      await renderAndWait();
+      fireEvent.click(screen.getByTestId('import-users-button'));
+      expect(
+        await screen.findByTestId('import-users-modal'),
+      ).toBeInTheDocument();
+    } finally {
+      window.featureFlags = {};
+    }
   });
 });

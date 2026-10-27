@@ -185,6 +185,19 @@ class SupersetUserApi(UserApi):
         item.roles = []
 
 
+def with_user_import(api: type[UserApi]) -> type[UserApi]:
+    """
+    Acrescenta a rota de importação em massa à API de usuários (fork PTM). O mixin
+    depende do boot completo, então não dá para herdá-lo na definição da classe.
+    """
+    try:
+        from superset.extensions.portal.api.user_import import UserImportApiMixin
+    except ImportError:
+        logger.exception("Importação de usuários indisponível: mixin não carregou")
+        return api
+    return type(api.__name__, (UserImportApiMixin, api), {})
+
+
 # Limiting routes on FAB model views
 PermissionViewModelView.include_route_methods = {RouteMethod.LIST}
 PermissionModelView.include_route_methods = {RouteMethod.LIST}
@@ -3178,6 +3191,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
     # temporal change to remove the roles view from the security menu,
     # after migrating all views to frontend, we will set FAB_ADD_SECURITY_VIEWS = False
     def register_views(self) -> None:
+        self.user_api = with_user_import(self.user_api)
         from superset.views.auth import (
             SupersetAuthView,
             SupersetForgotPasswordView,

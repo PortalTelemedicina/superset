@@ -32,6 +32,9 @@ export const PTM_ENABLE_SLICE_HEADER_CONTROLS =
 export const PTM_ENABLE_DATA_RELIABILITY_INDICATOR =
   'PTM_ENABLE_DATA_RELIABILITY_INDICATOR';
 
+/** Importação de usuários em massa na Lista de Usuários (desligada por padrão). */
+export const PTM_USER_IMPORT = 'PTM_USER_IMPORT';
+
 type FeatureFlags = Record<string, boolean>;
 
 function getBootstrapFlags(): FeatureFlags {
@@ -132,4 +135,8 @@ export function isPtmSliceHeaderControlsEnabled(): boolean {
 
 export function isPtmDataReliabilityIndicatorEnabled(): boolean {
   return isPtmFlagOn(PTM_ENABLE_DATA_RELIABILITY_INDICATOR, true);
+}
+
+export function isPtmUserImportEnabled(): boolean {
+  return isPtmFlagOn(PTM_USER_IMPORT, false);
 }

@@ -5730,9 +5730,8 @@ msgstr "Erro ao buscar dados: %s"
 msgid "Error while fetching groups"
 msgstr "Erro ao buscar gráficos"
 
-#, fuzzy
 msgid "Error while fetching roles"
-msgstr "Erro ao buscar gráficos"
+msgstr "Erro ao buscar funções"
 
 #, python-format
 msgid "Error while rendering virtual dataset query: %(msg)s"
@@ -16779,3 +16778,207 @@ msgstr "área de zoom"
 
 msgid "© Layer attribution"
 msgstr "© Atribuição da camada"
+
+msgid "Required columns missing from the file: %s"
+msgstr "Colunas obrigatórias ausentes no arquivo: %s"
+
+msgid "The file or the selected role is invalid."
+msgstr "O arquivo ou a função selecionada é inválido."
+
+msgid "Your session has expired. Sign in again."
+msgstr "Sua sessão expirou. Entre novamente."
+
+msgid "You do not have permission to import users."
+msgstr "Você não tem permissão para importar usuários."
+
+msgid "User import is not enabled in this environment."
+msgstr "A importação de usuários não está habilitada neste ambiente."
+
+msgid "The preview is invalid or has expired. Run the preview again."
+msgstr "A pré-visualização é inválida ou expirou. Faça a pré-visualização novamente."
+
+msgid "The file is larger than the allowed limit."
+msgstr "O arquivo é maior que o limite permitido."
+
+msgid "The file could not be read: it is empty, unreadable or over the row limit."
+msgstr "Não foi possível ler o arquivo: ele está vazio, ilegível ou excede o limite de linhas."
+
+msgid "Too many requests. Wait a moment and try again."
+msgstr "Muitas requisições. Aguarde um instante e tente novamente."
+
+msgid "Unexpected error while importing users."
+msgstr "Erro inesperado ao importar usuários."
+
+msgid "To create"
+msgstr "A criar"
+
+msgid "Already exists"
+msgstr "Já existe"
+
+msgid "Held"
+msgstr "Retida"
+
+msgid "Required field is empty: %s"
+msgstr "Campo obrigatório vazio: %s"
+
+msgid "Same username on more than one line of the file"
+msgstr "Mesmo nome de usuário em mais de uma linha do arquivo"
+
+msgid "Same email on more than one line of the file"
+msgstr "Mesmo e-mail em mais de uma linha do arquivo"
+
+msgid "Username already registered"
+msgstr "Nome de usuário já cadastrado"
+
+msgid "Username already registered (differs only by leading zeros)"
+msgstr "Nome de usuário já cadastrado (difere apenas por zeros à esquerda)"
+
+msgid "Email already registered"
+msgstr "E-mail já cadastrado"
+
+msgid "Existing user is inactive; nothing was changed"
+msgstr "O usuário existente está inativo; nada foi alterado"
+
+msgid "Matches more than one existing user"
+msgstr "Corresponde a mais de um usuário existente"
+
+msgid "Invalid email"
+msgstr "E-mail inválido"
+
+msgid "Invalid password"
+msgstr "Senha inválida"
+
+msgid "Role does not exist"
+msgstr "A função não existe"
+
+msgid "Role is not allowed"
+msgstr "A função não é permitida"
+
+msgid "Name must have first and last name"
+msgstr "O nome precisa ter nome e sobrenome"
+
+msgid "Invalid username"
+msgstr "Nome de usuário inválido"
+
+msgid "Error while creating the user"
+msgstr "Erro ao criar o usuário"
+
+msgid "Unrecognized reason: %s"
+msgstr "Motivo não reconhecido: %s"
+
+msgid "Numeric usernames in XLSX may have lost leading zeros. Prefer CSV."
+msgstr "Nomes de usuário numéricos em XLSX podem ter perdido os zeros à esquerda. Prefira CSV."
+
+msgid "Warning: %s"
+msgstr "Aviso: %s"
+
+msgid "Existing username: %s"
+msgstr "Nome de usuário existente: %s"
+
+msgid "Lines: %s"
+msgstr "Linhas: %s"
+
+msgid "Password differs from the file (accents removed)"
+msgstr "A senha difere da do arquivo (acentos removidos)"
+
+msgid "Reason code"
+msgstr "Código do motivo"
+
+msgid "Reason"
+msgstr "Motivo"
+
+msgid "Only .csv and .xlsx files are accepted."
+msgstr "Somente arquivos .csv e .xlsx são aceitos."
+
+msgid "Import finished: %s users created."
+msgstr "Importação concluída: %s usuários criados."
+
+msgid "Upload a CSV or XLSX file with the columns NAME, USERNAME, PASSWORD and EMAIL. Nothing is created until you review the preview."
+msgstr "Envie um arquivo CSV ou XLSX com as colunas NOME, USUÁRIO, SENHA e E-MAIL. Nada é criado até você revisar a pré-visualização."
+
+msgid "Default role"
+msgstr "Função padrão"
+
+msgid "Select a role"
+msgstr "Selecione uma função"
+
+msgid "Lines marked as existing or held will not be changed. Held lines need to be fixed in the file and imported again."
+msgstr "Linhas marcadas como existentes ou retidas não serão alteradas. As linhas retidas precisam ser corrigidas no arquivo e importadas novamente."
+
+msgid "To confirm, type the number of users that will be created (%s)"
+msgstr "Para confirmar, digite o número de usuários que serão criados (%s)"
+
+msgid "Number of users to create"
+msgstr "Número de usuários a criar"
+
+msgid "Download report (CSV)"
+msgstr "Baixar relatório (CSV)"
+
+msgid "Import users"
+msgstr "Importar usuários"
+
+msgid "Invalid file extension; use .csv or .xlsx"
+msgstr "Extensão de arquivo inválida; use .csv ou .xlsx"
+
+msgid "Required columns are missing"
+msgstr "Há colunas obrigatórias ausentes"
+
+msgid "The file is too large"
+msgstr "O arquivo é grande demais"
+
+msgid "The file has no data rows"
+msgstr "O arquivo não tem linhas de dados"
+
+msgid "The file encoding could not be recognized"
+msgstr "Não foi possível reconhecer a codificação do arquivo"
+
+msgid "The file exceeds the row limit"
+msgstr "O arquivo excede o limite de linhas"
+
+msgid "The file could not be read"
+msgstr "Não foi possível ler o arquivo"
+
+msgid "The CSRF token is missing."
+msgstr "O token CSRF está ausente."
+
+msgid "The CSRF token is invalid."
+msgstr "O token CSRF é inválido."
+
+msgid "Unexpected error while importing users"
+msgstr "Erro inesperado ao importar usuários"
+
+msgid "Request MIME type is not 'multipart/form-data'"
+msgstr "O tipo MIME da requisição não é 'multipart/form-data'"
+
+msgid "default_role is required"
+msgstr "default_role é obrigatório"
+
+msgid "dry_run must be true or false"
+msgstr "dry_run deve ser true ou false"
+
+msgid "The default role is not allowed"
+msgstr "A função padrão não é permitida"
+
+msgid "The file is required"
+msgstr "O arquivo é obrigatório"
+
+msgid "Invalid or expired plan; redo the preview"
+msgstr "Plano inválido ou expirado; refaça a pré-visualização"
+
+msgid "The default role does not exist"
+msgstr "A função padrão não existe"
+
+msgid "Content-Length is required"
+msgstr "O cabeçalho Content-Length é obrigatório"
+
+msgid "A cell exceeds the maximum length"
+msgstr "Uma célula excede o tamanho máximo"
+
+msgid "Name is too long"
+msgstr "O nome é muito longo"
+
+msgid "Import finished, but no users were created."
+msgstr "Importação concluída, mas nenhum usuário foi criado."
+
+msgid "Import finished: %s users created, %s lines failed."
+msgstr "Importação concluída: %s usuários criados, %s linhas com falha."
