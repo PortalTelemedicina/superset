@@ -137,7 +137,9 @@ def _decode_csv(content: bytes) -> str:
     try:
         return content.decode("cp1252")
     except UnicodeDecodeError as ex:
-        raise ParseError(ERRO_ENCODING, "Codificação do arquivo não reconhecida") from ex
+        raise ParseError(
+            ERRO_ENCODING, "Codificação do arquivo não reconhecida"
+        ) from ex
 
 
 def _detect_delimiter(text: str) -> str:
@@ -155,7 +157,9 @@ def _detect_delimiter(text: str) -> str:
 
 def parse_csv(content: bytes, max_rows: int = DEFAULT_MAX_ROWS) -> ParsedFile:
     text = _decode_csv(content)
-    reader = csv.reader(io.StringIO(text, newline=""), delimiter=_detect_delimiter(text))
+    reader = csv.reader(
+        io.StringIO(text, newline=""), delimiter=_detect_delimiter(text)
+    )
     mapping: Optional[dict[str, int]] = None
     rows: list[RawRow] = []
     previous_end = 0
@@ -169,7 +173,9 @@ def parse_csv(content: bytes, max_rows: int = DEFAULT_MAX_ROWS) -> ParsedFile:
                 mapping = _map_header(cells)
                 continue
             if len(rows) >= max_rows:
-                raise ParseError(ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas")
+                raise ParseError(
+                    ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas"
+                )
             rows.append(_build_row(start, cells, mapping))
     except csv.Error as ex:
         raise ParseError(ERRO_ILEGIVEL, "Arquivo CSV ilegível") from ex
@@ -185,7 +191,9 @@ def _check_zip(content: bytes, max_uncompressed: int) -> None:
             if len(infos) > XLSX_MAX_ENTRIES:
                 raise ParseError(ERRO_ILEGIVEL, "Arquivo XLSX inválido")
             if sum(i.file_size for i in infos) > max_uncompressed:
-                raise ParseError(ERRO_LIMITE_BYTES, "Arquivo XLSX descomprimido grande demais")
+                raise ParseError(
+                    ERRO_LIMITE_BYTES, "Arquivo XLSX descomprimido grande demais"
+                )
     except zipfile.BadZipFile as ex:
         raise ParseError(ERRO_ILEGIVEL, "Arquivo XLSX ilegível") from ex
 
@@ -201,7 +209,7 @@ def _xlsx_text(value: Any) -> tuple[str, bool]:
     return ("" if value is None else str(value)), False
 
 
-def parse_xlsx(
+def parse_xlsx(  # noqa: C901
     content: bytes,
     max_rows: int = DEFAULT_MAX_ROWS,
     max_uncompressed: int = DEFAULT_XLSX_MAX_UNCOMPRESSED,
@@ -229,22 +237,26 @@ def parse_xlsx(
             sheet.iter_rows(max_col=XLSX_MAX_COLUMNS, values_only=True), start=1
         ):
             if line > XLSX_MAX_SCAN_LINES:
-                raise ParseError(ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas")
-            cells = list(cells)
-            if not any(c is not None and str(c).strip() for c in cells):
+                raise ParseError(
+                    ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas"
+                )
+            row_cells = list(cells)
+            if not any(c is not None and str(c).strip() for c in row_cells):
                 continue
             if mapping is None:
-                mapping = _map_header(cells)
+                mapping = _map_header(row_cells)
                 continue
             if len(rows) >= max_rows:
-                raise ParseError(ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas")
+                raise ParseError(
+                    ERRO_LIMITE_LINHAS, "Arquivo acima do limite de linhas"
+                )
             username = None
             index = mapping["usuario"]
-            if index < len(cells):
-                username, numeric = _xlsx_text(cells[index])
+            if index < len(row_cells):
+                username, numeric = _xlsx_text(row_cells[index])
                 if numeric and WARNING_USERNAME_NUMERICO_XLSX not in warnings:
                     warnings.append(WARNING_USERNAME_NUMERICO_XLSX)
-            texts = [_xlsx_text(c)[0] for c in cells]
+            texts = [_xlsx_text(c)[0] for c in row_cells]
             rows.append(_build_row(line, texts, mapping, username))
     except ParseError:
         raise

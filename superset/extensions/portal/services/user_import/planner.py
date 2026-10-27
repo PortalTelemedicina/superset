@@ -133,7 +133,7 @@ class _UnionFind:
         self.parent[self.find(a)] = self.find(b)
 
 
-def _find_duplicates(rows: Sequence[_Row]) -> dict[int, tuple[str, tuple[int, ...]]]:
+def _find_duplicates(rows: Sequence[_Row]) -> dict[int, tuple[str, tuple[int, ...]]]:  # noqa: C901
     """Índice da linha -> (motivo, linhas do grupo). Só grupos com mais de uma linha."""
     by_key: dict[str, list[int]] = {}
     by_email: dict[str, list[int]] = {}
@@ -234,7 +234,7 @@ def classify_existing(
     return _db_outcome(hits, reasons, len(by_email.get(email, [])))
 
 
-def plan_import(
+def plan_import(  # noqa: C901
     rows: Sequence[RawRow],
     repo: UserRepository,
     default_role: str,
@@ -263,7 +263,11 @@ def plan_import(
 
     checked = [
         _validate_row(
-            raw, default_role, allowed_roles, role_exists, min_password_len,
+            raw,
+            default_role,
+            allowed_roles,
+            role_exists,
+            min_password_len,
             complexity_check,
         )
         for raw in rows
@@ -282,7 +286,9 @@ def plan_import(
     results: list[RowResult] = []
     for index, row in enumerate(checked):
         hits, reasons = _existing_hits(row, by_key, by_email)
-        db = _db_outcome(hits, reasons, len(by_email.get(row.email, [])) if row.email_ok else 0)
+        db = _db_outcome(
+            hits, reasons, len(by_email.get(row.email, [])) if row.email_ok else 0
+        )
 
         status = Status.CRIAR
         reason: Optional[str] = None

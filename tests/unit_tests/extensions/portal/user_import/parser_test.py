@@ -27,10 +27,10 @@ from superset.extensions.portal.services.user_import.models import (
     WARNING_USERNAME_NUMERICO_XLSX,
 )
 from superset.extensions.portal.services.user_import.parser import (
-    ParseError,
     parse_csv,
     parse_upload,
     parse_xlsx,
+    ParseError,
 )
 
 CSV = "NOME,USUÁRIO,SENHA,E-MAIL\nMARIA SILVA,01234567890,Senha1234,m@ptm.com.br\n"
@@ -105,7 +105,9 @@ def test_csv_cabecalhos_e_sinonimos(header: str) -> None:
 
 
 def test_csv_colunas_em_outra_ordem() -> None:
-    parsed = parse_csv(b"e-mail,senha,usu\xc3\xa1rio,nome\na@p.com,Senha1234,7,Ana Lima\n")
+    parsed = parse_csv(
+        b"e-mail,senha,usu\xc3\xa1rio,nome\na@p.com,Senha1234,7,Ana Lima\n"
+    )
     row = parsed.rows[0]
     assert (row.nome, row.usuario, row.email) == ("Ana Lima", "7", "a@p.com")
 
@@ -229,9 +231,10 @@ def test_xlsx_limite_de_linhas() -> None:
 def test_xlsx_zip_bomb_por_tamanho_descomprimido() -> None:
     base = _xlsx([CABECALHO_XLSX, ["A B", "1", "Senha1234", "a@p.com"]])
     buf = io.BytesIO()
-    with zipfile.ZipFile(io.BytesIO(base)) as src, zipfile.ZipFile(
-        buf, "w", zipfile.ZIP_DEFLATED
-    ) as dst:
+    with (
+        zipfile.ZipFile(io.BytesIO(base)) as src,
+        zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as dst,
+    ):
         for info in src.infolist():
             dst.writestr(info.filename, src.read(info.filename))
         dst.writestr("xl/bomba.bin", b"\0" * (21 * 1024 * 1024))

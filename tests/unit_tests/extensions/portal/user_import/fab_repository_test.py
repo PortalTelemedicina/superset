@@ -45,14 +45,14 @@ class FakeSecurityManager:
         return self.add_user_result
 
 
-KW = dict(
-    username="01234567890",
-    first_name="Maria",
-    last_name="da Silva",
-    email="m@ptm.com.br",
-    role="Gamma",
-    password="SegredoUnico77",
-)
+KW = {
+    "username": "01234567890",
+    "first_name": "Maria",
+    "last_name": "da Silva",
+    "email": "m@ptm.com.br",
+    "role": "Gamma",
+    "password": "SegredoUnico77",
+}
 
 
 def test_role_exists() -> None:
@@ -66,14 +66,14 @@ def test_create_user_passa_objeto_role_e_dados_ao_add_user() -> None:
     sm = FakeSecurityManager({"Gamma": role})
     FabUserRepository(sm).create_user(**KW)
     assert sm.calls == [
-        dict(
-            username="01234567890",
-            first_name="Maria",
-            last_name="da Silva",
-            email="m@ptm.com.br",
-            role=role,
-            password="SegredoUnico77",
-        )
+        {
+            "username": "01234567890",
+            "first_name": "Maria",
+            "last_name": "da Silva",
+            "email": "m@ptm.com.br",
+            "role": role,
+            "password": "SegredoUnico77",
+        }
     ]
 
 

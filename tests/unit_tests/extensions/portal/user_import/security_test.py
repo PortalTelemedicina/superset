@@ -17,7 +17,6 @@
 """Varredura de senha: nada que o núcleo produz pode conter a senha conhecida."""
 
 import dataclasses
-import json
 import logging
 
 import pytest
@@ -33,10 +32,11 @@ from superset.extensions.portal.services.user_import.normalize import (
     sanitize_csv_cell,
 )
 from superset.extensions.portal.services.user_import.parser import (
-    ParseError,
     parse_csv,
+    ParseError,
 )
 from superset.extensions.portal.services.user_import.planner import plan_import
+from superset.utils import json
 from tests.unit_tests.extensions.portal.user_import.fakes import FakeRepo, row, user
 
 SENHA = "Sênha#Única77"
@@ -114,11 +114,17 @@ def test_relatorio_sanitizado_nao_tem_coluna_de_senha() -> None:
         assert "senha" not in r.to_report_dict()
         assert "password" not in r.to_report_dict()
         assert set(r.to_report_dict()) <= {
-            "line", "username", "status", "reason", "existing_username",
+            "line",
+            "username",
+            "status",
+            "reason",
+            "existing_username",
         }
 
 
 def test_campos_livres_do_relatorio_podem_ser_sanitizados() -> None:
-    r = plan_import([row(2, nome="=cmd|calc", usuario="x")], FakeRepo(), "Gamma").rows[0]
+    r = plan_import([row(2, nome="=cmd|calc", usuario="x")], FakeRepo(), "Gamma").rows[
+        0
+    ]
     assert sanitize_csv_cell(r.first_name).startswith("'=")
     assert isinstance(RawRow(line=1).senha, Secret)

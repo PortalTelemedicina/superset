@@ -38,8 +38,8 @@ from tests.integration_tests.constants import ADMIN_USERNAME, GAMMA_USERNAME
 URI = "api/v1/security/users/import"
 PREFIX = "ptmimp"
 HEADER = "NOME,USUÁRIO,SENHA,E-MAIL"
-PASSWORD = "Sênha-Forte1"
-PASSWORD_NORMALIZED = "Senha-Forte1"
+PASSWORD = "Sênha-Forte1"  # noqa: S105
+PASSWORD_NORMALIZED = "Senha-Forte1"  # noqa: S105
 AUDIT_ACTION = "SupersetUserApi.import_users"
 # CPF-like: a detecção por zeros à esquerda só vale para username numérico
 ZERO_PADDED_USERNAME = "0099900011"
@@ -51,7 +51,12 @@ def _csv(*rows: tuple[str, str, str, str], header: str = HEADER) -> bytes:
 
 
 def _row(n: int, password: str = PASSWORD) -> tuple[str, str, str, str]:
-    return (f"USUARIO TESTE {n}", f"{PREFIX}{n:04d}", password, f"{PREFIX}{n}@teste.com")
+    return (
+        f"USUARIO TESTE {n}",
+        f"{PREFIX}{n:04d}",
+        password,
+        f"{PREFIX}{n}@teste.com",
+    )
 
 
 class TestUserImportApi(SupersetTestCase):
@@ -258,7 +263,12 @@ class TestUserImportApi(SupersetTestCase):
         content = _csv(
             ("Ativo Igual", f"{PREFIX}0100", PASSWORD, f"{PREFIX}x1@teste.com"),
             # mesmo CPF do existente, mas sem o zero à esquerda
-            ("Sem Zero", ZERO_PADDED_USERNAME.lstrip("0"), PASSWORD, f"{PREFIX}x2@t.com"),
+            (
+                "Sem Zero",
+                ZERO_PADDED_USERNAME.lstrip("0"),
+                PASSWORD,
+                f"{PREFIX}x2@t.com",
+            ),
             ("Inativo Igual", f"{PREFIX}0300", PASSWORD, f"{PREFIX}x3@teste.com"),
             ("Duplicado Um", f"{PREFIX}0400", PASSWORD, f"{PREFIX}x4@teste.com"),
             ("Duplicado Dois", f"{PREFIX}0400", PASSWORD, f"{PREFIX}x5@teste.com"),

@@ -73,7 +73,11 @@ def test_cria_com_dados_normalizados_e_role() -> None:
 def test_falha_numa_linha_nao_aborta_o_lote() -> None:
     repo = FakeRepo(fail_usernames={"2"})
     result = _run([row(2, usuario="1"), row(3, usuario="2"), row(4, usuario="3")], repo)
-    assert [r.status for r in result.rows] == [Status.CRIADO, Status.FALHA, Status.CRIADO]
+    assert [r.status for r in result.rows] == [
+        Status.CRIADO,
+        Status.FALHA,
+        Status.CRIADO,
+    ]
     assert result.rows[1].reason == Reason.ERRO_CRIACAO
     assert len(repo.created) == 2
 
@@ -85,8 +89,14 @@ def test_excecao_inesperada_tambem_nao_aborta() -> None:
                 raise RuntimeError("boom")
             super().create_user(**kwargs)
 
-    result = _run([row(2, usuario="1"), row(3, usuario="2"), row(4, usuario="3")], Quebrado())
-    assert [r.status for r in result.rows] == [Status.CRIADO, Status.FALHA, Status.CRIADO]
+    result = _run(
+        [row(2, usuario="1"), row(3, usuario="2"), row(4, usuario="3")], Quebrado()
+    )
+    assert [r.status for r in result.rows] == [
+        Status.CRIADO,
+        Status.FALHA,
+        Status.CRIADO,
+    ]
 
 
 def test_corrida_vira_ja_existe_por_releitura() -> None:

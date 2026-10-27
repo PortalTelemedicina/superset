@@ -64,7 +64,9 @@ class FakeRepo:
         self.users.append(ExistingUser(username, kwargs["email"], True))
 
 
-def user(username: str, email: Optional[str] = None, active: bool = True) -> ExistingUser:
+def user(
+    username: str, email: Optional[str] = None, active: bool = True
+) -> ExistingUser:
     return ExistingUser(username, email, active)
 
 

@@ -312,7 +312,7 @@ class UserImportApiMixin:
         response.headers["Cache-Control"] = "no-store"
         return response
 
-    def _ptm_user_import_run(self, audit: dict[str, Any]) -> Response:
+    def _ptm_user_import_run(self, audit: dict[str, Any]) -> Response:  # noqa: C901
         config = current_app.config
         if not is_feature_enabled("PTM_USER_IMPORT"):
             return self.response_404()
@@ -383,6 +383,9 @@ class UserImportApiMixin:
 
         secret_key = config["SECRET_KEY"]
         user_id = get_user_id()
+        if user_id is None:
+            audit["error"] = "unauthenticated"
+            return self.response(401, message=__("Not authenticated"))
         ttl = int(config["PTM_USER_IMPORT_PLAN_TTL_SECONDS"])
         options: dict[str, Any] = {
             "allowed_roles": allowed_roles,

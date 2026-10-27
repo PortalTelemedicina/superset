@@ -70,7 +70,7 @@ def normalize_name(raw: Optional[str]) -> str:
 
 
 def split_name(full_name: str) -> Optional[tuple[str, str]]:
-    """first_name é o primeiro token; None se houver um token só (FAB exige last_name)."""
+    """first_name é o primeiro token; None se houver um só (FAB exige last_name)."""
     tokens = full_name.split()
     if len(tokens) < 2:
         return None

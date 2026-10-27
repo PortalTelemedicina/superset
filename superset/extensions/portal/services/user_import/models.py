@@ -97,7 +97,7 @@ class Reason:
 
 WARNING_USERNAME_NUMERICO_XLSX = "username_numerico_xlsx"
 
-# Limites reais das colunas do FAB (User.first_name/last_name 64, username 128, email 320)
+# Limites reais das colunas do FAB (first_name/last_name 64, username 128, email 320)
 MAX_USERNAME_LEN = 128
 MAX_NAME_PART_LEN = 64
 MAX_EMAIL_LEN = 320
@@ -248,7 +248,7 @@ class UserCreationError(Exception):
     """Falha genérica na gravação; nunca carrega valores do usuário."""
 
 
-class InvalidDefaultRole(ValueError):
+class InvalidDefaultRole(ValueError):  # noqa: N818
     """Role padrão inexistente ou barrada. `reason` é um código de Reason."""
 
     def __init__(self, reason: str) -> None:

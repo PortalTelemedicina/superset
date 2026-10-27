@@ -109,7 +109,17 @@ def test_senha_ascii_nao_e_marcada_como_normalizada() -> None:
 
 @pytest.mark.parametrize(
     "raw",
-    [None, "", "curta1", "senha 😀 boa", " espaco1234", "espaco1234 ", "x" * 129, "ß-senha-12", "senha\tcom\ttab"],
+    [
+        None,
+        "",
+        "curta1",
+        "senha 😀 boa",
+        " espaco1234",
+        "espaco1234 ",
+        "x" * 129,
+        "ß-senha-12",
+        "senha\tcom\ttab",
+    ],
 )
 def test_senha_invalida(raw: object) -> None:
     result = normalize_password(raw)
@@ -130,7 +140,9 @@ def test_senha_complexidade_opcional() -> None:
     assert normalize_password("Senha1234", complexity_check=lambda p: False).reason == (
         Reason.SENHA_INVALIDA
     )
-    assert normalize_password("Senha1234", complexity_check=lambda p: True).reason is None
+    assert (
+        normalize_password("Senha1234", complexity_check=lambda p: True).reason is None
+    )
 
 
 def test_motivo_de_senha_nao_contem_a_senha() -> None:

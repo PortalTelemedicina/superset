@@ -54,7 +54,7 @@ def validate_plan_token(
     default_role: str,
     max_age: int = DEFAULT_TTL_SECONDS,
 ) -> bool:
-    """False para token ausente, adulterado, expirado ou de outro arquivo, usuário ou role."""
+    """False para token ausente, adulterado, expirado ou de outro arquivo/usuário."""
     if not token or not isinstance(token, str):
         return False
     try:

@@ -26,7 +26,9 @@ from tests.unit_tests.extensions.portal.user_import.fakes import FakeRepo, row, 
 
 
 def _plan(rows, repo=None, **kwargs):  # type: ignore[no-untyped-def]
-    return plan_import(rows, repo or FakeRepo(), kwargs.pop("default_role", "Gamma"), **kwargs)
+    return plan_import(
+        rows, repo or FakeRepo(), kwargs.pop("default_role", "Gamma"), **kwargs
+    )
 
 
 def test_linha_valida_vira_criar() -> None:
@@ -34,7 +36,11 @@ def test_linha_valida_vira_criar() -> None:
     r = plan.rows[0]
     assert r.status is Status.CRIAR
     assert r.reason is None
-    assert (r.username, r.first_name, r.last_name) == ("01234567890", "Maria", "da Silva")
+    assert (r.username, r.first_name, r.last_name) == (
+        "01234567890",
+        "Maria",
+        "da Silva",
+    )
     assert r.role == "Gamma"
     assert plan.summary.criar == 1
 
@@ -125,7 +131,10 @@ def test_duplicado_por_username_segura_todas_as_linhas() -> None:
 
 def test_duplicado_por_email_segura_todas_as_linhas() -> None:
     plan = _plan(
-        [row(2, usuario="1", email="x@ptm.com.br"), row(3, usuario="2", email="X@ptm.com.br")]
+        [
+            row(2, usuario="1", email="x@ptm.com.br"),
+            row(3, usuario="2", email="X@ptm.com.br"),
+        ]
     )
     assert [(r.status, r.reason) for r in plan.rows] == [
         (Status.SEGURADA, Reason.DUPLICADO_EMAIL)
@@ -200,8 +209,10 @@ def test_role_padrao_fora_da_allowlist_levanta() -> None:
 
 
 def test_allowlist_vazia_permite_todas_exceto_admin() -> None:
-    plan = _plan([row(2, usuario="1", role="Alpha"), row(3, usuario="2", role="sql_lab")],
-        allowed_roles=set(),)
+    plan = _plan(
+        [row(2, usuario="1", role="Alpha"), row(3, usuario="2", role="sql_lab")],
+        allowed_roles=set(),
+    )
     assert [r.status for r in plan.rows] == [Status.CRIAR, Status.CRIAR]
 
 
@@ -234,7 +245,10 @@ def test_senha_curta_e_senha_acentuada() -> None:
 
 
 def test_minimo_de_senha_configuravel() -> None:
-    assert _plan([row(2, senha="Abc12")], min_password_len=5).rows[0].status is Status.CRIAR
+    assert (
+        _plan([row(2, senha="Abc12")], min_password_len=5).rows[0].status
+        is Status.CRIAR
+    )
 
 
 def test_sem_senha_fica_segurada() -> None:
@@ -269,7 +283,9 @@ def test_determinismo_e_ordem_por_linha() -> None:
     repo = FakeRepo([user("1", "z@z.com")])
     a = _plan(rows, repo)
     b = _plan(list(rows), FakeRepo([user("1", "z@z.com")]))
-    assert [r.to_preview_dict() for r in a.rows] == [r.to_preview_dict() for r in b.rows]
+    assert [r.to_preview_dict() for r in a.rows] == [
+        r.to_preview_dict() for r in b.rows
+    ]
     assert [r.line for r in a.rows] == sorted(r.line for r in a.rows)
 
 
