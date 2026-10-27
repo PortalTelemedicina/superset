@@ -472,7 +472,8 @@ class TestUserImportApi(SupersetTestCase):
                 "default_role": "Gamma",
             },
             content_type="multipart/form-data",
-            environ_overrides={"CONTENT_LENGTH": ""},
+            # CONTENT_LENGTH vazio vira 0 no werkzeug; só chunked dá content_length None
+            environ_overrides={"HTTP_TRANSFER_ENCODING": "chunked"},
         )
         assert response.status_code == 411
 
