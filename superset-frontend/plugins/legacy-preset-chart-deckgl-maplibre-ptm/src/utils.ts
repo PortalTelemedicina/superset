@@ -74,9 +74,9 @@ export function getBreakPoints(
         ? minValue - 1
         : minValue;
 
-    return new Array(numBuckets + 1 + extraBucket)
-      .fill(0)
-      .map((_, i) => (startValue + i * delta).toFixed(precision));
+    return Array.from({ length: numBuckets + 1 + extraBucket }, (_, i) =>
+      (startValue + i * delta).toFixed(precision),
+    );
   }
 
   return formDataBreakPoints.sort(

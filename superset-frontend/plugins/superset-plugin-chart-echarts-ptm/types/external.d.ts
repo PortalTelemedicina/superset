@@ -36,11 +36,15 @@ declare module 'lodash.merge' {
 
 declare module '@superset-ui/plugin-chart-echarts/Timeseries/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Timeseries/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Timeseries/EchartsTimeseries' {
@@ -62,7 +66,12 @@ declare module '@superset-ui/plugin-chart-echarts/Timeseries/Regular/Bar/control
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Timeseries/types' {
-  import { QueryFormData, ChartProps, TimeFormatter, AxisType } from '@superset-ui/core';
+  import {
+    QueryFormData,
+    ChartProps,
+    TimeFormatter,
+    AxisType,
+  } from '@superset-ui/core';
 
   export enum OrientationType {
     Vertical = 'vertical',
@@ -79,7 +88,8 @@ declare module '@superset-ui/plugin-chart-echarts/Timeseries/types' {
     End = 'end',
   }
 
-  export type EchartsTimeseriesFormData = QueryFormData & Record<string, unknown>;
+  export type EchartsTimeseriesFormData = QueryFormData &
+    Record<string, unknown>;
   export interface EchartsTimeseriesChartProps extends ChartProps {
     formData: EchartsTimeseriesFormData;
   }
@@ -92,11 +102,15 @@ declare module '@superset-ui/plugin-chart-echarts/Timeseries/types' {
 
 declare module '@superset-ui/plugin-chart-echarts/Pie/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Pie/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Pie/EchartsPie' {
@@ -117,11 +131,15 @@ declare module '@superset-ui/plugin-chart-echarts/Pie/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Funnel/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Funnel/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Funnel/EchartsFunnel' {
@@ -142,11 +160,15 @@ declare module '@superset-ui/plugin-chart-echarts/Funnel/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Gauge/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Gauge/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Gauge/EchartsGauge' {
@@ -167,11 +189,15 @@ declare module '@superset-ui/plugin-chart-echarts/Gauge/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Radar/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Radar/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Radar/EchartsRadar' {
@@ -192,11 +218,15 @@ declare module '@superset-ui/plugin-chart-echarts/Radar/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Treemap/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Treemap/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Treemap/EchartsTreemap' {
@@ -217,11 +247,15 @@ declare module '@superset-ui/plugin-chart-echarts/Treemap/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/MixedTimeseries/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/MixedTimeseries/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/MixedTimeseries/EchartsMixedTimeseries' {
@@ -242,11 +276,15 @@ declare module '@superset-ui/plugin-chart-echarts/MixedTimeseries/controlPanel' 
 
 declare module '@superset-ui/plugin-chart-echarts/BoxPlot/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/BoxPlot/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/BoxPlot/EchartsBoxPlot' {
@@ -267,11 +305,15 @@ declare module '@superset-ui/plugin-chart-echarts/BoxPlot/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Graph/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Graph/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Graph/EchartsGraph' {
@@ -292,11 +334,15 @@ declare module '@superset-ui/plugin-chart-echarts/Graph/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/Sunburst/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Sunburst/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/Sunburst/EchartsSunburst' {
@@ -317,11 +363,15 @@ declare module '@superset-ui/plugin-chart-echarts/Sunburst/controlPanel' {
 
 declare module '@superset-ui/plugin-chart-echarts/BigNumber/BigNumberTotal/transformProps' {
   import { ChartProps } from '@superset-ui/core';
-  export default function transformProps(chartProps: ChartProps): Record<string, unknown>;
+  export default function transformProps(
+    chartProps: ChartProps,
+  ): Record<string, unknown>;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/BigNumber/BigNumberTotal/buildQuery' {
-  export default function buildQuery(formData: Record<string, unknown>): unknown;
+  export default function buildQuery(
+    formData: Record<string, unknown>,
+  ): unknown;
 }
 
 declare module '@superset-ui/plugin-chart-echarts/BigNumber/BigNumberViz' {

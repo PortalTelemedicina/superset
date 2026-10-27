@@ -197,6 +197,65 @@ async function convertPtmCharts(
 }
 
 /**
+ * Convert all eligible legacy charts on a dashboard to their PTM equivalents.
+ * Used when saving from the Properties modal with auto-convert turned on, and when
+ * duplicating a PTM-enabled dashboard. Scoped to this dashboard's own charts, so it
+ * never touches charts that belong to other dashboards.
+ */
+export async function convertPtmChartsForDashboard(
+  dashboardId: number,
+): Promise<void> {
+  try {
+    const chartsResponse = await SupersetClient.get({
+      endpoint: `/api/v1/dashboard/${dashboardId}/charts`,
+    });
+    const charts = chartsResponse.json?.result ?? [];
+    if (charts.length === 0) return;
+
+    const slices: Record<
+      string,
+      {
+        form_data?: Record<string, unknown>;
+        slice_name?: string;
+        datasource?: string | number;
+      }
+    > = {};
+    charts.forEach(
+      (chart: {
+        id: number;
+        form_data?: Record<string, unknown>;
+        params?: string;
+        slice_name?: string;
+        datasource_id?: number;
+        datasource_type?: string;
+      }) => {
+        const formData = (chart.form_data ??
+          (chart.params ? JSON.parse(chart.params) : {})) as Record<
+          string,
+          unknown
+        >;
+        slices[String(chart.id)] = {
+          form_data: {
+            ...formData,
+            datasource_id: chart.datasource_id ?? formData.datasource_id,
+            datasource_type: chart.datasource_type ?? formData.datasource_type,
+          },
+          slice_name: chart.slice_name,
+          datasource:
+            chart.datasource_id ??
+            (formData.datasource_id as number | undefined),
+        };
+      },
+    );
+
+    await convertPtmCharts(slices);
+  } catch (error) {
+    console.warn('Failed to convert PTM charts for dashboard:', error);
+    throw error;
+  }
+}
+
+/**
  * PTM dashboard save hook handler.
  *
  * IMPORTANT: chart PTM<->legacy conversion happens ONLY through explicit user intent:
@@ -310,65 +369,6 @@ export async function revertPtmChartsForDashboard(
     }
   } catch (error) {
     console.warn('Failed to revert PTM charts for dashboard:', error);
-    throw error;
-  }
-}
-
-/**
- * Convert all eligible legacy charts on a dashboard to their PTM equivalents.
- * Used when saving from the Properties modal with auto-convert turned on, and when
- * duplicating a PTM-enabled dashboard. Scoped to this dashboard's own charts, so it
- * never touches charts that belong to other dashboards.
- */
-export async function convertPtmChartsForDashboard(
-  dashboardId: number,
-): Promise<void> {
-  try {
-    const chartsResponse = await SupersetClient.get({
-      endpoint: `/api/v1/dashboard/${dashboardId}/charts`,
-    });
-    const charts = chartsResponse.json?.result ?? [];
-    if (charts.length === 0) return;
-
-    const slices: Record<
-      string,
-      {
-        form_data?: Record<string, unknown>;
-        slice_name?: string;
-        datasource?: string | number;
-      }
-    > = {};
-    charts.forEach(
-      (chart: {
-        id: number;
-        form_data?: Record<string, unknown>;
-        params?: string;
-        slice_name?: string;
-        datasource_id?: number;
-        datasource_type?: string;
-      }) => {
-        const formData = (chart.form_data ??
-          (chart.params ? JSON.parse(chart.params) : {})) as Record<
-          string,
-          unknown
-        >;
-        slices[String(chart.id)] = {
-          form_data: {
-            ...formData,
-            datasource_id: chart.datasource_id ?? formData.datasource_id,
-            datasource_type: chart.datasource_type ?? formData.datasource_type,
-          },
-          slice_name: chart.slice_name,
-          datasource:
-            chart.datasource_id ??
-            (formData.datasource_id as number | undefined),
-        };
-      },
-    );
-
-    await convertPtmCharts(slices);
-  } catch (error) {
-    console.warn('Failed to convert PTM charts for dashboard:', error);
     throw error;
   }
 }

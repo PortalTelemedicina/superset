@@ -26,67 +26,28 @@ interface EchartOptions {
   [key: string]: unknown;
 }
 
-/**
- * Schema source: https://echarts.apache.org/en/option.html
- */
-export function applyAllDefaults(
-  options: EchartOptions,
-  ptmDefaults: Record<string, unknown>,
-): EchartOptions {
-  let result = { ...options };
-
-  for (const [propertyName, defaultValue] of Object.entries(ptmDefaults)) {
-    if (defaultValue === undefined) continue;
-
-    const currentValue = result[propertyName];
-    const strategy = getMergeStrategy(propertyName);
-
-    result = applyMergeStrategy(
-      result,
-      propertyName,
-      currentValue,
-      defaultValue,
-      strategy,
-    );
-  }
-
-  return result;
-}
-
-function applyMergeStrategy(
+function mergeIntoEachArrayItem(
   options: EchartOptions,
   propertyName: string,
-  currentValue: unknown,
+  currentArray: Record<string, unknown>[],
   defaultValue: unknown,
-  strategy: MergeStrategy,
 ): EchartOptions {
-  switch (strategy) {
-    case 'merge-into-items':
-      return applyMergeIntoItems(
-        options,
-        propertyName,
-        currentValue,
-        defaultValue,
-      );
+  const defaultStyle = Array.isArray(defaultValue)
+    ? defaultValue[0]
+    : defaultValue;
 
-    case 'deep-merge':
-      return applyDeepMerge(options, propertyName, currentValue, defaultValue);
-
-    case 'set-if-missing':
-      return applySetIfMissing(
-        options,
-        propertyName,
-        currentValue,
-        defaultValue,
-      );
-
-    case 'replace':
-      return applyReplace(options, propertyName, defaultValue);
-
-    default:
-      // Unknown strategy, default to deep merge (safe fallback)
-      return applyDeepMerge(options, propertyName, currentValue, defaultValue);
+  if (!defaultStyle || typeof defaultStyle !== 'object') {
+    return options;
   }
+
+  const mergedArray = currentArray.map((item: Record<string, unknown>) =>
+    merge({}, defaultStyle as Record<string, unknown>, item),
+  );
+
+  return {
+    ...options,
+    [propertyName]: mergedArray,
+  };
 }
 
 function applyMergeIntoItems(
@@ -189,26 +150,65 @@ function applyReplace(
   };
 }
 
-function mergeIntoEachArrayItem(
+function applyMergeStrategy(
   options: EchartOptions,
   propertyName: string,
-  currentArray: Record<string, unknown>[],
+  currentValue: unknown,
   defaultValue: unknown,
+  strategy: MergeStrategy,
 ): EchartOptions {
-  const defaultStyle = Array.isArray(defaultValue)
-    ? defaultValue[0]
-    : defaultValue;
+  switch (strategy) {
+    case 'merge-into-items':
+      return applyMergeIntoItems(
+        options,
+        propertyName,
+        currentValue,
+        defaultValue,
+      );
 
-  if (!defaultStyle || typeof defaultStyle !== 'object') {
-    return options;
+    case 'deep-merge':
+      return applyDeepMerge(options, propertyName, currentValue, defaultValue);
+
+    case 'set-if-missing':
+      return applySetIfMissing(
+        options,
+        propertyName,
+        currentValue,
+        defaultValue,
+      );
+
+    case 'replace':
+      return applyReplace(options, propertyName, defaultValue);
+
+    default:
+      // Unknown strategy, default to deep merge (safe fallback)
+      return applyDeepMerge(options, propertyName, currentValue, defaultValue);
+  }
+}
+
+/**
+ * Schema source: https://echarts.apache.org/en/option.html
+ */
+export function applyAllDefaults(
+  options: EchartOptions,
+  ptmDefaults: Record<string, unknown>,
+): EchartOptions {
+  let result = { ...options };
+
+  for (const [propertyName, defaultValue] of Object.entries(ptmDefaults)) {
+    if (defaultValue === undefined) continue;
+
+    const currentValue = result[propertyName];
+    const strategy = getMergeStrategy(propertyName);
+
+    result = applyMergeStrategy(
+      result,
+      propertyName,
+      currentValue,
+      defaultValue,
+      strategy,
+    );
   }
 
-  const mergedArray = currentArray.map((item: Record<string, unknown>) =>
-    merge({}, defaultStyle as Record<string, unknown>, item),
-  );
-
-  return {
-    ...options,
-    [propertyName]: mergedArray,
-  };
+  return result;
 }

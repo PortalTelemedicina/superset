@@ -30,6 +30,8 @@ import {
   shouldDeferDailyBarZoom,
 } from '../../src/plugin/timeseries/transformHelpers/sparseTimeBarLayout';
 
+const DAY_MS = 86_400_000;
+
 describe('sparseTimeBarLayout', () => {
   const june1 = Date.UTC(2026, 5, 1);
   const june2 = Date.UTC(2026, 5, 2);
@@ -211,5 +213,3 @@ describe('sparseTimeBarLayout', () => {
     expect(result).toEqual(options);
   });
 });
-
-const DAY_MS = 86_400_000;

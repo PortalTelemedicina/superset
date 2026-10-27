@@ -26,61 +26,61 @@ const partialformData: Partial<QueryFormData> = {
 };
 
 describe('getAggFunc', () => {
-  it('returns correct function for sum', () => {
+  test('returns correct function for sum', () => {
     const aggFunc = getAggFunc('sum');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBe(10);
   });
 
-  it('returns correct function for min', () => {
+  test('returns correct function for min', () => {
     const aggFunc = getAggFunc('min');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBe(1);
   });
 
-  it('returns correct function for max', () => {
+  test('returns correct function for max', () => {
     const aggFunc = getAggFunc('max');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBe(4);
   });
 
-  it('returns correct function for mean', () => {
+  test('returns correct function for mean', () => {
     const aggFunc = getAggFunc('mean');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBe(2.5);
   });
 
-  it('returns correct function for median', () => {
+  test('returns correct function for median', () => {
     const aggFunc = getAggFunc('median');
     const result = aggFunc([1, 2, 3, 4, 5]);
     expect(result).toBe(3);
   });
 
-  it('returns correct function for variance', () => {
+  test('returns correct function for variance', () => {
     const aggFunc = getAggFunc('variance');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBeCloseTo(1.6666666666666667);
   });
 
-  it('returns correct function for deviation', () => {
+  test('returns correct function for deviation', () => {
     const aggFunc = getAggFunc('deviation');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBeCloseTo(1.29099, 5);
   });
 
-  it('returns correct function for count', () => {
+  test('returns correct function for count', () => {
     const aggFunc = getAggFunc('count');
     const result = aggFunc([1, 2, 3, 4]);
     expect(result).toBe(4);
   });
 
-  it('returns correct function for p95 (percentiles)', () => {
+  test('returns correct function for p95 (percentiles)', () => {
     const aggFunc = getAggFunc('p95');
     const result = aggFunc([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(result).toBeCloseTo(9.55, 5);
   });
 
-  it('throws an error for unsupported aggregation type', () => {
+  test('throws an error for unsupported aggregation type', () => {
     expect(() => getAggFunc('unsupported')).toThrow(
       'Unsupported aggregation type: unsupported',
     );
@@ -94,7 +94,7 @@ describe('commonLayerProps', () => {
   );
   const mockOnSelect = jest.fn();
 
-  it('returns correct props when js_tooltip is provided', () => {
+  test('returns correct props when js_tooltip is provided', () => {
     const formData = {
       ...partialformData,
       js_tooltip: 'tooltip => tooltip.content',
@@ -108,7 +108,7 @@ describe('commonLayerProps', () => {
     expect(props.onHover).toBeDefined();
   });
 
-  it('calls onHover and sets tooltip', () => {
+  test('calls onHover and sets tooltip', () => {
     const formData = { ...partialformData, js_tooltip: null } as QueryFormData;
     const props = commonLayerProps(
       formData,
@@ -125,7 +125,7 @@ describe('commonLayerProps', () => {
     });
   });
 
-  it('calls onSelect when table_filter is enabled', () => {
+  test('calls onSelect when table_filter is enabled', () => {
     const formData = {
       ...partialformData,
       table_filter: true,

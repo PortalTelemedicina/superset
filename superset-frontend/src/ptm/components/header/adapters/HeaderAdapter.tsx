@@ -157,7 +157,6 @@ export const HeaderAdapter: FC<HeaderAdapterProps> = ({
     previewMode,
     pageHeaderProps.titlePanelAdditionalItems,
     handlePreviewToggle,
-    t,
   ]);
 
   // Add "Customize header" button to right panel when in edit mode (so user can enable/edit header)
