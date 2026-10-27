@@ -14,6 +14,8 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+from typing import Any
+
 import pytest
 
 from superset.extensions.portal.services.user_import.models import (
@@ -25,7 +27,7 @@ from superset.extensions.portal.services.user_import.planner import plan_import
 from tests.unit_tests.extensions.portal.user_import.fakes import FakeRepo, row, user
 
 
-def _plan(rows, repo=None, **kwargs):  # type: ignore[no-untyped-def]
+def _plan(rows, repo=None, **kwargs):
     return plan_import(
         rows, repo or FakeRepo(), kwargs.pop("default_role", "Gamma"), **kwargs
     )
@@ -266,7 +268,7 @@ def test_sem_senha_fica_segurada() -> None:
         ({"email": "invalido"}, Reason.EMAIL_INVALIDO),
     ],
 )
-def test_validacoes_de_campo(kwargs: dict, reason: str) -> None:
+def test_validacoes_de_campo(kwargs: dict[str, Any], reason: str) -> None:
     r = _plan([row(2, **kwargs)]).rows[0]
     assert (r.status, r.reason) == (Status.SEGURADA, reason)
 

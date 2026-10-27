@@ -105,8 +105,7 @@ def _validate_row(
 
     requested = raw.role.strip()
     role = requested or default_role
-    blocked = role_blocker(role, allowed_roles)
-    if blocked:
+    if blocked := role_blocker(role, allowed_roles):
         problems.append(blocked)
     elif not role_exists(role):
         problems.append(Reason.ROLE_INVALIDA)
@@ -247,8 +246,7 @@ def plan_import(  # noqa: C901
     Gera o plano sem gravar nada. Determinístico: mesmas linhas e mesmo banco
     dão o mesmo plano. Levanta InvalidDefaultRole se a role padrão não servir.
     """
-    blocked = role_blocker(default_role, allowed_roles)
-    if blocked:
+    if blocked := role_blocker(default_role, allowed_roles):
         raise InvalidDefaultRole(blocked)
 
     role_cache: dict[str, bool] = {}

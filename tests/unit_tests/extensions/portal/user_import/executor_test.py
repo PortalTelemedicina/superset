@@ -21,7 +21,7 @@ from superset.extensions.portal.services.user_import.models import Reason, Statu
 from tests.unit_tests.extensions.portal.user_import.fakes import FakeRepo, row, user
 
 
-def _run(rows, repo, **kwargs):  # type: ignore[no-untyped-def]
+def _run(rows, repo, **kwargs):
     return execute_import(rows, repo, "Gamma", **kwargs)
 
 
@@ -122,7 +122,7 @@ def test_releitura_que_falha_vira_falha() -> None:
         def create_user(self, **kwargs: str) -> None:
             raise RuntimeError("x")
 
-        def find_by_username_keys(self, keys):  # type: ignore[no-untyped-def]
+        def find_by_username_keys(self, keys):
             if self.create_attempts:
                 raise RuntimeError("db fora")
             return super().find_by_username_keys(keys)
@@ -161,7 +161,7 @@ def test_resultado_nao_guarda_senha() -> None:
     assert all(r.password is None for r in result.rows)
 
 
-def test_log_de_falha_nao_vaza_senha(caplog) -> None:  # type: ignore[no-untyped-def]
+def test_log_de_falha_nao_vaza_senha(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     repo = FakeRepo(fail_usernames={"1"})
     _run([row(2, usuario="1", senha="SegredoUnico77")], repo)

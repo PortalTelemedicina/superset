@@ -16,6 +16,7 @@
 # under the License.
 import io
 import zipfile
+from collections.abc import Sequence
 
 import pytest
 from openpyxl import Workbook
@@ -37,7 +38,7 @@ CSV = "NOME,USUÁRIO,SENHA,E-MAIL\nMARIA SILVA,01234567890,Senha1234,m@ptm.com.b
 CABECALHO_XLSX = ["NOME", "USUARIO", "SENHA", "EMAIL"]
 
 
-def _xlsx(rows: list[list[object]]) -> bytes:
+def _xlsx(rows: Sequence[Sequence[object]]) -> bytes:
     wb = Workbook()
     ws = wb.active
     for r in rows:

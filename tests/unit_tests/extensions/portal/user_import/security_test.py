@@ -66,7 +66,7 @@ def test_secret_nao_vaza_em_nenhuma_representacao() -> None:
     _varrer(repr([s]) + repr({"k": s}))
 
 
-def test_rawrow_e_plano_nao_vazam_em_repr_str_asdict_json(caplog) -> None:  # type: ignore[no-untyped-def]
+def test_rawrow_e_plano_nao_vazam_em_repr_str_asdict_json(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     parsed = parse_csv(CSV.encode("utf-8"))
     repo = FakeRepo([user("3", "x@x.com")])
@@ -78,15 +78,15 @@ def test_rawrow_e_plano_nao_vazam_em_repr_str_asdict_json(caplog) -> None:  # ty
     assert any(r.password is not None for r in plan.rows)
     _varrer(_tudo_como_texto(plan))
     _varrer(_tudo_como_texto(plan.summary))
-    for r in plan.rows:
-        _varrer(_tudo_como_texto(r))
-        _varrer(json.dumps(r.to_preview_dict()))
-        _varrer(json.dumps(r.to_report_dict()))
+    for linha in plan.rows:
+        _varrer(_tudo_como_texto(linha))
+        _varrer(json.dumps(linha.to_preview_dict()))
+        _varrer(json.dumps(linha.to_report_dict()))
     _varrer(json.dumps({"rows": [r.to_preview_dict() for r in plan.rows]}))
     _varrer(caplog.text)
 
 
-def test_execucao_com_falha_nao_vaza_em_saida_nem_log(caplog) -> None:  # type: ignore[no-untyped-def]
+def test_execucao_com_falha_nao_vaza_em_saida_nem_log(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     repo = FakeRepo(fail_usernames={"002"}, race_usernames={"003"})
     result = execute_import(parse_csv(CSV.encode()).rows, repo, "Gamma")
