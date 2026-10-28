@@ -27,7 +27,7 @@ import { SupersetPluginChartEchartsPtm } from '../src';
  * properly transform the data and/or any resulting props).
  */
 describe('superset-plugin-chart-echarts-ptm', () => {
-  it('exists', () => {
+  test('exists', () => {
     expect(SupersetPluginChartEchartsPtm).toBeDefined();
   });
 });

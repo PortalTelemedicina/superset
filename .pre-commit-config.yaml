@@ -45,6 +45,19 @@ repos:
         name: mypy (superset-extensions-cli)
         args: [--check-untyped-defs]
         files: ^superset-extensions-cli/
+        additional_dependencies: [
+            types-cachetools,
+            types-simplejson,
+            types-python-dateutil,
+            types-requests,
+            types-redis==4.6.0.4,
+            types-pytz,
+            types-croniter,
+            types-PyYAML,
+            types-setuptools,
+            types-paramiko,
+            types-Markdown,
+          ]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

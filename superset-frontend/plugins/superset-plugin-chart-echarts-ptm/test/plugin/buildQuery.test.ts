@@ -18,7 +18,7 @@
  */
 
 describe('SupersetPluginChartEchartsPtm buildQuery', () => {
-  it('should be implemented', () => {
+  test('should be implemented', () => {
     // PTM uses the shared buildQuery from plugin-chart-echarts
     expect(true).toBe(true);
   });

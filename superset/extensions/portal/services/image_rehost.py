@@ -142,7 +142,9 @@ class ImageRehostService:
         # Ensure bucket has IAM policy: allUsers with role Storage Object Viewer
         public_url = f"https://storage.googleapis.com/{bucket_name}/{blob_path}"
 
-        current_app.logger.info(f"Uploaded image to GCP: {blob_path} -> {public_url}")
+        current_app.logger.info(
+            "Uploaded image to GCP: %s -> %s", blob_path, public_url
+        )
         return public_url, blob_path
 
     @staticmethod

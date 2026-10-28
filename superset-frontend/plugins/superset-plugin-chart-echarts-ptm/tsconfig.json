@@ -10,7 +10,11 @@
     "lib",
     "esm",
     "test",
-    "node_modules"
+    "node_modules",
+    "../plugin-chart-table/src/**/*.test.*",
+    "../plugin-chart-table/src/**/*.stories.*",
+    "../plugin-chart-pivot-table/src/**/*.test.*",
+    "../plugin-chart-pivot-table/src/**/*.stories.*"
   ],
   "include": [
     "src/**/*",

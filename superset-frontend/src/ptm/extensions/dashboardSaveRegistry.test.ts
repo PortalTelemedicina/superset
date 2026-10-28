@@ -17,6 +17,13 @@
  * under the License.
  */
 
+import { SupersetClient } from '@superset-ui/core';
+import {
+  ptmDashboardSaveHook,
+  convertPtmChartsForDashboard,
+  revertPtmChartsForDashboard,
+} from './dashboardSaveRegistry';
+
 jest.mock('@superset-ui/core', () => ({
   SupersetClient: { get: jest.fn(), put: jest.fn() },
   getExtensionsRegistry: jest.fn(() => ({ set: jest.fn() })),
@@ -25,13 +32,6 @@ jest.mock('@superset-ui/core', () => ({
 jest.mock('../config/featureFlags', () => ({
   isPtmExtensionEnabled: () => true,
 }));
-
-import { SupersetClient } from '@superset-ui/core';
-import {
-  ptmDashboardSaveHook,
-  convertPtmChartsForDashboard,
-  revertPtmChartsForDashboard,
-} from './dashboardSaveRegistry';
 
 const mockGet = SupersetClient.get as unknown as jest.Mock;
 const mockPut = SupersetClient.put as unknown as jest.Mock;
@@ -153,7 +153,11 @@ describe('ptmDashboardSaveHook (no chart changes on routine saves)', () => {
 
 describe('convertPtmChartsForDashboard', () => {
   test('converts only legacy charts with a PTM equivalent', async () => {
-    setupClient([legacyChart(1, 'table'), ptmChart(2), legacyChart(3, 'table')]);
+    setupClient([
+      legacyChart(1, 'table'),
+      ptmChart(2),
+      legacyChart(3, 'table'),
+    ]);
     await convertPtmChartsForDashboard(100);
 
     const endpoints = putEndpoints().sort();

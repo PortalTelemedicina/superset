@@ -18,7 +18,7 @@
  */
 
 describe('SupersetPluginChartEchartsPtm transformProps', () => {
-  it('should be implemented', () => {
+  test('should be implemented', () => {
     // PTM uses wrapTransformProps from shared module
     expect(true).toBe(true);
   });
