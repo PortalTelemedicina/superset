@@ -16982,3 +16982,54 @@ msgstr "Importação concluída, mas nenhum usuário foi criado."
 
 msgid "Import finished: %s users created, %s lines failed."
 msgstr "Importação concluída: %s usuários criados, %s linhas com falha."
+
+msgid "Are you sure you want to delete the selected queries?"
+msgstr "Tem certeza que deseja remover as consultas selecionadas ?"
+
+msgid "Copy query URL"
+msgstr "Copiar URL da consulta"
+
+msgid "Delete query"
+msgstr "Excluir consulta"
+
+msgid "Edit query"
+msgstr "Editar consulta"
+
+msgid "Export query"
+msgstr "Exportar consulta"
+
+msgid "Link Copied!"
+msgstr "Link copiado!"
+
+msgid "There was an issue deleting the selected queries: %s"
+msgstr "Houve um problema ao excluir as consultas selecionadas: %s"
+
+msgid "queries"
+msgstr "consultas"
+
+msgid "Build"
+msgstr "Construir"
+
+msgid "SHA"
+msgstr "SHA"
+
+msgid "Loading"
+msgstr "Carregando"
+
+msgid "Emit Filter Events"
+msgstr "Emitir eventos de filtro"
+
+msgid "Multiple filtering"
+msgstr "Filtragem múltipla"
+
+msgid "Whether to apply filter when items are clicked"
+msgstr "Se o filtro deve ser aplicado quando os itens são clicados"
+
+msgid "Allow sending multiple polygons as a filter event"
+msgstr "Permitir o envio de vários polígonos como um evento de filtro"
+
+msgid "Pick a set of deck.gl charts to layer on top of one another"
+msgstr "Escolha um conjunto de gráficos deck.gl para colocar em camadas uns sobre os outros"
+
+msgid "deck.gl charts"
+msgstr "gráficos do deck.gl"

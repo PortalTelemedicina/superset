@@ -900,4 +900,23 @@ ADDITIONS: dict[str, str | list[str]] = {
     "Name is too long": "O nome é muito longo",
     "Import finished, but no users were created.": "Importação concluída, mas nenhum usuário foi criado.",
     "Import finished: %s users created, %s lines failed.": "Importação concluída: %s usuários criados, %s linhas com falha.",
+    # Traduções da 6.0 cujo msgid saiu do catálogo da 6.1, mas que o código ainda usa
+    "Are you sure you want to delete the selected queries?": "Tem certeza que deseja remover as consultas selecionadas ?",
+    "Copy query URL": "Copiar URL da consulta",
+    "Delete query": "Excluir consulta",
+    "Edit query": "Editar consulta",
+    "Export query": "Exportar consulta",
+    "Link Copied!": "Link copiado!",
+    "There was an issue deleting the selected queries: %s": "Houve um problema ao excluir as consultas selecionadas: %s",
+    "queries": "consultas",
+    "Build": "Construir",
+    "SHA": "SHA",
+    "Loading": "Carregando",
+    # Plugin deck.gl do PTM (legacy-preset-chart-deckgl-maplibre-ptm)
+    "Emit Filter Events": "Emitir eventos de filtro",
+    "Multiple filtering": "Filtragem múltipla",
+    "Whether to apply filter when items are clicked": "Se o filtro deve ser aplicado quando os itens são clicados",
+    "Allow sending multiple polygons as a filter event": "Permitir o envio de vários polígonos como um evento de filtro",
+    "Pick a set of deck.gl charts to layer on top of one another": "Escolha um conjunto de gráficos deck.gl para colocar em camadas uns sobre os outros",
+    "deck.gl charts": "gráficos do deck.gl",
 }
