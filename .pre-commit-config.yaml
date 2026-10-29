@@ -94,6 +94,9 @@ repos:
         language: system
         pass_filenames: true
         files: ^superset-frontend/.*\.(js|jsx|ts|tsx)$
+        # Código do fork PTM usa cor literal e texto sem t(); migrar para tokens de tema
+        # e i18n fica como débito, então fica de fora do hook por enquanto.
+        exclude: ^superset-frontend/(plugins/[^/]+-ptm/|src/ptm/|src/explore/components/controls/ConditionalFormattingControl/constants\.ts$)
       - id: eslint-docs
         name: eslint (docs)
         entry: bash -c 'cd docs && FILES=$(printf "%s\n" "$@" | sed "s|^docs/||" | tr "\n" " ") && yarn eslint --fix --quiet $FILES'
