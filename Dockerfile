@@ -231,6 +231,12 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
 # Install the superset package
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     uv pip install -e .
+
+# Driver do Postgres: o banco de metadados do PTM é sempre Postgres, então isso precisa
+# estar no estagio lean (herdado por ci/showtime) e nao so no dev/ci, senao qualquer build
+# que caia no showtime sobe sem o driver e quebra a conexao com o banco.
+RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
+    uv pip install .[postgres]
 RUN python -m compileall /app/superset
 
 USER superset
@@ -270,7 +276,7 @@ USER superset
 ######################################################################
 FROM lean AS ci
 USER root
-RUN uv pip install .[postgres,duckdb]
+RUN uv pip install .[duckdb]
 USER superset
 CMD ["/app/docker/entrypoints/docker-ci.sh"]
 
