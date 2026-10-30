@@ -94,7 +94,7 @@ COPY superset/translations /app/superset/translations
 RUN if [ "${BUILD_TRANSLATIONS}" = "true" ]; then \
         npm run build-translation; \
     fi; \
-    rm -rf /app/superset/translations/*/*/*.[po,mo];
+    rm -rf /app/superset/translations/*/*/*.po /app/superset/translations/*/*/*.mo;
 
 
 ######################################################################
@@ -136,7 +136,7 @@ COPY superset/translations/ /app/translations_mo/
 RUN if [ "${BUILD_TRANSLATIONS}" = "true" ]; then \
         pybabel compile -d /app/translations_mo | true; \
     fi; \
-    rm -f /app/translations_mo/*/*/*.[po,json]
+    rm -f /app/translations_mo/*/*/*.po /app/translations_mo/*/*/*.json
 
 ######################################################################
 # Python APP common layer
